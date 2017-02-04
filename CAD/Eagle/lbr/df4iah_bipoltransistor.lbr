@@ -203,7 +203,7 @@
 </packages>
 <symbols>
 <symbol name="NPN">
-<description>&lt;h3&gt;NPN Bipolar-Transistor&lt;/h3&gt;</description>
+<description>&lt;h3&gt;NPN Bipolar-Transistor (BJT)&lt;/h3&gt;</description>
 <wire x1="2.54" y1="2.54" x2="0.508" y2="1.524" width="0.1524" layer="94"/>
 <wire x1="1.778" y1="-1.524" x2="2.54" y2="-2.54" width="0.1524" layer="94"/>
 <wire x1="2.54" y1="-2.54" x2="1.27" y2="-2.54" width="0.1524" layer="94"/>
@@ -314,6 +314,26 @@ Reference: &lt;a href="http://www.farnell.com/datasheets/45958.pdf"&gt;http://ww
 <attribute name="MARKING" value="MCs" constant="no"/>
 <attribute name="OC_FARNELL" value="1056522" constant="no"/>
 </technology>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MMBT2222" prefix="T">
+<description>&lt;b&gt;MMBT2222L, MMBT2222AL, SMMBT2222AL&lt;/b&gt;&lt;p&gt;
+NPN, hfe=300, Ic=600mA, B=300MHz, Vce=40V, Ptot=225mW</description>
+<gates>
+<gate name="G$1" symbol="NPN" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SOT23">
+<connects>
+<connect gate="G$1" pin="B" pad="1"/>
+<connect gate="G$1" pin="C" pad="3"/>
+<connect gate="G$1" pin="E" pad="2"/>
+</connects>
+<technologies>
+<technology name="AL"/>
+<technology name="L"/>
 </technologies>
 </device>
 </devices>
