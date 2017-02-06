@@ -7454,6 +7454,97 @@ USART&lt;p&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="df4iah_opamp">
+<description>&lt;b&gt;DF4IAH Library - OP-Amps: Bipolar, FET or MOS technology&lt;/b&gt;&lt;p&gt;</description>
+<packages>
+<package name="SO08">
+<description>&lt;b&gt;Small Outline Package 8&lt;/b&gt;&lt;br&gt;
+NS Package M08A</description>
+<wire x1="2.4" y1="1.9" x2="2.4" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.4" x2="2.4" y2="-1.9" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.9" x2="-2.4" y2="-1.9" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="-1.9" x2="-2.4" y2="-1.4" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="-1.4" x2="-2.4" y2="1.9" width="0.2032" layer="51"/>
+<wire x1="-2.4" y1="1.9" x2="2.4" y2="1.9" width="0.2032" layer="51"/>
+<wire x1="2.4" y1="-1.4" x2="-2.4" y2="-1.4" width="0.2032" layer="51"/>
+<smd name="2" x="-0.635" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="7" x="-0.635" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="1" x="-1.905" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="3" x="0.635" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="4" x="1.905" y="-2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="8" x="-1.905" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="6" x="0.635" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<smd name="5" x="1.905" y="2.6" dx="0.6" dy="2.2" layer="1"/>
+<text x="-2.667" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="3.937" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<rectangle x1="-2.15" y1="-3.1" x2="-1.66" y2="-2" layer="51"/>
+<rectangle x1="-0.88" y1="-3.1" x2="-0.39" y2="-2" layer="51"/>
+<rectangle x1="0.39" y1="-3.1" x2="0.88" y2="-2" layer="51"/>
+<rectangle x1="1.66" y1="-3.1" x2="2.15" y2="-2" layer="51"/>
+<rectangle x1="1.66" y1="2" x2="2.15" y2="3.1" layer="51"/>
+<rectangle x1="0.39" y1="2" x2="0.88" y2="3.1" layer="51"/>
+<rectangle x1="-0.88" y1="2" x2="-0.39" y2="3.1" layer="51"/>
+<rectangle x1="-2.15" y1="2" x2="-1.66" y2="3.1" layer="51"/>
+</package>
+</packages>
+<symbols>
+<symbol name="TS4871__A">
+<description>&lt;b&gt;STMICROELECTRONICS  TS4871ID&lt;/b&gt;&lt;p&gt;
+Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
+<pin name="VIN_P" x="-17.78" y="2.54" length="middle" direction="pas"/>
+<pin name="VIN_N" x="-17.78" y="7.62" length="middle" direction="pas"/>
+<pin name="BYPASS" x="-17.78" y="-2.54" length="middle" direction="pas"/>
+<pin name="STANDBY" x="-17.78" y="-7.62" length="middle" direction="in"/>
+<pin name="VOUT2" x="17.78" y="-2.54" length="middle" direction="pas" rot="R180"/>
+<pin name="VOUT1" x="17.78" y="2.54" length="middle" direction="pas" rot="R180"/>
+<wire x1="-12.7" y1="10.16" x2="-12.7" y2="-10.16" width="0.4064" layer="94"/>
+<wire x1="-12.7" y1="-10.16" x2="12.7" y2="-10.16" width="0.4064" layer="94"/>
+<wire x1="12.7" y1="-10.16" x2="12.7" y2="10.16" width="0.4064" layer="94"/>
+<wire x1="12.7" y1="10.16" x2="-12.7" y2="10.16" width="0.4064" layer="94"/>
+<text x="-5.08" y="12.7" size="2.0828" layer="95" ratio="10">&gt;NAME</text>
+<text x="-5.08" y="-15.24" size="2.0828" layer="96" ratio="10">&gt;VALUE</text>
+</symbol>
+<symbol name="TS4871__B">
+<description>&lt;b&gt;STMICROELECTRONICS  TS4871ID&lt;/b&gt;&lt;p&gt;
+Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
+<pin name="VCC" x="-10.16" y="2.54" length="middle" direction="pwr"/>
+<pin name="VSS" x="-10.16" y="-2.54" length="middle" direction="pwr"/>
+<wire x1="-5.08" y1="5.08" x2="-5.08" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="-5.08" y1="-5.08" x2="5.08" y2="-5.08" width="0.4064" layer="94"/>
+<wire x1="5.08" y1="-5.08" x2="5.08" y2="5.08" width="0.4064" layer="94"/>
+<wire x1="5.08" y1="5.08" x2="-5.08" y2="5.08" width="0.4064" layer="94"/>
+<text x="-5.08" y="7.62" size="2.0828" layer="95" ratio="10">&gt;NAME</text>
+<text x="-5.08" y="-10.16" size="2.0828" layer="96" ratio="10">&gt;VALUE</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="TS4871ID" prefix="U">
+<description>&lt;b&gt;STMICROELECTRONICS  TS4871ID&lt;/b&gt;&lt;p&gt;
+Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
+<gates>
+<gate name="A" symbol="TS4871__A" x="0" y="0"/>
+<gate name="B" symbol="TS4871__B" x="0" y="-43.18"/>
+</gates>
+<devices>
+<device name="" package="SO08">
+<connects>
+<connect gate="A" pin="BYPASS" pad="2"/>
+<connect gate="A" pin="STANDBY" pad="1"/>
+<connect gate="A" pin="VIN_N" pad="4"/>
+<connect gate="A" pin="VIN_P" pad="3"/>
+<connect gate="A" pin="VOUT1" pad="5"/>
+<connect gate="A" pin="VOUT2" pad="8"/>
+<connect gate="B" pin="VCC" pad="6"/>
+<connect gate="B" pin="VSS" pad="7"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -7475,14 +7566,6 @@ USART&lt;p&gt;
 <part name="R391" library="rcl" deviceset="R-EU_" device="R0603" value="1.5kR"/>
 <part name="R392" library="rcl" deviceset="R-EU_" device="R0603" value="1.5kR"/>
 <part name="FRAME4" library="df4iah_frame" deviceset="A4L-LOC" device="" value="Holes"/>
-<part name="H402" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
-<part name="H401" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
-<part name="H403" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
-<part name="H404" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
-<part name="GND401" library="df4iah_supply" deviceset="GND" device=""/>
-<part name="GND402" library="df4iah_supply" deviceset="GND" device=""/>
-<part name="GND404" library="df4iah_supply" deviceset="GND" device=""/>
-<part name="GND403" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="X201" library="df4iah_connector" deviceset="LCD_23WAY__UC1608" device=""/>
 <part name="C201" library="rcl" deviceset="C-EU" device="C0805" value="4.7uF"/>
 <part name="C202" library="rcl" deviceset="C-EU" device="C0805" value="4.7uF"/>
@@ -7498,7 +7581,7 @@ USART&lt;p&gt;
 <part name="+3V3_101" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="C102" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
 <part name="C101" library="rcl" deviceset="C-EU" device="C0805" value="22uF"/>
-<part name="C111" library="rcl" deviceset="C-EU" device="C0805" value="100pF"/>
+<part name="C103" library="rcl" deviceset="C-EU" device="C0805" value="100pF"/>
 <part name="R101" library="rcl" deviceset="R-EU_" device="R0805" value="12kR"/>
 <part name="R121" library="rcl" deviceset="R-EU_" device="R0805" value="18kR"/>
 <part name="Q121" library="df4iah_bipoltransistor" deviceset="MMBT2222" device="" technology="AL"/>
@@ -7506,7 +7589,7 @@ USART&lt;p&gt;
 <part name="GND211" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="+3V3_201" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="+5V0_241" library="df4iah_supply" deviceset="+5V" device=""/>
-<part name="GND1" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="GND121" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="+3V3_221" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="X131" library="df4iah_connector" deviceset="HEADER-1X2" device="" value="LDR"/>
 <part name="+3V3_131" library="df4iah_supply" deviceset="+3V3" device=""/>
@@ -7518,15 +7601,39 @@ USART&lt;p&gt;
 <part name="GND151" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="R151" library="rcl" deviceset="R-EU_" device="R0805" value="330R"/>
 <part name="R152" library="rcl" deviceset="R-EU_" device="R0805" value="330R"/>
-<part name="H411" library="df4iah_holes" deviceset="MOUNT-HOLE" device="1.7"/>
-<part name="H412" library="df4iah_holes" deviceset="MOUNT-HOLE" device="1.7"/>
 <part name="U101" library="df4iah_processors" deviceset="MEGA8-P" device=""/>
-<part name="R141" library="rcl" deviceset="R-EU_" device="R0805" value="18kR"/>
-<part name="C141" library="rcl" deviceset="C-EU" device="C0805" value="100pF"/>
-<part name="GND2" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="R111" library="rcl" deviceset="R-EU_" device="R0805" value="3.3kR"/>
+<part name="C111" library="rcl" deviceset="C-EU" device="C0805" value="22nF"/>
+<part name="GND111" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="X141" library="df4iah_connector" deviceset="HEADER-2X2" device="" value="Switches"/>
 <part name="X232" library="df4iah_connector" deviceset="CON_1X" device="" value="LED_K"/>
 <part name="X231" library="df4iah_connector" deviceset="CON_1X" device="" value="LED_A"/>
+<part name="FRAME5" library="df4iah_frame" deviceset="A4L-LOC" device="" value="Holes"/>
+<part name="H501" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
+<part name="H502" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
+<part name="H504" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
+<part name="H503" library="holes" deviceset="MOUNT-PAD-ROUND" device="2.8"/>
+<part name="GND502" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="GND501" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="GND503" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="GND504" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="H511" library="df4iah_holes" deviceset="MOUNT-HOLE" device="1.7"/>
+<part name="H512" library="df4iah_holes" deviceset="MOUNT-HOLE" device="1.7"/>
+<part name="U401" library="df4iah_opamp" deviceset="TS4871ID" device=""/>
+<part name="GND401" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="+3V3_401" library="df4iah_supply" deviceset="+3V3" device=""/>
+<part name="C401" library="rcl" deviceset="C-EU" device="C0805" value="22uF"/>
+<part name="C402" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
+<part name="C411" library="rcl" deviceset="C-EU" device="C0805" value="47uF"/>
+<part name="C412" library="rcl" deviceset="C-EU" device="C0805" value="47uF"/>
+<part name="X411" library="df4iah_connector" deviceset="HEADER-2X2" device="" value="Audio"/>
+<part name="GND421" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="C431" library="rcl" deviceset="C-EU" device="C0805" value="1uF"/>
+<part name="GND431" library="df4iah_supply" deviceset="GND" device=""/>
+<part name="R451" library="rcl" deviceset="R-EU_" device="R0805" value="22kR"/>
+<part name="R454" library="rcl" deviceset="R-EU_" device="R0805" value="22kR"/>
+<part name="C455" library="rcl" deviceset="C-EU" device="C0805" value="470nF"/>
+<part name="C452" library="rcl" deviceset="C-EU" device="C0805" value="470pF"/>
 </parts>
 <sheets>
 <sheet>
@@ -7542,14 +7649,14 @@ USART&lt;p&gt;
 <instance part="+3V3_101" gate="G$1" x="63.5" y="170.18"/>
 <instance part="C102" gate="G$1" x="50.8" y="119.38"/>
 <instance part="C101" gate="G$1" x="38.1" y="119.38"/>
-<instance part="C111" gate="G$1" x="73.66" y="147.32" smashed="yes" rot="R90">
+<instance part="C103" gate="G$1" x="73.66" y="147.32" smashed="yes" rot="R90">
 <attribute name="NAME" x="67.564" y="147.701" size="1.778" layer="95"/>
 <attribute name="VALUE" x="65.024" y="145.161" size="1.778" layer="96"/>
 </instance>
 <instance part="R101" gate="G$1" x="73.66" y="154.94"/>
 <instance part="R121" gate="G$1" x="160.02" y="101.6"/>
 <instance part="Q121" gate="G$1" x="182.88" y="101.6"/>
-<instance part="GND1" gate="1" x="185.42" y="93.98"/>
+<instance part="GND121" gate="1" x="185.42" y="93.98"/>
 <instance part="X131" gate="A" x="187.96" y="165.1"/>
 <instance part="+3V3_131" gate="G$1" x="154.94" y="170.18"/>
 <instance part="R131" gate="G$1" x="167.64" y="165.1"/>
@@ -7570,12 +7677,12 @@ USART&lt;p&gt;
 <attribute name="NAME" x="106.68" y="160.02" size="1.778" layer="95"/>
 <attribute name="VALUE" x="106.68" y="91.44" size="1.778" layer="96"/>
 </instance>
-<instance part="R141" gate="G$1" x="147.32" y="81.28"/>
-<instance part="C141" gate="G$1" x="154.94" y="76.2" smashed="yes">
+<instance part="R111" gate="G$1" x="147.32" y="81.28"/>
+<instance part="C111" gate="G$1" x="154.94" y="76.2" smashed="yes">
 <attribute name="NAME" x="152.019" y="70.104" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="159.639" y="70.104" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="GND2" gate="1" x="154.94" y="68.58"/>
+<instance part="GND111" gate="1" x="154.94" y="68.58"/>
 <instance part="X141" gate="G$1" x="134.62" y="167.64"/>
 </instances>
 <busses>
@@ -7591,7 +7698,7 @@ USART&lt;p&gt;
 <net name="GND" class="0">
 <segment>
 <pinref part="Q121" gate="G$1" pin="E"/>
-<pinref part="GND1" gate="1" pin="GND"/>
+<pinref part="GND121" gate="1" pin="GND"/>
 </segment>
 <segment>
 <pinref part="C131" gate="G$1" pin="2"/>
@@ -7621,7 +7728,7 @@ USART&lt;p&gt;
 <wire x1="71.12" y1="111.76" x2="71.12" y2="114.3" width="0.1524" layer="91"/>
 <pinref part="U101" gate="G$1" pin="GND@1"/>
 <wire x1="71.12" y1="124.46" x2="86.36" y2="124.46" width="0.1524" layer="91"/>
-<pinref part="C111" gate="G$1" pin="1"/>
+<pinref part="C103" gate="G$1" pin="1"/>
 <wire x1="71.12" y1="124.46" x2="71.12" y2="147.32" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="147.32" x2="71.12" y2="149.86" width="0.1524" layer="91"/>
 <pinref part="U101" gate="G$1" pin="AGND"/>
@@ -7630,8 +7737,8 @@ USART&lt;p&gt;
 <junction x="71.12" y="124.46"/>
 </segment>
 <segment>
-<pinref part="C141" gate="G$1" pin="2"/>
-<pinref part="GND2" gate="1" pin="GND"/>
+<pinref part="C111" gate="G$1" pin="2"/>
+<pinref part="GND111" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="+3V3" class="0">
@@ -7869,7 +7976,7 @@ USART&lt;p&gt;
 </net>
 <net name="AREF" class="0">
 <segment>
-<pinref part="C111" gate="G$1" pin="2"/>
+<pinref part="C103" gate="G$1" pin="2"/>
 <wire x1="78.74" y1="147.32" x2="86.36" y2="147.32" width="0.1524" layer="91"/>
 <pinref part="U101" gate="G$1" pin="AREF"/>
 <label x="78.74" y="147.32" size="1.778" layer="95"/>
@@ -7889,18 +7996,19 @@ USART&lt;p&gt;
 <wire x1="134.62" y1="106.68" x2="139.7" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="139.7" y1="106.68" x2="139.7" y2="81.28" width="0.1524" layer="91"/>
 <label x="139.7" y="83.82" size="1.778" layer="95" rot="R90"/>
-<pinref part="R141" gate="G$1" pin="1"/>
+<pinref part="R111" gate="G$1" pin="1"/>
 <wire x1="139.7" y1="81.28" x2="142.24" y2="81.28" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="AUDIO_LP" class="0">
 <segment>
-<pinref part="R141" gate="G$1" pin="2"/>
+<pinref part="R111" gate="G$1" pin="2"/>
 <wire x1="152.4" y1="81.28" x2="154.94" y2="81.28" width="0.1524" layer="91"/>
-<pinref part="C141" gate="G$1" pin="1"/>
-<wire x1="154.94" y1="81.28" x2="160.02" y2="81.28" width="0.1524" layer="91"/>
+<pinref part="C111" gate="G$1" pin="1"/>
+<wire x1="154.94" y1="81.28" x2="167.64" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="154.94" y1="81.28" x2="154.94" y2="78.74" width="0.1524" layer="91"/>
 <junction x="154.94" y="81.28"/>
+<label x="167.64" y="81.28" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="SW_I" class="0">
@@ -8386,6 +8494,179 @@ USART&lt;p&gt;
 </nets>
 </sheet>
 <sheet>
+<description>Audio</description>
+<plain>
+<text x="192.024" y="125.476" size="2.1844" layer="97" ratio="12">Audio</text>
+</plain>
+<instances>
+<instance part="FRAME4" gate="G$1" x="0" y="0"/>
+<instance part="U401" gate="A" x="129.54" y="114.3"/>
+<instance part="U401" gate="B" x="129.54" y="48.26"/>
+<instance part="GND401" gate="1" x="109.22" y="40.64"/>
+<instance part="+3V3_401" gate="G$1" x="109.22" y="58.42"/>
+<instance part="C401" gate="G$1" x="78.74" y="48.26"/>
+<instance part="C402" gate="G$1" x="93.98" y="48.26"/>
+<instance part="C411" gate="G$1" x="162.56" y="116.84" smashed="yes" rot="R90">
+<attribute name="NAME" x="161.544" y="122.301" size="1.778" layer="95"/>
+<attribute name="VALUE" x="161.544" y="119.761" size="1.778" layer="96"/>
+</instance>
+<instance part="C412" gate="G$1" x="162.56" y="111.76" smashed="yes" rot="R90">
+<attribute name="NAME" x="161.544" y="107.061" size="1.778" layer="95"/>
+<attribute name="VALUE" x="161.544" y="104.521" size="1.778" layer="96"/>
+</instance>
+<instance part="X411" gate="G$1" x="195.58" y="134.62" smashed="yes">
+<attribute name="NAME" x="191.77" y="138.43" size="1.778" layer="95" ratio="10"/>
+</instance>
+<instance part="GND421" gate="1" x="109.22" y="101.6"/>
+<instance part="C431" gate="G$1" x="93.98" y="109.22" smashed="yes">
+<attribute name="NAME" x="87.884" y="109.601" size="1.778" layer="95"/>
+<attribute name="VALUE" x="87.884" y="104.521" size="1.778" layer="96"/>
+</instance>
+<instance part="GND431" gate="1" x="93.98" y="101.6"/>
+<instance part="R451" gate="G$1" x="129.54" y="142.24"/>
+<instance part="R454" gate="G$1" x="68.58" y="121.92"/>
+<instance part="C455" gate="G$1" x="91.44" y="121.92" smashed="yes" rot="R90">
+<attribute name="NAME" x="87.884" y="124.841" size="1.778" layer="95"/>
+<attribute name="VALUE" x="87.884" y="117.221" size="1.778" layer="96"/>
+</instance>
+<instance part="C452" gate="G$1" x="129.54" y="152.4" smashed="yes" rot="R90">
+<attribute name="NAME" x="125.984" y="155.321" size="1.778" layer="95"/>
+<attribute name="VALUE" x="125.984" y="147.701" size="1.778" layer="96"/>
+</instance>
+</instances>
+<busses>
+</busses>
+<nets>
+<net name="+3V3" class="0">
+<segment>
+<pinref part="+3V3_401" gate="G$1" pin="+3V3"/>
+<wire x1="109.22" y1="55.88" x2="109.22" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="U401" gate="B" pin="VCC"/>
+<wire x1="109.22" y1="50.8" x2="119.38" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="C402" gate="G$1" pin="1"/>
+<wire x1="109.22" y1="50.8" x2="93.98" y2="50.8" width="0.1524" layer="91"/>
+<pinref part="C401" gate="G$1" pin="1"/>
+<wire x1="93.98" y1="50.8" x2="78.74" y2="50.8" width="0.1524" layer="91"/>
+<junction x="93.98" y="50.8"/>
+<junction x="109.22" y="50.8"/>
+</segment>
+</net>
+<net name="GND" class="0">
+<segment>
+<pinref part="GND401" gate="1" pin="GND"/>
+<pinref part="U401" gate="B" pin="VSS"/>
+<wire x1="109.22" y1="43.18" x2="119.38" y2="43.18" width="0.1524" layer="91"/>
+<wire x1="119.38" y1="43.18" x2="119.38" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="109.22" y1="43.18" x2="93.98" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="C401" gate="G$1" pin="2"/>
+<wire x1="93.98" y1="43.18" x2="78.74" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="C402" gate="G$1" pin="2"/>
+<junction x="93.98" y="43.18"/>
+<junction x="109.22" y="43.18"/>
+</segment>
+<segment>
+<pinref part="GND421" gate="1" pin="GND"/>
+<wire x1="109.22" y1="104.14" x2="109.22" y2="106.68" width="0.1524" layer="91"/>
+<pinref part="U401" gate="A" pin="STANDBY"/>
+<wire x1="109.22" y1="106.68" x2="111.76" y2="106.68" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="C431" gate="G$1" pin="2"/>
+<pinref part="GND431" gate="1" pin="GND"/>
+</segment>
+</net>
+<net name="VOUT1" class="0">
+<segment>
+<pinref part="U401" gate="A" pin="VOUT1"/>
+<pinref part="C411" gate="G$1" pin="1"/>
+<wire x1="147.32" y1="116.84" x2="160.02" y2="116.84" width="0.1524" layer="91"/>
+<label x="149.86" y="116.84" size="1.778" layer="95"/>
+<wire x1="147.32" y1="116.84" x2="147.32" y2="142.24" width="0.1524" layer="91"/>
+<pinref part="R451" gate="G$1" pin="2"/>
+<wire x1="147.32" y1="142.24" x2="134.62" y2="142.24" width="0.1524" layer="91"/>
+<junction x="147.32" y="116.84"/>
+<wire x1="147.32" y1="142.24" x2="147.32" y2="152.4" width="0.1524" layer="91"/>
+<pinref part="C452" gate="G$1" pin="2"/>
+<wire x1="147.32" y1="152.4" x2="134.62" y2="152.4" width="0.1524" layer="91"/>
+<junction x="147.32" y="142.24"/>
+</segment>
+</net>
+<net name="VOUT2" class="0">
+<segment>
+<pinref part="U401" gate="A" pin="VOUT2"/>
+<pinref part="C412" gate="G$1" pin="1"/>
+<wire x1="147.32" y1="111.76" x2="160.02" y2="111.76" width="0.1524" layer="91"/>
+<label x="149.86" y="111.76" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SPK_P" class="0">
+<segment>
+<pinref part="X411" gate="G$1" pin="1"/>
+<wire x1="190.5" y1="134.62" x2="180.34" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="180.34" y1="134.62" x2="180.34" y2="116.84" width="0.1524" layer="91"/>
+<pinref part="C411" gate="G$1" pin="2"/>
+<wire x1="180.34" y1="116.84" x2="167.64" y2="116.84" width="0.1524" layer="91"/>
+<label x="170.18" y="116.84" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="SPK_N" class="0">
+<segment>
+<pinref part="C412" gate="G$1" pin="2"/>
+<wire x1="167.64" y1="111.76" x2="210.82" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="210.82" y1="111.76" x2="210.82" y2="134.62" width="0.1524" layer="91"/>
+<pinref part="X411" gate="G$1" pin="2"/>
+<wire x1="210.82" y1="134.62" x2="200.66" y2="134.62" width="0.1524" layer="91"/>
+<label x="170.18" y="111.76" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="BYPASS" class="0">
+<segment>
+<pinref part="C431" gate="G$1" pin="1"/>
+<pinref part="U401" gate="A" pin="BYPASS"/>
+<wire x1="93.98" y1="111.76" x2="109.22" y2="111.76" width="0.1524" layer="91"/>
+<label x="99.06" y="111.76" size="1.778" layer="95"/>
+<wire x1="109.22" y1="111.76" x2="111.76" y2="111.76" width="0.1524" layer="91"/>
+<junction x="109.22" y="111.76"/>
+<wire x1="109.22" y1="111.76" x2="109.22" y2="116.84" width="0.1524" layer="91"/>
+<pinref part="U401" gate="A" pin="VIN_P"/>
+<wire x1="109.22" y1="116.84" x2="111.76" y2="116.84" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="VIN_N" class="0">
+<segment>
+<pinref part="C455" gate="G$1" pin="2"/>
+<pinref part="U401" gate="A" pin="VIN_N"/>
+<wire x1="96.52" y1="121.92" x2="109.22" y2="121.92" width="0.1524" layer="91"/>
+<label x="99.06" y="121.92" size="1.778" layer="95"/>
+<pinref part="R451" gate="G$1" pin="1"/>
+<wire x1="109.22" y1="121.92" x2="111.76" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="124.46" y1="142.24" x2="109.22" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="109.22" y1="142.24" x2="109.22" y2="121.92" width="0.1524" layer="91"/>
+<junction x="109.22" y="121.92"/>
+<wire x1="109.22" y1="142.24" x2="109.22" y2="152.4" width="0.1524" layer="91"/>
+<pinref part="C452" gate="G$1" pin="1"/>
+<wire x1="109.22" y1="152.4" x2="127" y2="152.4" width="0.1524" layer="91"/>
+<junction x="109.22" y="142.24"/>
+</segment>
+</net>
+<net name="AU454" class="0">
+<segment>
+<pinref part="C455" gate="G$1" pin="1"/>
+<pinref part="R454" gate="G$1" pin="2"/>
+<wire x1="88.9" y1="121.92" x2="73.66" y2="121.92" width="0.1524" layer="91"/>
+<label x="76.2" y="121.92" size="1.778" layer="95"/>
+</segment>
+</net>
+<net name="AUDIO_LP" class="0">
+<segment>
+<pinref part="R454" gate="G$1" pin="1"/>
+<wire x1="63.5" y1="121.92" x2="53.34" y2="121.92" width="0.1524" layer="91"/>
+<label x="53.34" y="121.92" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+</nets>
+</sheet>
+<sheet>
 <description>Holes</description>
 <plain>
 <wire x1="27.94" y1="147.32" x2="228.6" y2="147.32" width="0.1524" layer="97"/>
@@ -8394,44 +8675,44 @@ USART&lt;p&gt;
 <wire x1="27.94" y1="27.94" x2="27.94" y2="147.32" width="0.1524" layer="97"/>
 </plain>
 <instances>
-<instance part="FRAME4" gate="G$1" x="0" y="0"/>
-<instance part="H402" gate="G$1" x="45.72" y="45.72"/>
-<instance part="H401" gate="G$1" x="45.72" y="132.08"/>
-<instance part="H403" gate="G$1" x="213.36" y="132.08"/>
-<instance part="H404" gate="G$1" x="213.36" y="45.72"/>
-<instance part="GND401" gate="1" x="40.64" y="124.46"/>
-<instance part="GND402" gate="1" x="40.64" y="38.1"/>
-<instance part="GND404" gate="1" x="208.28" y="38.1"/>
-<instance part="GND403" gate="1" x="208.28" y="124.46"/>
-<instance part="H411" gate="G$1" x="58.42" y="55.88"/>
-<instance part="H412" gate="G$1" x="198.12" y="53.34"/>
+<instance part="FRAME5" gate="G$1" x="0" y="0"/>
+<instance part="H501" gate="G$1" x="45.72" y="45.72"/>
+<instance part="H502" gate="G$1" x="45.72" y="132.08"/>
+<instance part="H504" gate="G$1" x="213.36" y="132.08"/>
+<instance part="H503" gate="G$1" x="213.36" y="45.72"/>
+<instance part="GND502" gate="1" x="40.64" y="124.46"/>
+<instance part="GND501" gate="1" x="40.64" y="38.1"/>
+<instance part="GND503" gate="1" x="208.28" y="38.1"/>
+<instance part="GND504" gate="1" x="208.28" y="124.46"/>
+<instance part="H511" gate="G$1" x="58.42" y="55.88"/>
+<instance part="H512" gate="G$1" x="198.12" y="53.34"/>
 </instances>
 <busses>
 </busses>
 <nets>
 <net name="GND" class="0">
 <segment>
-<pinref part="GND402" gate="1" pin="GND"/>
+<pinref part="GND501" gate="1" pin="GND"/>
 <wire x1="40.64" y1="40.64" x2="40.64" y2="45.72" width="0.1524" layer="91"/>
-<pinref part="H402" gate="G$1" pin="MOUNT"/>
+<pinref part="H501" gate="G$1" pin="MOUNT"/>
 <wire x1="40.64" y1="45.72" x2="43.18" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="GND401" gate="1" pin="GND"/>
+<pinref part="GND502" gate="1" pin="GND"/>
 <wire x1="40.64" y1="127" x2="40.64" y2="132.08" width="0.1524" layer="91"/>
-<pinref part="H401" gate="G$1" pin="MOUNT"/>
+<pinref part="H502" gate="G$1" pin="MOUNT"/>
 <wire x1="40.64" y1="132.08" x2="43.18" y2="132.08" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="GND404" gate="1" pin="GND"/>
+<pinref part="GND503" gate="1" pin="GND"/>
 <wire x1="208.28" y1="40.64" x2="208.28" y2="45.72" width="0.1524" layer="91"/>
-<pinref part="H404" gate="G$1" pin="MOUNT"/>
+<pinref part="H503" gate="G$1" pin="MOUNT"/>
 <wire x1="208.28" y1="45.72" x2="210.82" y2="45.72" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="GND403" gate="1" pin="GND"/>
+<pinref part="GND504" gate="1" pin="GND"/>
 <wire x1="208.28" y1="127" x2="208.28" y2="132.08" width="0.1524" layer="91"/>
-<pinref part="H403" gate="G$1" pin="MOUNT"/>
+<pinref part="H504" gate="G$1" pin="MOUNT"/>
 <wire x1="208.28" y1="132.08" x2="210.82" y2="132.08" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -8441,6 +8722,8 @@ USART&lt;p&gt;
 <errors>
 <approved hash="104,2,144.78,58.42,U221,VDD,+3V3,,,"/>
 <approved hash="104,2,144.78,45.72,U221,VSS,GND,,,"/>
+<approved hash="104,4,119.38,50.8,U401B,VCC,+3V3,,,"/>
+<approved hash="104,4,119.38,45.72,U401B,VSS,GND,,,"/>
 </errors>
 </schematic>
 </drawing>
