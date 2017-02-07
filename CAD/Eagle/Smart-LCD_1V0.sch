@@ -595,11 +595,17 @@ DIN A4, landscape with location and doc. field</description>
 </package>
 <package name="P1-20X0.80">
 <description>&lt;b&gt;THT contact 2mm x 0.80mm&lt;/b&gt;</description>
-<pad name="1" x="0" y="0" drill="0.35" diameter="2" shape="long"/>
-<text x="-1.27" y="2.54" size="1.27" layer="25" ratio="10">&gt;NAME</text>
-<text x="-1.27" y="-3.81" size="1.27" layer="27">&gt;VALUE</text>
-<rectangle x1="-1" y1="-0.4" x2="1" y2="0.4" layer="51"/>
-<wire x1="-1" y1="0" x2="1" y2="0" width="0.8" layer="46"/>
+<text x="-1.27" y="1.905" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="-1.27" y="-3.175" size="1.27" layer="27">&gt;VALUE</text>
+<rectangle x1="-1.27" y1="-0.508" x2="1.27" y2="0.508" layer="51"/>
+<polygon width="0.002540625" layer="46">
+<vertex x="-1.016" y="0.5"/>
+<vertex x="1.016" y="0.5" curve="-180"/>
+<vertex x="1.016" y="-0.5"/>
+<vertex x="-1.016" y="-0.5" curve="-180"/>
+</polygon>
+<smd name="1" x="0" y="0" dx="3.75" dy="1.8" layer="1" roundness="100" thermals="no" cream="no"/>
+<smd name="2" x="0" y="0" dx="3.75" dy="1.8" layer="16" roundness="100" thermals="no" cream="no"/>
 </package>
 </packages>
 <symbols>
@@ -879,7 +885,7 @@ DIN A4, landscape with location and doc. field</description>
 <devices>
 <device name="" package="P1-20X0.80">
 <connects>
-<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="1" pad="1 2"/>
 </connects>
 <technologies>
 <technology name=""/>
