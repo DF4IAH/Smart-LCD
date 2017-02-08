@@ -30,11 +30,105 @@
  */
 #include <asf.h>
 
+#if 0
+#include <compiler.h>
+#include <sysclk.h>
+#include <gpio.h>
+#include <delay.h>
+#include <adc.h>
+#endif
+
+#include "main.h"
+
+
+static uint8_t		runmode								= (uint8_t) 0;			// global runmode
+
+
+
+/* INIT section */
+
+static void s_tc_init(void)
+{
+#if 0
+	/* LCD backlight PWM signal generation */
+	struct pwm_config pwm_vctcxo_cfg;
+	pwm_init(&pwm_vctcxo_cfg, PWM_TCC0, PWM_CH_D, 500);							// Init PWM structure and enable timer
+	pwm_start(&pwm_vctcxo_cfg, 45);												// Start PWM. Percentage with 1% granularity is to coarse, use driver access instead
+	tc_write_cc_buffer(&TCC0, TC_CCD, (uint16_t) (0.5f + 65536 * 1.5f/3.3f));	// Initial value for VCTCXO @ 1.5 V
+#endif
+}
+
+static void s_tc_start(void)
+{
+#if 0
+	/* ADC clock */
+	tc_write_clock_source(&TCC0, TC_TC0_CLKSEL_DIV1_gc);						// ADC clock for LDR
+#endif
+}
+
+
+static void s_adc_init(void)
+{
+	adc_init(ADC_PRESCALER_DIV32);
+
+	irqflags_t flags = cpu_irq_save();
+	adc_set_mux(ADC_MUX_ADC0);
+	cpu_irq_restore(flags);
+}
+
+
+static void s_reset_global_vars(void)
+{
+}
+
+static void s_task(void)
+{
+	/* TASK when woken up */
+
+}
+
+void halt(void)
+{
+	/* MAIN Loop Shutdown */
+
+	runmode = 0;
+}
+
+
+
 int main (void)
 {
-	/* Insert system clock initialization code here (sysclk_init()). */
+	uint8_t retcode = 0;
+	
+	/* Init of sub-modules */
+	//pmic_init();
+	sysclk_init();
+	s_tc_init();
+	s_adc_init();
 
+	/* All interrupt sources prepared here - IRQ activation */
+	cpu_irq_enable();
+	
 	board_init();
 
+	/* Start of sub-modules */
+	s_tc_start();			// All clocks and PWM timers start here
+
 	/* Insert application code here, after the board has been initialized. */
+	 reset_cause_t rc = reset_cause_get_causes();
+	 if (rc & CHIP_RESET_CAUSE_EXTRST || 
+		 rc & CHIP_RESET_CAUSE_BOD_CPU || 
+		 rc & CHIP_RESET_CAUSE_POR) {
+		 s_reset_global_vars();
+	 }
+	 
+    while (runmode) {
+	    s_task();
+	    //sleepmgr_enter_sleep();
+    }
+    
+    cpu_irq_disable();
+    //sleepmgr_enter_sleep();
+    
+    return retcode;
 }

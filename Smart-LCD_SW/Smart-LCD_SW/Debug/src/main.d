@@ -31,7 +31,7 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/ASF/common/services/ioport/ioport.h \
  ../src/ASF/common/services/ioport/mega/ioport.h \
  ../src/ASF/mega/utils/status_codes.h \
- ../src/ASF/mega/drivers/usart/usart_mega.h
+ ../src/ASF/mega/drivers/usart/usart_mega.h ../src/main.h
 
 ../src/asf.h:
 
@@ -108,3 +108,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 ../src/ASF/mega/utils/status_codes.h:
 
 ../src/ASF/mega/drivers/usart/usart_mega.h:
+
+../src/main.h:
