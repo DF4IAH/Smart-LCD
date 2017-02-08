@@ -69,10 +69,13 @@ static void s_tc_start(void)
 
 static void s_adc_init(void)
 {
-	adc_init(ADC_PRESCALER_DIV32);
+	adc_init(ADC_PRESCALER_DIV128);
 
 	irqflags_t flags = cpu_irq_save();
-	adc_set_mux(ADC_MUX_ADC0);
+	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_LEFT);
+	//adc_set_mux(ADC_MUX_ADC0);
+	//adc_set_voltage_reference(ADC_VREF_1V1);
+	adc_set_autotrigger_source( ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
 	cpu_irq_restore(flags);
 }
 
@@ -80,6 +83,19 @@ static void s_adc_init(void)
 static void s_reset_global_vars(void)
 {
 }
+
+/* ISR routines */
+void bad_interrupt(void)
+{
+	__asm__ __volatile__ ("break" ::: "memory");
+}
+
+ISR(__vector_1)
+{
+	bad_interrupt();
+}
+
+
 
 static void s_task(void)
 {

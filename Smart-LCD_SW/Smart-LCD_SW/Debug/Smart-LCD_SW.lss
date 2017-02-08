@@ -3,33 +3,33 @@ Smart-LCD_SW.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  0000018e  2**0
+  0 .data         00000000  00800100  00800100  000001ac  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000011a  00000000  00000000  00000074  2**1
+  1 .text         00000138  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000001  00800100  00800100  0000018e  2**0
+  2 .bss          00000001  00800100  00800100  000001ac  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  0000018e  2**0
+  3 .comment      00000030  00000000  00000000  000001ac  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001c0  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001dc  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000078  00000000  00000000  00000200  2**0
+  5 .debug_aranges 00000088  00000000  00000000  0000021c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00000d31  00000000  00000000  00000278  2**0
+  6 .debug_info   00000e2a  00000000  00000000  000002a4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000099f  00000000  00000000  00000fa9  2**0
+  7 .debug_abbrev 000009ff  00000000  00000000  000010ce  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   0000118c  00000000  00000000  00001948  2**0
+  8 .debug_line   000011cd  00000000  00000000  00001acd  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000000dc  00000000  00000000  00002ad4  2**2
+  9 .debug_frame  00000108  00000000  00000000  00002c9c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00010902  00000000  00000000  00002bb0  2**0
+ 10 .debug_str    00010af5  00000000  00000000  00002da4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000001f8  00000000  00000000  000134b2  2**0
+ 11 .debug_loc    00000227  00000000  00000000  00013899  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000048  00000000  00000000  000136aa  2**0
+ 12 .debug_ranges 00000058  00000000  00000000  00013ac0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_macro  00000c0a  00000000  00000000  000136f2  2**0
+ 13 .debug_macro  00000c0a  00000000  00000000  00013b18  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -37,7 +37,7 @@ Disassembly of section .text:
 00000000 <__vectors>:
    0:	33 c0       	rjmp	.+102    	; 0x68 <__ctors_end>
    2:	00 00       	nop
-   4:	4c c0       	rjmp	.+152    	; 0x9e <__bad_interrupt>
+   4:	67 c0       	rjmp	.+206    	; 0xd4 <__vector_1>
    6:	00 00       	nop
    8:	4a c0       	rjmp	.+148    	; 0x9e <__bad_interrupt>
    a:	00 00       	nop
@@ -100,7 +100,7 @@ Disassembly of section .text:
   74:	11 e0       	ldi	r17, 0x01	; 1
   76:	a0 e0       	ldi	r26, 0x00	; 0
   78:	b1 e0       	ldi	r27, 0x01	; 1
-  7a:	ea e1       	ldi	r30, 0x1A	; 26
+  7a:	e8 e3       	ldi	r30, 0x38	; 56
   7c:	f1 e0       	ldi	r31, 0x01	; 1
   7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
   80:	05 90       	lpm	r0, Z+
@@ -122,8 +122,8 @@ Disassembly of section .text:
   94:	a1 30       	cpi	r26, 0x01	; 1
   96:	b2 07       	cpc	r27, r18
   98:	e1 f7       	brne	.-8      	; 0x92 <.do_clear_bss_loop>
-  9a:	1c d0       	rcall	.+56     	; 0xd4 <main>
-  9c:	3c c0       	rjmp	.+120    	; 0x116 <_exit>
+  9a:	27 d0       	rcall	.+78     	; 0xea <main>
+  9c:	4b c0       	rjmp	.+150    	; 0x134 <_exit>
 
 0000009e <__bad_interrupt>:
   9e:	b0 cf       	rjmp	.-160    	; 0x0 <__vectors>
@@ -199,112 +199,136 @@ void board_init(void)
 {
   d2:	08 95       	ret
 
-000000d4 <main>:
+000000d4 <__vector_1>:
+
+void halt(void)
+{
+	/* MAIN Loop Shutdown */
+
+	runmode = 0;
+  d4:	1f 92       	push	r1
+  d6:	0f 92       	push	r0
+  d8:	0f b6       	in	r0, 0x3f	; 63
+  da:	0f 92       	push	r0
+  dc:	11 24       	eor	r1, r1
+  de:	98 95       	break
+  e0:	0f 90       	pop	r0
+  e2:	0f be       	out	0x3f, r0	; 63
+  e4:	0f 90       	pop	r0
+  e6:	1f 90       	pop	r1
+  e8:	18 95       	reti
+
+000000ea <main>:
 }
 
 
 
 int main (void)
 {
-  d4:	cf 93       	push	r28
-  d6:	df 93       	push	r29
-  d8:	1f 92       	push	r1
-  da:	cd b7       	in	r28, 0x3d	; 61
-  dc:	de b7       	in	r29, 0x3e	; 62
+  ea:	cf 93       	push	r28
+  ec:	df 93       	push	r29
+  ee:	1f 92       	push	r1
+  f0:	cd b7       	in	r28, 0x3d	; 61
+  f2:	de b7       	in	r29, 0x3e	; 62
 	uint8_t retcode = 0;
 	
 	/* Init of sub-modules */
 	//pmic_init();
 	sysclk_init();
-  de:	e0 df       	rcall	.-64     	; 0xa0 <sysclk_init>
+  f4:	d5 df       	rcall	.-86     	; 0xa0 <sysclk_init>
  *
  * \param prescaler   ADC clock prescaler
  */
 static inline void adc_init(enum adc_prescaler prescaler)
 {
 	ADCSRA = (uint8_t)prescaler | (1 << ADEN);
-  e0:	85 e8       	ldi	r24, 0x85	; 133
-  e2:	80 93 7a 00 	sts	0x007A, r24	; 0x80007a <__TEXT_REGION_LENGTH__+0x7e007a>
+  f6:	87 e8       	ldi	r24, 0x87	; 135
+  f8:	80 93 7a 00 	sts	0x007A, r24	; 0x80007a <__TEXT_REGION_LENGTH__+0x7e007a>
 
 typedef uint8_t irqflags_t;
 
 static inline irqflags_t cpu_irq_save(void)
 {
 	volatile irqflags_t flags = SREG;
-  e6:	8f b7       	in	r24, 0x3f	; 63
-  e8:	89 83       	std	Y+1, r24	; 0x01
+  fc:	8f b7       	in	r24, 0x3f	; 63
+  fe:	89 83       	std	Y+1, r24	; 0x01
 	cpu_irq_disable();
-  ea:	f8 94       	cli
+ 100:	f8 94       	cli
 	return flags;
-  ec:	99 81       	ldd	r25, Y+1	; 0x01
+ 102:	99 81       	ldd	r25, Y+1	; 0x01
+ *
+ * \param regval   ADC input mux selection and voltage reference
  */
-static inline void adc_set_mux(enum adc_mux_setting input)
+static inline void adc_set_admux(uint8_t regval)
+{
+	ADMUX = regval;
+ 104:	80 ee       	ldi	r24, 0xE0	; 224
+ 106:	80 93 7c 00 	sts	0x007C, r24	; 0x80007c <__TEXT_REGION_LENGTH__+0x7e007c>
+ */
+static inline void adc_set_autotrigger_source(enum adc_auto_trigger_source trg)
 {
 	uint8_t temp;
 
-	temp = (ADMUX & ~(ADC_MUX_MASK));
-  ee:	ec e7       	ldi	r30, 0x7C	; 124
-  f0:	f0 e0       	ldi	r31, 0x00	; 0
-  f2:	80 81       	ld	r24, Z
-  f4:	80 7f       	andi	r24, 0xF0	; 240
-	/* mask out MUX5 for ADMUX. */
-	temp |= ((uint8_t)input & ADC_MUX_MASK);
-#else
-	temp |= (uint8_t)input;
-#endif
-	ADMUX = temp;
-  f6:	80 83       	st	Z, r24
+	temp = (ADC_ADTS_REG & ~(ADC_ADTS_SOURCE_MASK));
+ 10a:	eb e7       	ldi	r30, 0x7B	; 123
+ 10c:	f0 e0       	ldi	r31, 0x00	; 0
+ 10e:	80 81       	ld	r24, Z
+ 110:	88 7f       	andi	r24, 0xF8	; 248
+	temp |= (uint8_t)trg;
+ 112:	86 60       	ori	r24, 0x06	; 6
+	ADC_ADTS_REG = temp;
+ 114:	80 83       	st	Z, r24
 }
 
 static inline void cpu_irq_restore(irqflags_t flags)
 {
 	barrier();
 	SREG = flags;
-  f8:	9f bf       	out	0x3f, r25	; 63
+ 116:	9f bf       	out	0x3f, r25	; 63
 	s_tc_init();
 	s_adc_init();
 
 	/* All interrupt sources prepared here - IRQ activation */
 	cpu_irq_enable();
-  fa:	78 94       	sei
+ 118:	78 94       	sei
 	
 	board_init();
-  fc:	ea df       	rcall	.-44     	; 0xd2 <board_init>
+ 11a:	db df       	rcall	.-74     	; 0xd2 <board_init>
 //@}
 static inline reset_cause_t reset_cause_get_causes(void)
 {
 #if (MEGA_XX4 ||MEGA_XX4_A || MEGA_XX8 || MEGA_XX8_A || \
 	MEGA_XX || MEGA_XX_UN2 || MEGA_XX0_1 || MEGA_RF || MEGA_UNCATEGORIZED) && !MEGA_XX_UN0 && !MEGA_XX_UN1
 	uint8_t temp_mcsr = MCUSR ;
-  fe:	84 b7       	in	r24, 0x34	; 52
+ 11c:	84 b7       	in	r24, 0x34	; 52
 		 rc & CHIP_RESET_CAUSE_BOD_CPU || 
 		 rc & CHIP_RESET_CAUSE_POR) {
 		 s_reset_global_vars();
 	 }
 	 
     while (runmode) {
- 100:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__data_end>
- 104:	81 11       	cpse	r24, r1
- 106:	fe cf       	rjmp	.-4      	; 0x104 <main+0x30>
+ 11e:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__data_end>
+ 122:	81 11       	cpse	r24, r1
+ 124:	fe cf       	rjmp	.-4      	; 0x122 <main+0x38>
 	    s_task();
 	    //sleepmgr_enter_sleep();
     }
     
     cpu_irq_disable();
- 108:	f8 94       	cli
+ 126:	f8 94       	cli
     //sleepmgr_enter_sleep();
     
     return retcode;
 }
- 10a:	80 e0       	ldi	r24, 0x00	; 0
- 10c:	90 e0       	ldi	r25, 0x00	; 0
- 10e:	0f 90       	pop	r0
- 110:	df 91       	pop	r29
- 112:	cf 91       	pop	r28
- 114:	08 95       	ret
+ 128:	80 e0       	ldi	r24, 0x00	; 0
+ 12a:	90 e0       	ldi	r25, 0x00	; 0
+ 12c:	0f 90       	pop	r0
+ 12e:	df 91       	pop	r29
+ 130:	cf 91       	pop	r28
+ 132:	08 95       	ret
 
-00000116 <_exit>:
- 116:	f8 94       	cli
+00000134 <_exit>:
+ 134:	f8 94       	cli
 
-00000118 <__stop_program>:
- 118:	ff cf       	rjmp	.-2      	; 0x118 <__stop_program>
+00000136 <__stop_program>:
+ 136:	ff cf       	rjmp	.-2      	; 0x136 <__stop_program>
