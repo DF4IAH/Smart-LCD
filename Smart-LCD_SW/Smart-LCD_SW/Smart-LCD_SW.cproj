@@ -175,9 +175,6 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="main.c">
-      <SubType>compile</SubType>
-    </Compile>
     <None Include="src\asf.h">
       <SubType>compile</SubType>
     </None>
