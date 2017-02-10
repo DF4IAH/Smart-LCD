@@ -11,4 +11,6 @@
 #ifndef CONF_BOARD_H
 #define CONF_BOARD_H
 
+// no special variants to decide from
+
 #endif // CONF_BOARD_H

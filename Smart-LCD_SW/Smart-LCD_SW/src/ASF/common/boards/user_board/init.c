@@ -14,8 +14,94 @@
 
 void board_init(void)
 {
-	/* This function is meant to contain board-specific initialization code
-	 * for, e.g., the I/O pins. The initialization can rely on application-
-	 * specific board configuration, found in conf_board.h.
-	 */
+	
+	/* PWM */
+	ioport_set_pin_dir(AUDIO_PWM, IOPORT_DIR_OUTPUT);
+	ioport_disable_pin(AUDIO_PWM);
+
+	ioport_set_pin_dir(LCDBL_PWM, IOPORT_DIR_OUTPUT);
+	ioport_disable_pin(LCDBL_PWM);
+
+
+	/* LCD interface */
+	ioport_set_pin_dir(LCD_CD, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(LCD_CD, false);
+
+	ioport_set_pin_dir(LCD_RW, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(LCD_RW, true);
+	
+	ioport_set_pin_dir(LCD_EN, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(LCD_EN, false);
+
+	ioport_set_pin_dir(LCD_CS, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(LCD_CS, false);
+
+	ioport_set_pin_dir(LCD_RST_N, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_RST_N, false);
+	ioport_set_pin_mode(LCD_RST_N, IOPORT_MODE_PULLUP);
+	
+	ioport_set_pin_dir(LCD_D0, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D0, false);
+	ioport_set_pin_mode(LCD_D0, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D1, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D1, false);
+	ioport_set_pin_mode(LCD_D1, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D2, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D2, false);
+	ioport_set_pin_mode(LCD_D2, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D3, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D3, false);
+	ioport_set_pin_mode(LCD_D3, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D4, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D4, false);
+	ioport_set_pin_mode(LCD_D4, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D5, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D5, false);
+	ioport_set_pin_mode(LCD_D5, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D6, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D6, false);
+	ioport_set_pin_mode(LCD_D6, IOPORT_MODE_PULLDOWN);
+	
+	ioport_set_pin_dir(LCD_D7, IOPORT_DIR_INPUT);
+	ioport_set_pin_level(LCD_D7, false);
+	ioport_set_pin_mode(LCD_D7, IOPORT_MODE_PULLDOWN);
+	
+
+	/* Status LEDs */
+	ioport_set_pin_dir(LED_RD, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(LED_RD, false);
+
+	ioport_set_pin_dir(LED_GN, IOPORT_DIR_OUTPUT);
+	ioport_set_pin_level(LED_GN, false);
+
+
+	/* Contacts: Knob and Push button */
+	ioport_set_pin_dir(CNTCT_P, IOPORT_DIR_INPUT);
+	ioport_set_pin_mode(CNTCT_P, IOPORT_MODE_PULLDOWN);
+
+	ioport_set_pin_dir(CNTCT_I, IOPORT_DIR_INPUT);
+	ioport_set_pin_mode(CNTCT_I, IOPORT_MODE_PULLDOWN);
+
+	ioport_set_pin_dir(CNTCT_Q, IOPORT_DIR_INPUT);
+	ioport_set_pin_mode(CNTCT_Q, IOPORT_MODE_PULLDOWN);
+
+
+	/* ADC: LDR ambient light detection */
+	ioport_set_pin_dir(LDR_ADC, IOPORT_DIR_INPUT);
+	ioport_disable_pin(LDR_ADC);
+	
+
+	/* I2C / TWI interface */
+	ioport_set_pin_dir(SDA_GPIO, IOPORT_DIR_INPUT);
+	ioport_disable_pin(SDA_GPIO);
+
+	ioport_set_pin_dir(SCL_GPIO, IOPORT_DIR_INPUT);
+	ioport_disable_pin(SCL_GPIO);
+
 }

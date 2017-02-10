@@ -26,12 +26,12 @@
  * low pass filter of 15 kHz this results to a 10 bit DAC for audio purposes.
  */
 //@{
-#define AUDIO_PWM_GPIO                  AUDIO_CREATE_PIN(PORTB, 1)
+#define AUDIO_PWM_GPIO                  IOPORT_CREATE_PIN(PORTB, 1)
 #define AUDIO_PWM                       AUDIO_PWM_GPIO
 //@}
 
 /**
- * \name LCD backlight PWM
+ * \name LCD backlight controlled by PWM
  *
  * The backlight of the LCD panel is pulsed by a PWM signal with a frequency of
  * nearly 244 Hz. By the PWM percentage the light is dimmed, also.
@@ -64,7 +64,9 @@
 
 #define LCD_CD                          LCD_CD_GPIO
 #define LCD_WR0                         LCD_WR0_GPIO
+#define LCD_RW							LCD_WR0_GPIO
 #define LCD_WR1                         LCD_WR1_GPIO
+#define LCD_EN                          LCD_WR1_GPIO
 #define LCD_CS                          LCD_CS_GPIO
 #define LCD_RST_N                       LCD_RST_N_GPIO
 #define RESET_N                         LCD_RST_N_GPIO

@@ -11,18 +11,18 @@
 
 
 /* INIT section */
-
 static void s_tc_init(void);
 static void s_tc_start(void);
 static void s_adc_init(void);
 
 
+/* ISR */
+void bad_interrupt(void);
+
+
 /* RUNNING section */
-
 static void s_task(void);
-
 void halt(void);
-
 int main(void);
 
 
