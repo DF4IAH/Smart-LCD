@@ -506,7 +506,7 @@ static inline void adc_set_admux(uint8_t regval)
 /**
  * \brief Disable digital input buffers on ADC pin 0-7
  *
- * disable the digitial input buffer on ADC pin 0-7. This will
+ * disable the digital input buffer on ADC pin 0-7. This will
  * reduce the power consumption if you are not using the ADC pins for
  * digital IO.
  *

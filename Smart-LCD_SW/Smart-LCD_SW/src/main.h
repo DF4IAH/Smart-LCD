@@ -10,19 +10,28 @@
 #define MAIN_H_
 
 
-/* INIT section */
-static void s_tc_init(void);
-static void s_tc_start(void);
-static void s_adc_init(void);
+/* HELPERS */
+static void s_reset_global_vars(void);
+static void s_asm_break(void);
 
 
 /* ISR */
 void bad_interrupt(void);
 
 
-/* RUNNING section */
+/* INIT section */
+static void s_tc_init(void);
+static void s_tc_start(void);
+static void s_adc_init(void);
+
+
+/* TASK section */
+static void s_task_backlight(uint16_t adc);
 static void s_task(void);
 void halt(void);
+
+
+/* MAIN section */
 int main(void);
 
 
