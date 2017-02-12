@@ -29,7 +29,6 @@ static void s_asm_break(void);
 void bad_interrupt(void);
 void __vector_21__bottom(uint8_t reason, uint16_t adc_val);
 
-
 /* INIT section */
 static void s_tc_init(void);
 static void s_tc_disable(void);

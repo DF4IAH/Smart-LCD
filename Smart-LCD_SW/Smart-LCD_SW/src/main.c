@@ -44,6 +44,9 @@
 
 /* GLOBAL section */
 
+uint16_t			gi_ui16_tmp1						= 0;
+uint8_t				gi_ui8_tmp1							= 0;
+
 uint8_t				g_adc_state							= 0;
 float				g_adc_ldr							= 0.f;
 float				g_adc_ldr_last						= 0.f;
@@ -189,12 +192,12 @@ ISR(__vector_20, ISR_BLOCK)
 	bad_interrupt();
 }
 
-ISR(__vector_21, ISR_BLOCK)  // ISR_NAKED
+ISR(__vector_21, ISR_BLOCK)  // ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
 {	/* ADC */
 	uint16_t adc_val;
 	uint8_t  reason = g_adc_state;
 	
-	/* SEI part */
+	/* CLI part */
 	adc_val  = ADCL;
 	adc_val |= ADCH << 8;
 	
@@ -222,8 +225,8 @@ ISR(__vector_21, ISR_BLOCK)  // ISR_NAKED
 		g_adc_state = ADC_STATE_PRE_LDR;
 	}
 	
-	/* CLI part */
-	cli();
+	/* SEI part */
+	sei();
 	__vector_21__bottom(reason, adc_val);
 }
 
