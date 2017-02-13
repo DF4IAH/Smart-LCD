@@ -236,7 +236,7 @@ static void s_twi_init(void)
 	TWAR  = (TWI_SLAVE_ADDR    << TWA0) | (TWI_SLAVE_ADDR_GCE << TWGCE);
 	TWAMR = (TWI_SLAVE_ADDR_BM << TWAM0);
 
-	TWCR = _BV(TWEN) | _BV(TWIE);
+	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);
 
 	cpu_irq_restore(flags);
 }

@@ -19,6 +19,11 @@ enum ADC_STATES {
 	ADC_STATE__COUNT
 };
 
+enum TWI_FSM_STATUS {
+	TWI_FSM_STATUS_BLOCKING_BM = _BV(0),
+	
+};
+
 
 /* Helper functions */
 void asm_break(void);
