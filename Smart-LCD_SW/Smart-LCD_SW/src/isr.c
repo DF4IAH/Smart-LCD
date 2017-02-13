@@ -6,16 +6,24 @@
  */
 
 /**
- * \mainpage User Application template doxygen documentation
+ * \mainpage ISR
  *
- * \par Empty user application template
+ * \par Interrupt Service Routines (ISR)
  *
- * Bare minimum empty user application template
+ * The Interrupt Service Routines are global functions which are called
+ * when enabled interrupts are happening. Each routine is connected to its
+ * sub-module where the interrupt is originated.
+ *
+ * The ISR routine has always a part of code which needs to block any other
+ * interrupts to happen until this critical section is done. Often the ISR
+ * contains a second (bottom) part, that is non-critical to any new interruption
+ * and the global interrupt enable is activated again before entering this
+ * bottom part.
  *
  * \par Content
  *
  * -# Include the ASF header files (through asf.h)
- * -# Static helper functions for the ISR entry functions
+ * -# Static and global helper functions for the ISR entry functions
  * -# Interrupt Service Routine vectors
  *
  */
@@ -28,20 +36,20 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
+#include "twi.h"
 
 #include "isr.h"
 
 
+/* External vars */
+
 extern uint8_t				g_adc_state;
 extern float				g_adc_ldr;
-//extern float				g_adc_ldr_last;
 extern float				g_adc_temp;
-
-//extern float				g_temp;
-//extern float				g_temp_lcd_last;
 
 
 /* Forward declarations */
+
 static void s_bad_interrupt(void);
 
 
@@ -224,7 +232,13 @@ ISR(__vector_23, ISR_BLOCK)
 
 ISR(__vector_24, ISR_BLOCK)
 {	/* TWI */
-	s_bad_interrupt();
+	uint8_t tws = TWSR & (0b1111 << TWS4);
+	uint8_t twd = TWDR;
+	
+	/* SEI part */
+	sei();
+	__vector_24__bottom(tws, twd);
+	TWCR = _BV(TWINT);
 }
 
 ISR(__vector_25, ISR_BLOCK)

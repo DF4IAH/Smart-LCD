@@ -284,6 +284,12 @@
     <Compile Include="src\main.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\twi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\twi.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\ASF\mega\drivers\usart\usart_mega.h">
       <SubType>compile</SubType>
     </None>

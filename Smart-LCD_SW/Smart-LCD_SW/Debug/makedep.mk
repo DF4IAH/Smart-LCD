@@ -10,6 +10,8 @@ src\ASF\mega\drivers\usart\usart_mega.c
 
 src\isr.c
 
+src\twi.c
+
 src\ASF\common\boards\user_board\init.c
 
 src\main.c

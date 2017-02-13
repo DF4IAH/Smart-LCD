@@ -66,6 +66,7 @@ C_SRCS +=  \
 ../src/ASF/common/services/clock/mega/sysclk.c \
 ../src/ASF/mega/drivers/usart/usart_mega.c \
 ../src/isr.c \
+../src/twi.c \
 ../src/ASF/common/boards/user_board/init.c \
 ../src/main.c
 
@@ -81,6 +82,7 @@ src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
 src/ASF/mega/drivers/usart/usart_mega.o \
 src/isr.o \
+src/twi.o \
 src/ASF/common/boards/user_board/init.o \
 src/main.o
 
@@ -89,6 +91,7 @@ src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
 src/ASF/mega/drivers/usart/usart_mega.o \
 src/isr.o \
+src/twi.o \
 src/ASF/common/boards/user_board/init.o \
 src/main.o
 
@@ -97,6 +100,7 @@ src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
 src/ASF/mega/drivers/usart/usart_mega.d \
 src/isr.d \
+src/twi.d \
 src/ASF/common/boards/user_board/init.d \
 src/main.d
 
@@ -105,6 +109,7 @@ src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
 src/ASF/mega/drivers/usart/usart_mega.d \
 src/isr.d \
+src/twi.d \
 src/ASF/common/boards/user_board/init.d \
 src/main.d
 
@@ -122,6 +127,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

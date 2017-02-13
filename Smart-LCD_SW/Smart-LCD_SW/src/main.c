@@ -1,16 +1,17 @@
 /**
  * \file
  *
- * \brief The main-loop, init and shutdown of the application 
+ * \brief The main-loop, init and shutdown of the application
  *
  */
 
 /**
- * \mainpage User Application template doxygen documentation
+ * \mainpage Main module
  *
- * \par Empty user application template
+ * \par The main-loop, init and shutdown of the application
  *
- * Bare minimum empty user application template
+ * The Main module includes the main loop of the application. Any
+ * needed initialization and shutdown code is located here, also.
  *
  * \par Content
  *
@@ -30,6 +31,7 @@
  */
 #include <asf.h>
 #include "isr.h"
+#include "twi.h"
 
 #include "main.h"
 
@@ -226,10 +228,23 @@ static void s_twi_init(void)
 {
 	sysclk_enable_module(0, PRTWI);
 	
+	irqflags_t flags = cpu_irq_save();
+
+	TWSR = (0b00 << TWPS0);
+	TWBR = 12;	// TWI bit-rate = 400 kBit/sec @ 16 MHz when master mode active
+	
+	TWAR  = (TWI_SLAVE_ADDR    << TWA0) | (TWI_SLAVE_ADDR_GCE << TWGCE);
+	TWAMR = (TWI_SLAVE_ADDR_BM << TWAM0);
+
+	TWCR = _BV(TWEN) | _BV(TWIE);
+
+	cpu_irq_restore(flags);
 }
 
 static void s_twi_disable(void)
 {
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_restore(flags);
 
 	sysclk_disable_module(0, PRTWI);
 }
