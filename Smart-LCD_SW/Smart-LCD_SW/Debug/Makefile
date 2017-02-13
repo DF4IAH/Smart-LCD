@@ -65,6 +65,7 @@ C_SRCS +=  \
 ../src/ASF/common/services/calendar/calendar.c \
 ../src/ASF/common/services/clock/mega/sysclk.c \
 ../src/ASF/mega/drivers/usart/usart_mega.c \
+../src/isr.c \
 ../src/ASF/common/boards/user_board/init.c \
 ../src/main.c
 
@@ -79,6 +80,7 @@ OBJS +=  \
 src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
 src/ASF/mega/drivers/usart/usart_mega.o \
+src/isr.o \
 src/ASF/common/boards/user_board/init.o \
 src/main.o
 
@@ -86,6 +88,7 @@ OBJS_AS_ARGS +=  \
 src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
 src/ASF/mega/drivers/usart/usart_mega.o \
+src/isr.o \
 src/ASF/common/boards/user_board/init.o \
 src/main.o
 
@@ -93,6 +96,7 @@ C_DEPS +=  \
 src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
 src/ASF/mega/drivers/usart/usart_mega.d \
+src/isr.d \
 src/ASF/common/boards/user_board/init.d \
 src/main.d
 
@@ -100,6 +104,7 @@ C_DEPS_AS_ARGS +=  \
 src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
 src/ASF/mega/drivers/usart/usart_mega.d \
+src/isr.d \
 src/ASF/common/boards/user_board/init.d \
 src/main.d
 
@@ -117,6 +122,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
@@ -149,14 +156,14 @@ src/ASF/mega/drivers/usart/%.o: ../src/ASF/mega/drivers/usart/%.c
 	@echo Finished building: $<
 	
 
-src/ASF/common/boards/user_board/%.o: ../src/ASF/common/boards/user_board/%.c
+src/%.o: ../src/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.9.2
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -DDEBUG -DBOARD=USER_BOARD  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\include" -I"../src/ASF/common/boards/user_board" -I"../src/ASF/common/boards" -I"../src/ASF/mega/utils/preprocessor" -I"../src/ASF/mega/utils" -I"../src/ASF/common/utils" -I"../src" -I"../src/config" -I"../src/ASF/common/services/calendar" -I"../src/ASF/mega/drivers/cpu" -I"../src/ASF/common/services/clock" -I"../src/ASF/common/services/delay" -I"../src/ASF/common/services/ioport" -I"../src/ASF/mega/drivers/adc" -I"../src/ASF/mega/drivers/usart"  -O1 -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g3 -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\gcc\dev\atmega328p" -c -std=gnu99 -fno-strict-aliasing -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -mrelax -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
-src/%.o: ../src/%.c
+src/ASF/common/boards/user_board/%.o: ../src/ASF/common/boards/user_board/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.9.2
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -DDEBUG -DBOARD=USER_BOARD  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\include" -I"../src/ASF/common/boards/user_board" -I"../src/ASF/common/boards" -I"../src/ASF/mega/utils/preprocessor" -I"../src/ASF/mega/utils" -I"../src/ASF/common/utils" -I"../src" -I"../src/config" -I"../src/ASF/common/services/calendar" -I"../src/ASF/mega/drivers/cpu" -I"../src/ASF/common/services/clock" -I"../src/ASF/common/services/delay" -I"../src/ASF/common/services/ioport" -I"../src/ASF/mega/drivers/adc" -I"../src/ASF/mega/drivers/usart"  -O1 -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g3 -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\gcc\dev\atmega328p" -c -std=gnu99 -fno-strict-aliasing -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -mrelax -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

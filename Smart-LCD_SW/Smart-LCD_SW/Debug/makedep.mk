@@ -8,6 +8,8 @@ src\ASF\common\services\clock\mega\sysclk.c
 
 src\ASF\mega\drivers\usart\usart_mega.c
 
+src\isr.c
+
 src\ASF\common\boards\user_board\init.c
 
 src\main.c

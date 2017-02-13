@@ -1,0 +1,233 @@
+/**
+ * \file
+ *
+ * \brief Interrupt Service Routines (ISR)
+ *
+ */
+
+/**
+ * \mainpage User Application template doxygen documentation
+ *
+ * \par Empty user application template
+ *
+ * Bare minimum empty user application template
+ *
+ * \par Content
+ *
+ * -# Include the ASF header files (through asf.h)
+ * -# Static helper functions for the ISR entry functions
+ * -# Interrupt Service Routine vectors
+ *
+ */
+
+/*
+ * Include header files for all drivers that have been imported from
+ * Atmel Software Framework (ASF).
+ */
+/*
+ * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
+ */
+#include <asf.h>
+
+#include "isr.h"
+
+
+extern uint8_t				g_adc_state;
+extern float				g_adc_ldr;
+//extern float				g_adc_ldr_last;
+extern float				g_adc_temp;
+
+//extern float				g_temp;
+//extern float				g_temp_lcd_last;
+
+
+/* Forward declarations */
+static void s_bad_interrupt(void);
+
+
+/* Helper functions */
+
+void asm_break(void)
+{
+	__asm__ __volatile__ ("break" ::: "memory");
+}
+
+
+/* ISR routines */
+
+static void s_bad_interrupt(void)
+{
+	asm_break();
+}
+
+
+ISR(__vector_1, ISR_BLOCK)
+{	/* INT0 */
+	s_bad_interrupt();
+}
+
+ISR(__vector_2, ISR_BLOCK)
+{	/* INT1 */
+	s_bad_interrupt();
+}
+
+ISR(__vector_3, ISR_BLOCK)
+{	/* PCINT0 */
+	s_bad_interrupt();
+}
+
+ISR(__vector_4, ISR_BLOCK)
+{	/* PCINT1 */
+	s_bad_interrupt();
+}
+
+ISR(__vector_5, ISR_BLOCK)
+{	/* PCINT2 */
+	s_bad_interrupt();
+}
+
+ISR(__vector_6, ISR_BLOCK)
+{	/* WDT - Watchdog Timeout */
+	s_bad_interrupt();
+}
+
+ISR(__vector_7, ISR_BLOCK)
+{	/* TIMER 2 COMP-A */
+	s_bad_interrupt();
+}
+
+ISR(__vector_8, ISR_BLOCK)
+{	/* TIMER 2 COMP-B */
+	s_bad_interrupt();
+}
+
+ISR(__vector_9, ISR_BLOCK)
+{	/* TIMER 2 OVF - Overflow */
+	s_bad_interrupt();
+}
+
+ISR(__vector_10, ISR_BLOCK)
+{	/* TIMER 1 CAPT */
+	s_bad_interrupt();
+}
+
+ISR(__vector_11, ISR_BLOCK)
+{	/* TIMER 1 COMP-A */
+	s_bad_interrupt();
+}
+
+ISR(__vector_12, ISR_BLOCK)
+{	/* TIMER 1 COMP-B */
+	s_bad_interrupt();
+}
+
+ISR(__vector_13, ISR_BLOCK)
+{	/* TIMER 1 OVF - Overflow */
+	s_bad_interrupt();
+}
+
+ISR(__vector_14, ISR_BLOCK)
+{	/* TIMER 0 COMP-A */
+	s_bad_interrupt();
+}
+
+ISR(__vector_15, ISR_BLOCK)
+{	/* TIMER 0 COMP-B */
+	s_bad_interrupt();
+}
+
+ISR(__vector_16, ISR_BLOCK)
+{	/* TIMER 0 OVF - Overflow */
+	s_bad_interrupt();
+}
+
+ISR(__vector_17, ISR_BLOCK)
+{	/* SPI, STC - Serial Transfer Complete */
+	s_bad_interrupt();
+}
+
+ISR(__vector_18, ISR_BLOCK)
+{	/* USART, RX - Complete */
+	s_bad_interrupt();
+}
+
+ISR(__vector_19, ISR_BLOCK)
+{	/* USART, UDRE - Data Register Empty */
+	s_bad_interrupt();
+}
+
+ISR(__vector_20, ISR_BLOCK)
+{	/* USART, TX - Complete */
+	s_bad_interrupt();
+}
+
+ISR(__vector_21, ISR_BLOCK)  // ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
+{	/* ADC */
+	uint16_t adc_val;
+	uint8_t  reason = g_adc_state;
+	
+	/* CLI part */
+	adc_val  = ADCL;
+	adc_val |= ADCH << 8;
+	
+	switch (g_adc_state) {
+		case ADC_STATE_PRE_LDR:
+		// drop one ADC value after switching MUX
+		g_adc_state = ADC_STATE_VLD_LDR;
+		break;
+		
+		case ADC_STATE_VLD_LDR:
+		adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+		g_adc_state = ADC_STATE_PRE_TEMP;
+		break;
+		
+		case ADC_STATE_PRE_TEMP:
+		// drop one ADC value after switching MUX
+		g_adc_state = ADC_STATE_VLD_TEMP;
+		break;
+		
+		case ADC_STATE_VLD_TEMP:
+		// fall-through
+		
+		default:
+		adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+		g_adc_state = ADC_STATE_PRE_LDR;
+	}
+	
+	/* SEI part */
+	sei();
+	__vector_21__bottom(reason, adc_val);
+}
+
+/* do not static this function to avoid code inlining that would inherit many push operations in the critical section */
+void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
+{
+	/* Low pass filtering and enhancing the data depth */
+	
+	if (reason == ADC_STATE_VLD_LDR) {
+		g_adc_ldr	= 0.90f * g_adc_ldr		+ 0.10f * adc_val;
+		
+		} else if (reason == ADC_STATE_VLD_TEMP) {
+		g_adc_temp	= 0.97f * g_adc_temp	+ 0.03f * adc_val;
+	}
+}
+
+ISR(__vector_22, ISR_BLOCK)
+{	/* EEREADY */
+	s_bad_interrupt();
+}
+
+ISR(__vector_23, ISR_BLOCK)
+{	/* ANALOG COMP */
+	s_bad_interrupt();
+}
+
+ISR(__vector_24, ISR_BLOCK)
+{	/* TWI */
+	s_bad_interrupt();
+}
+
+ISR(__vector_25, ISR_BLOCK)
+{	/* SPM READY - Store Program Memory Ready */
+	s_bad_interrupt();
+}

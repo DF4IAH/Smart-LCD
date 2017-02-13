@@ -10,24 +10,9 @@
 #define MAIN_H_
 
 
-enum ADC_STATES {
-	ADC_STATE_PRE_LDR = 0,
-	ADC_STATE_VLD_LDR,
-	ADC_STATE_PRE_TEMP,
-	ADC_STATE_VLD_TEMP,
-
-	ADC_STATE__COUNT
-	};
-
-
 /* HELPERS */
 static void s_reset_global_vars(void);
-static void s_asm_break(void);
 
-
-/* ISR */
-void bad_interrupt(void);
-void __vector_21__bottom(uint8_t reason, uint16_t adc_val);
 
 /* INIT section */
 static void s_tc_init(void);
