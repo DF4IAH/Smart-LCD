@@ -244,6 +244,17 @@ static void s_twi_init(void)
 static void s_twi_disable(void)
 {
 	irqflags_t flags = cpu_irq_save();
+
+	TWCR = _BV(TWEN);							// disable the interrupt source
+
+	ioport_set_pin_dir(SDA_GPIO, IOPORT_DIR_INPUT);
+	ioport_set_pin_mode(SDA_GPIO, IOPORT_MODE_PULLUP);
+
+	ioport_set_pin_dir(SCL_GPIO, IOPORT_DIR_INPUT);
+	ioport_set_pin_mode(SCL_GPIO, IOPORT_MODE_PULLUP);
+
+	TWCR = 0;									// disable the TWI port
+	
 	cpu_irq_restore(flags);
 
 	sysclk_disable_module(0, PRTWI);

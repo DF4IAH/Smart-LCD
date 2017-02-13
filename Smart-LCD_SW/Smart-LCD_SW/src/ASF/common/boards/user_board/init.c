@@ -89,8 +89,8 @@ void board_init(void)
 
 	/* I2C / TWI interface */
 	ioport_set_pin_dir(SDA_GPIO, IOPORT_DIR_INPUT);
-	ioport_set_pin_mode(LDR_ADC, IOPORT_MODE_PULLUP);
+	ioport_set_pin_mode(SDA_GPIO, IOPORT_MODE_PULLUP);
 
 	ioport_set_pin_dir(SCL_GPIO, IOPORT_DIR_INPUT);
-	ioport_set_pin_mode(LDR_ADC, IOPORT_MODE_PULLUP);
+	ioport_set_pin_mode(SCL_GPIO, IOPORT_MODE_PULLUP);
 }
