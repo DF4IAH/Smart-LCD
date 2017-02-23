@@ -63,7 +63,7 @@
  * @{
  */
 
-extern struct font sysfont;
+extern const struct font sysfont;
 
 /** @} */
 

@@ -28,7 +28,7 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
-#include "conf_sysfont.h"
+#include "gfx_mono/sysfont.h"
 
 #include "lcd.h"
 
@@ -195,10 +195,20 @@ uint8_t lcd_init(void)
 		lcd_bus_write_cmd(0b10100110);								// Disable DC[0] (all pixel inverse)
 		lcd_bus_write_cmd(0b10101111);								// Enable  DC[2] (Display)
 		
-		// TEST
+		// TEST 1
 		for (int i = 0; i < 240; ++i) {
 			lcd_bus_write_ram(PROGMEM_READ_BYTE(&(sysfont_glyphs[i])));
 		}
+		
+		// TEST 2
+		gfx_mono_draw_string("DF4IAH Smart-LCD", 8, 24, &sysfont);
+		
+		// TEST 3
+		gfx_mono_generic_draw_rect(43, 27, 50, 25, GFX_PIXEL_SET);
+		
+		// TEST 4
+		gfx_mono_generic_draw_filled_circle(97, 70, 24, GFX_PIXEL_SET, GFX_WHOLE);
+		
 		return 0;													// Return OK
 		
 	} else {
@@ -209,5 +219,5 @@ uint8_t lcd_init(void)
 void lcd_shutdown(void)
 {
 	lcd_bus_write_cmd(0b11100010);									// Reset display
-	//delay_ms(2);													// Wait for the energy to dissipate
+	delay_ms(2);													// Wait for the energy to dissipate
 }

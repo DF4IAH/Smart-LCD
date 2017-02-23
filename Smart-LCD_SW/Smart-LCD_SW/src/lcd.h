@@ -9,6 +9,8 @@
 #ifndef LCD_H_
 #define LCD_H_
 
+#include <stdint.h>
+
 
 // Bias Ratio = 11.3
 #define C_LCD_BIASRATIO	(1 << 0)
@@ -34,8 +36,8 @@
 
 uint8_t	lcd_bus_read_status(void);
 void	lcd_bus_wait_ready(void);
-void	lcd_bus_write_cmd(uint8_t cmd_data);
-void	lcd_bus_write_ram(uint8_t cmd_data);
+void	lcd_bus_write_cmd(uint8_t cmd);
+void	lcd_bus_write_ram(uint8_t data);
 uint8_t lcd_bus_read_ram(void);
 
 uint8_t	lcd_init(void);

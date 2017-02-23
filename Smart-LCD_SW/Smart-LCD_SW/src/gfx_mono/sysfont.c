@@ -61,7 +61,7 @@ SYSFONT_DEFINE_GLYPHS;
  *
  * This initializes a basic system font globally usable by the application.
  */
-struct font sysfont = {
+const struct font sysfont = {
 	.type           = FONT_LOC_PROGMEM,
 	.width          = SYSFONT_WIDTH,
 	.height         = SYSFONT_HEIGHT,

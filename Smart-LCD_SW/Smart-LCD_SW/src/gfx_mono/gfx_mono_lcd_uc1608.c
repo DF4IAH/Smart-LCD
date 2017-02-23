@@ -43,7 +43,10 @@
 /*
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
+#include "lcd.h"
+
 #include "gfx_mono_lcd_uc1608.h"
+
 
 /**
  * \ingroup gfx_mono_lcd_uc1608
@@ -52,59 +55,187 @@
 
 
 /**
- * \brief gfx_mono_lcd_uc1608_put_page
+ * \brief Put a page from RAM to the LCD controller memory
+ *
+ * \param data Pointer to data to be written
+ * \param page Page address
+ * \param column Offset into page (x coordinate)
+ * \param width Number of bytes to be written.
  */
 void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_coord_t page_offset, gfx_coord_t width)
 {
-	
+	if (data &&
+		(page					< GFX_MONO_LCD_PAGES) && 
+	    (page_offset			< GFX_MONO_LCD_WIDTH) && 
+		((page_offset + width)	< GFX_MONO_LCD_WIDTH)) {
+		
+		gfx_mono_color_t *data_pt = data;
+		
+		lcd_bus_write_cmd(0b10000100 | C_LCD_AC);							// Set RAM Address Control
+		
+		lcd_bus_write_cmd(0b10110000 | ( page              & 0b00001111));	// Set Page Address
+		
+		lcd_bus_write_cmd(0b00000000 | ( page_offset       & 0b00001111));	// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((page_offset >> 4) & 0b00001111));	// Set Column Address MSB
+		
+		for (uint8_t cnt = width + 1; cnt; --cnt) {
+			lcd_bus_write_ram(*(data_pt++));								// Write byte slice to LCD panel
+		}
+	}
 }
 
 /**
- * \brief gfx_mono_lcd_uc1608_get_page
+ * \brief Read a page from the LCD controller memory into the RAM
+ *
+ * \param data   Pointer where to store the read data
+ * \param page   Page address
+ * \param column Offset into page (x coordinate)
+ * \param width  Number of bytes to be read.
  */
 void gfx_mono_lcd_uc1608_get_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_coord_t page_offset, gfx_coord_t width)
 {
-	
+	if (data &&
+	(page					< GFX_MONO_LCD_PAGES) &&
+	(page_offset			< GFX_MONO_LCD_WIDTH) &&
+	((page_offset + width)	< GFX_MONO_LCD_WIDTH)) {
+		
+		gfx_mono_color_t *data_pt = data;
+		
+		lcd_bus_write_cmd(0b10000100 | C_LCD_AC);							// Set RAM Address Control
+		
+		lcd_bus_write_cmd(0b10110000 | ( page              & 0b00001111));	// Set Page Address
+		
+		lcd_bus_write_cmd(0b00000000 | ( page_offset       & 0b00001111));	// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((page_offset >> 4) & 0b00001111));	// Set Column Address MSB
+		
+		for (uint8_t cnt = width + 1; cnt; --cnt) {
+			*(data_pt++) = lcd_bus_read_ram();								// Read byte slice from LCD panel
+		}
+	}
 }
 
 /**
- * \brief gfx_mono_lcd_uc1608_draw_pixel
+ * \brief Draw pixel to LCD controller memory
+ *
+ * \param x         X coordinate of the pixel
+ * \param y         Y coordinate of the pixel
+ * \param color     Pixel operation.
  */
 void gfx_mono_lcd_uc1608_draw_pixel(gfx_coord_t x, gfx_coord_t y, gfx_mono_color_t color)
 {
-	
+	if ((x < GFX_MONO_LCD_WIDTH) && (y < GFX_MONO_LCD_HEIGHT)) {
+		gfx_coord_t			page		= y / GFX_MONO_LCD_PIXELS_PER_BYTE;
+		gfx_mono_color_t	pixel_mask	= 1 << (y % GFX_MONO_LCD_PIXELS_PER_BYTE);
+		
+		gfx_mono_lcd_uc1608_mask_byte(page, x, pixel_mask, color);
+	}
 }
 
 /**
- * \brief gfx_mono_lcd_uc1608_get_pixel
+ * \brief Get the pixel value at x,y in the LCD controller memory
+ *
+ * \param x      X coordinate of pixel
+ * \param y      Y coordinate of pixel
+ * \return Non zero value if pixel is set.
  */
 uint8_t gfx_mono_lcd_uc1608_get_pixel(gfx_coord_t x, gfx_coord_t y)
 {
-	return 0;
+	uint8_t isSet = GFX_PIXEL_CLR;
+	
+	if ((x < GFX_MONO_LCD_WIDTH) && (y < GFX_MONO_LCD_HEIGHT)) {
+		gfx_coord_t			page		= y / GFX_MONO_LCD_PIXELS_PER_BYTE;
+		gfx_mono_color_t	pixel_mask	= 1 << (y % GFX_MONO_LCD_PIXELS_PER_BYTE);
+		uint8_t				byte;
+		
+		byte = gfx_mono_lcd_uc1608_get_byte(page, x);
+		isSet = (byte & pixel_mask) ?  GFX_PIXEL_SET : GFX_PIXEL_CLR;
+	}
+	return isSet;
 }
 
 /**
- * \brief gfx_mono_lcd_uc1608_put_byte
+ * \brief Put a byte to the LCD controller memory
+ *
+ * \param page   Page address
+ * \param column Page offset (x coordinate)
+ * \param data   Data to be written.
  */
 void gfx_mono_lcd_uc1608_put_byte(gfx_coord_t page, gfx_coord_t column, uint8_t data)
 {
-	
+	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
+		lcd_bus_write_cmd(0b10110000 | (page & 0b00001111));			// Set Page Address
+		
+		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
+		
+		lcd_bus_write_ram(data);										// Write byte slice to RAM
+	}
 }
 
 /**
- * \brief gfx_mono_lcd_uc1608_get_byte
+ * \brief Get a byte from the LCD controller memory
+ *
+ * \param page   Page address
+ * \param column Page offset (x coordinate)
+ * \return       data from LCD controller.
  */
 uint8_t gfx_mono_lcd_uc1608_get_byte(gfx_coord_t page, gfx_coord_t column)
 {
-	return 0;
+	uint8_t data = 0;
+	
+	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
+		lcd_bus_write_cmd(0b10110000 | (page & 0b00001111));			// Set Page Address
+		
+		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
+		
+		data = lcd_bus_read_ram();										// Read byte slice from RAM
+	}
+	return data;
 }
 
 /**
- * \brief gfx_mono_lcd_uc1608_mask_byte
+ * \brief Read/Modify/Write a byte in the LCD controller memory
+ *
+ * This function will read the byte from the LCD controller and
+ * do a mask operation on the byte according to the pixel operation selected
+ * by the color argument and the pixel mask provided.
+ *
+ * \param page       Page address
+ * \param column     Page offset (x coordinate)
+ * \param pixel_mask Mask for pixel operation
+ * \param color      Pixel operation
  */
 void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column, gfx_mono_color_t pixel_mask, gfx_mono_color_t color)
 {
+	uint8_t data = 0;
 	
+	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
+		lcd_bus_write_cmd(0b10110000 | (page & 0b00001111));			// Set Page Address
+		
+		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
+		
+		data = lcd_bus_read_ram();										// Read byte slice from RAM
+		switch (color) {
+			case GFX_PIXEL_CLR:
+				data &= ~pixel_mask;
+				break;
+			
+			case GFX_PIXEL_SET:
+				data |= pixel_mask;
+				break;
+			
+			case GFX_PIXEL_XOR:
+				data ^= pixel_mask;
+				break;
+		}
+
+		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
+
+		lcd_bus_write_ram(data);										// Write byte slice to RAM
+	}
 }
 
 /** @} */
