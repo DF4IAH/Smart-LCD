@@ -32,6 +32,7 @@
 #include <asf.h>
 #include "isr.h"
 #include "twi.h"
+#include "lcd.h"
 
 #include "main.h"
 
@@ -381,6 +382,8 @@ int main (void)
 	/* Start of sub-modules */
 	s_tc_start();								// All clocks and PWM timers start here
 	
+	/* Initialize external components */
+	lcd_init();
 	
 	/* main loop */
     while (runmode) {
@@ -389,6 +392,9 @@ int main (void)
     }
 	
 	
+	/* Shutdown external components */
+	lcd_shutdown();
+
 	cpu_irq_disable();
     
 	/* disable sub-modules */

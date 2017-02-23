@@ -8,7 +8,19 @@ src\ASF\common\services\clock\mega\sysclk.c
 
 src\ASF\mega\drivers\usart\usart_mega.c
 
+src\gfx_mono\gfx_mono_framebuffer.c
+
+src\gfx_mono\gfx_mono_generic.c
+
+src\gfx_mono\gfx_mono_null.c
+
+src\gfx_mono\gfx_mono_text.c
+
+src\gfx_mono\sysfont.c
+
 src\isr.c
+
+src\lcd.c
 
 src\twi.c
 

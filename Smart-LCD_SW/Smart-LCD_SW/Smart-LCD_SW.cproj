@@ -275,10 +275,52 @@
     <Compile Include="src\ASF\mega\drivers\usart\usart_mega.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\config\conf_sysfont.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_framebuffer.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_framebuffer.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_generic.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_generic.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_null.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_null.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_text.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\gfx_mono_text.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\sysfont.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gfx_mono\sysfont.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\isr.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\isr.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\lcd.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\lcd.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\main.h">
@@ -410,6 +452,9 @@
     <Folder Include="src\ASF\mega\utils\assembler\" />
     <Folder Include="src\ASF\mega\utils\preprocessor\" />
     <Folder Include="src\config\" />
+    <Folder Include="src\gfx_mono" />
+    <Folder Include="src\gfx_mono\docsrc" />
+    <Folder Include="src\gfx_mono\tools" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

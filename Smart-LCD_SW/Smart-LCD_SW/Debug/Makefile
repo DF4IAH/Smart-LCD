@@ -57,7 +57,10 @@ SUBDIRS :=  \
 ../src/ASF/mega/utils/ \
 ../src/ASF/mega/utils/assembler/ \
 ../src/ASF/mega/utils/preprocessor/ \
-../src/config/
+../src/config/ \
+../src/gfx_mono \
+../src/gfx_mono/docsrc \
+../src/gfx_mono/tools
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
@@ -65,7 +68,13 @@ C_SRCS +=  \
 ../src/ASF/common/services/calendar/calendar.c \
 ../src/ASF/common/services/clock/mega/sysclk.c \
 ../src/ASF/mega/drivers/usart/usart_mega.c \
+../src/gfx_mono/gfx_mono_framebuffer.c \
+../src/gfx_mono/gfx_mono_generic.c \
+../src/gfx_mono/gfx_mono_null.c \
+../src/gfx_mono/gfx_mono_text.c \
+../src/gfx_mono/sysfont.c \
 ../src/isr.c \
+../src/lcd.c \
 ../src/twi.c \
 ../src/ASF/common/boards/user_board/init.c \
 ../src/main.c
@@ -81,7 +90,13 @@ OBJS +=  \
 src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
 src/ASF/mega/drivers/usart/usart_mega.o \
+src/gfx_mono/gfx_mono_framebuffer.o \
+src/gfx_mono/gfx_mono_generic.o \
+src/gfx_mono/gfx_mono_null.o \
+src/gfx_mono/gfx_mono_text.o \
+src/gfx_mono/sysfont.o \
 src/isr.o \
+src/lcd.o \
 src/twi.o \
 src/ASF/common/boards/user_board/init.o \
 src/main.o
@@ -90,7 +105,13 @@ OBJS_AS_ARGS +=  \
 src/ASF/common/services/calendar/calendar.o \
 src/ASF/common/services/clock/mega/sysclk.o \
 src/ASF/mega/drivers/usart/usart_mega.o \
+src/gfx_mono/gfx_mono_framebuffer.o \
+src/gfx_mono/gfx_mono_generic.o \
+src/gfx_mono/gfx_mono_null.o \
+src/gfx_mono/gfx_mono_text.o \
+src/gfx_mono/sysfont.o \
 src/isr.o \
+src/lcd.o \
 src/twi.o \
 src/ASF/common/boards/user_board/init.o \
 src/main.o
@@ -99,7 +120,13 @@ C_DEPS +=  \
 src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
 src/ASF/mega/drivers/usart/usart_mega.d \
+src/gfx_mono/gfx_mono_framebuffer.d \
+src/gfx_mono/gfx_mono_generic.d \
+src/gfx_mono/gfx_mono_null.d \
+src/gfx_mono/gfx_mono_text.d \
+src/gfx_mono/sysfont.d \
 src/isr.d \
+src/lcd.d \
 src/twi.d \
 src/ASF/common/boards/user_board/init.d \
 src/main.d
@@ -108,7 +135,13 @@ C_DEPS_AS_ARGS +=  \
 src/ASF/common/services/calendar/calendar.d \
 src/ASF/common/services/clock/mega/sysclk.d \
 src/ASF/mega/drivers/usart/usart_mega.d \
+src/gfx_mono/gfx_mono_framebuffer.d \
+src/gfx_mono/gfx_mono_generic.d \
+src/gfx_mono/gfx_mono_null.d \
+src/gfx_mono/gfx_mono_text.d \
+src/gfx_mono/sysfont.d \
 src/isr.d \
+src/lcd.d \
 src/twi.d \
 src/ASF/common/boards/user_board/init.d \
 src/main.d
@@ -142,6 +175,18 @@ LINKER_SCRIPT_DEP+=
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 src/ASF/common/services/calendar/%.o: ../src/ASF/common/services/calendar/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.9.2
@@ -157,6 +202,13 @@ src/ASF/common/services/clock/mega/%.o: ../src/ASF/common/services/clock/mega/%.
 	
 
 src/ASF/mega/drivers/usart/%.o: ../src/ASF/mega/drivers/usart/%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 4.9.2
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -DDEBUG -DBOARD=USER_BOARD  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\include" -I"../src/ASF/common/boards/user_board" -I"../src/ASF/common/boards" -I"../src/ASF/mega/utils/preprocessor" -I"../src/ASF/mega/utils" -I"../src/ASF/common/utils" -I"../src" -I"../src/config" -I"../src/ASF/common/services/calendar" -I"../src/ASF/mega/drivers/cpu" -I"../src/ASF/common/services/clock" -I"../src/ASF/common/services/delay" -I"../src/ASF/common/services/ioport" -I"../src/ASF/mega/drivers/adc" -I"../src/ASF/mega/drivers/usart"  -O1 -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g3 -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\gcc\dev\atmega328p" -c -std=gnu99 -fno-strict-aliasing -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -mrelax -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+src/gfx_mono/%.o: ../src/gfx_mono/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 4.9.2
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -DDEBUG -DBOARD=USER_BOARD  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\include" -I"../src/ASF/common/boards/user_board" -I"../src/ASF/common/boards" -I"../src/ASF/mega/utils/preprocessor" -I"../src/ASF/mega/utils" -I"../src/ASF/common/utils" -I"../src" -I"../src/config" -I"../src/ASF/common/services/calendar" -I"../src/ASF/mega/drivers/cpu" -I"../src/ASF/common/services/clock" -I"../src/ASF/common/services/delay" -I"../src/ASF/common/services/ioport" -I"../src/ASF/mega/drivers/adc" -I"../src/ASF/mega/drivers/usart"  -O1 -fdata-sections -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g3 -Wall -mmcu=atmega328p -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.1.130\gcc\dev\atmega328p" -c -std=gnu99 -fno-strict-aliasing -Wstrict-prototypes -Wmissing-prototypes -Werror-implicit-function-declaration -Wpointer-arith -mrelax -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
