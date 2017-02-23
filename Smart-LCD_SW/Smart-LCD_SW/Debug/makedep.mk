@@ -12,6 +12,8 @@ src\gfx_mono\gfx_mono_framebuffer.c
 
 src\gfx_mono\gfx_mono_generic.c
 
+src\gfx_mono\gfx_mono_lcd_uc1608.c
+
 src\gfx_mono\gfx_mono_null.c
 
 src\gfx_mono\gfx_mono_text.c

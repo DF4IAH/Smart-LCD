@@ -55,7 +55,7 @@
  *
  * \note This function does a very simple bounds checking that does not
  * check if the line is placed outside the screen. If you supply an
- * x- or y-coordinate outside the display the behaviour is undefined,
+ * x- or y-coordinate outside the display the behavior is undefined,
  * and you risk overwriting portions of internal SRAM.
  *
  * \param  x          X coordinate of leftmost pixel.

@@ -114,7 +114,7 @@ Discarded input sections
                 0x00000000       0x58 src/ASF/common/services/calendar/calendar.o
  .debug_ranges  0x00000000       0x78 src/ASF/common/services/calendar/calendar.o
  .debug_macro   0x00000000      0x163 src/ASF/common/services/calendar/calendar.o
- .debug_macro   0x00000000      0xa4e src/ASF/common/services/calendar/calendar.o
+ .debug_macro   0x00000000      0xa54 src/ASF/common/services/calendar/calendar.o
  .debug_macro   0x00000000       0x10 src/ASF/common/services/calendar/calendar.o
  .debug_macro   0x00000000      0x1c9 src/ASF/common/services/calendar/calendar.o
  .debug_macro   0x00000000      0x2fc src/ASF/common/services/calendar/calendar.o
@@ -142,7 +142,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x10 src/ASF/common/services/calendar/calendar.o
  .debug_macro   0x00000000       0xf2 src/ASF/common/services/calendar/calendar.o
  .debug_line    0x00000000      0x73d src/ASF/common/services/calendar/calendar.o
- .debug_str     0x00000000     0xf281 src/ASF/common/services/calendar/calendar.o
+ .debug_str     0x00000000     0xf297 src/ASF/common/services/calendar/calendar.o
  .comment       0x00000000       0x31 src/ASF/common/services/calendar/calendar.o
  .debug_frame   0x00000000      0x204 src/ASF/common/services/calendar/calendar.o
  .group         0x00000000        0x8 src/ASF/common/services/clock/mega/sysclk.o
@@ -176,7 +176,7 @@ Discarded input sections
  .text          0x00000000        0x0 src/ASF/common/services/clock/mega/sysclk.o
  .data          0x00000000        0x0 src/ASF/common/services/clock/mega/sysclk.o
  .bss           0x00000000        0x0 src/ASF/common/services/clock/mega/sysclk.o
- .debug_macro   0x00000000      0xa4e src/ASF/common/services/clock/mega/sysclk.o
+ .debug_macro   0x00000000      0xa54 src/ASF/common/services/clock/mega/sysclk.o
  .debug_macro   0x00000000       0x10 src/ASF/common/services/clock/mega/sysclk.o
  .debug_macro   0x00000000      0x1c9 src/ASF/common/services/clock/mega/sysclk.o
  .debug_macro   0x00000000      0x2fc src/ASF/common/services/clock/mega/sysclk.o
@@ -260,7 +260,7 @@ Discarded input sections
                 0x00000000       0x50 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_ranges  0x00000000       0x40 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_macro   0x00000000      0x187 src/ASF/mega/drivers/usart/usart_mega.o
- .debug_macro   0x00000000      0xa4e src/ASF/mega/drivers/usart/usart_mega.o
+ .debug_macro   0x00000000      0xa54 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_macro   0x00000000      0x1c9 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_macro   0x00000000       0x10 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_macro   0x00000000      0x302 src/ASF/mega/drivers/usart/usart_mega.o
@@ -291,7 +291,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x7d src/ASF/mega/drivers/usart/usart_mega.o
  .debug_macro   0x00000000       0x56 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_line    0x00000000      0x72b src/ASF/mega/drivers/usart/usart_mega.o
- .debug_str     0x00000000    0x10782 src/ASF/mega/drivers/usart/usart_mega.o
+ .debug_str     0x00000000    0x10798 src/ASF/mega/drivers/usart/usart_mega.o
  .comment       0x00000000       0x31 src/ASF/mega/drivers/usart/usart_mega.o
  .debug_frame   0x00000000      0x11c src/ASF/mega/drivers/usart/usart_mega.o
  .group         0x00000000        0x8 src/gfx_mono/gfx_mono_framebuffer.o
@@ -341,14 +341,14 @@ Discarded input sections
                 0x00000000       0x40 src/gfx_mono/gfx_mono_framebuffer.o
  .bss.fbpointer
                 0x00000000        0x2 src/gfx_mono/gfx_mono_framebuffer.o
- .debug_info    0x00000000      0x3ed src/gfx_mono/gfx_mono_framebuffer.o
- .debug_abbrev  0x00000000      0x145 src/gfx_mono/gfx_mono_framebuffer.o
- .debug_loc     0x00000000      0x62c src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_info    0x00000000      0x424 src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_abbrev  0x00000000      0x172 src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_loc     0x00000000      0x636 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_aranges
                 0x00000000       0x58 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_ranges  0x00000000       0x48 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_macro   0x00000000      0x153 src/gfx_mono/gfx_mono_framebuffer.o
- .debug_macro   0x00000000      0xa4e src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_macro   0x00000000      0xa54 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_macro   0x00000000      0x1c9 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_macro   0x00000000       0x10 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_macro   0x00000000      0x302 src/gfx_mono/gfx_mono_framebuffer.o
@@ -373,9 +373,9 @@ Discarded input sections
  .debug_macro   0x00000000       0x40 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_macro   0x00000000      0x100 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_macro   0x00000000       0x88 src/gfx_mono/gfx_mono_framebuffer.o
- .debug_macro   0x00000000       0x7a src/gfx_mono/gfx_mono_framebuffer.o
- .debug_line    0x00000000      0x506 src/gfx_mono/gfx_mono_framebuffer.o
- .debug_str     0x00000000     0xf5d8 src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_macro   0x00000000       0x7b src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_line    0x00000000      0x50c src/gfx_mono/gfx_mono_framebuffer.o
+ .debug_str     0x00000000     0xf615 src/gfx_mono/gfx_mono_framebuffer.o
  .comment       0x00000000       0x31 src/gfx_mono/gfx_mono_framebuffer.o
  .debug_frame   0x00000000       0xd0 src/gfx_mono/gfx_mono_framebuffer.o
  .group         0x00000000        0x8 src/gfx_mono/gfx_mono_generic.o
@@ -430,7 +430,7 @@ Discarded input sections
                 0x00000000       0x58 src/gfx_mono/gfx_mono_generic.o
  .debug_ranges  0x00000000       0x48 src/gfx_mono/gfx_mono_generic.o
  .debug_macro   0x00000000      0x153 src/gfx_mono/gfx_mono_generic.o
- .debug_macro   0x00000000      0xa4e src/gfx_mono/gfx_mono_generic.o
+ .debug_macro   0x00000000      0xa54 src/gfx_mono/gfx_mono_generic.o
  .debug_macro   0x00000000      0x1c9 src/gfx_mono/gfx_mono_generic.o
  .debug_macro   0x00000000       0x10 src/gfx_mono/gfx_mono_generic.o
  .debug_macro   0x00000000      0x302 src/gfx_mono/gfx_mono_generic.o
@@ -455,11 +455,91 @@ Discarded input sections
  .debug_macro   0x00000000       0x40 src/gfx_mono/gfx_mono_generic.o
  .debug_macro   0x00000000      0x100 src/gfx_mono/gfx_mono_generic.o
  .debug_macro   0x00000000       0x88 src/gfx_mono/gfx_mono_generic.o
- .debug_macro   0x00000000       0x7a src/gfx_mono/gfx_mono_generic.o
- .debug_line    0x00000000      0x801 src/gfx_mono/gfx_mono_generic.o
- .debug_str     0x00000000     0xf76c src/gfx_mono/gfx_mono_generic.o
+ .debug_macro   0x00000000       0x7b src/gfx_mono/gfx_mono_generic.o
+ .debug_line    0x00000000      0x807 src/gfx_mono/gfx_mono_generic.o
+ .debug_str     0x00000000     0xf76a src/gfx_mono/gfx_mono_generic.o
  .comment       0x00000000       0x31 src/gfx_mono/gfx_mono_generic.o
  .debug_frame   0x00000000      0x220 src/gfx_mono/gfx_mono_generic.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .group         0x00000000        0x8 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text          0x00000000        0x0 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .data          0x00000000        0x0 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .bss           0x00000000        0x0 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_put_page
+                0x00000000        0x2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_get_page
+                0x00000000        0x2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_draw_pixel
+                0x00000000        0x2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_get_pixel
+                0x00000000        0x4 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_put_byte
+                0x00000000        0x2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_get_byte
+                0x00000000        0x4 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .text.gfx_mono_lcd_uc1608_mask_byte
+                0x00000000        0x2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_info    0x00000000      0x272 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_abbrev  0x00000000       0xcf src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_loc     0x00000000       0x42 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_aranges
+                0x00000000       0x50 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_ranges  0x00000000       0x40 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x153 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0xa54 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x1c9 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x10 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x302 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x9e src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000     0x1410 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x13a src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0xbd src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x34 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x18 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x6c src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x22 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x166 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x1c src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x35 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x66 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x652 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x44 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x69 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x2c src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x10 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0xe2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x40 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000      0x100 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x7b src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_macro   0x00000000       0x88 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_line    0x00000000      0x3e2 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_str     0x00000000     0xf54f src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .comment       0x00000000       0x31 src/gfx_mono/gfx_mono_lcd_uc1608.o
+ .debug_frame   0x00000000       0x84 src/gfx_mono/gfx_mono_lcd_uc1608.o
  .group         0x00000000        0x8 src/gfx_mono/gfx_mono_null.o
  .group         0x00000000        0x8 src/gfx_mono/gfx_mono_null.o
  .group         0x00000000        0x8 src/gfx_mono/gfx_mono_null.o
@@ -492,14 +572,14 @@ Discarded input sections
  .text.gfx_mono_null_init
                 0x00000000        0xa src/gfx_mono/gfx_mono_null.o
  .bss.framebuffer
-                0x00000000      0x200 src/gfx_mono/gfx_mono_null.o
+                0x00000000      0xf00 src/gfx_mono/gfx_mono_null.o
  .debug_info    0x00000000       0xe7 src/gfx_mono/gfx_mono_null.o
  .debug_abbrev  0x00000000       0xb1 src/gfx_mono/gfx_mono_null.o
  .debug_aranges
                 0x00000000       0x20 src/gfx_mono/gfx_mono_null.o
  .debug_ranges  0x00000000       0x10 src/gfx_mono/gfx_mono_null.o
- .debug_macro   0x00000000      0x153 src/gfx_mono/gfx_mono_null.o
- .debug_macro   0x00000000      0xa4e src/gfx_mono/gfx_mono_null.o
+ .debug_macro   0x00000000      0x159 src/gfx_mono/gfx_mono_null.o
+ .debug_macro   0x00000000      0xa54 src/gfx_mono/gfx_mono_null.o
  .debug_macro   0x00000000      0x1c9 src/gfx_mono/gfx_mono_null.o
  .debug_macro   0x00000000       0x10 src/gfx_mono/gfx_mono_null.o
  .debug_macro   0x00000000      0x302 src/gfx_mono/gfx_mono_null.o
@@ -523,10 +603,10 @@ Discarded input sections
  .debug_macro   0x00000000       0xe2 src/gfx_mono/gfx_mono_null.o
  .debug_macro   0x00000000       0x40 src/gfx_mono/gfx_mono_null.o
  .debug_macro   0x00000000      0x100 src/gfx_mono/gfx_mono_null.o
- .debug_macro   0x00000000       0x7a src/gfx_mono/gfx_mono_null.o
  .debug_macro   0x00000000       0x88 src/gfx_mono/gfx_mono_null.o
- .debug_line    0x00000000      0x36a src/gfx_mono/gfx_mono_null.o
- .debug_str     0x00000000     0xf467 src/gfx_mono/gfx_mono_null.o
+ .debug_macro   0x00000000       0x7b src/gfx_mono/gfx_mono_null.o
+ .debug_line    0x00000000      0x383 src/gfx_mono/gfx_mono_null.o
+ .debug_str     0x00000000     0xf47b src/gfx_mono/gfx_mono_null.o
  .comment       0x00000000       0x31 src/gfx_mono/gfx_mono_null.o
  .debug_frame   0x00000000       0x24 src/gfx_mono/gfx_mono_null.o
  .group         0x00000000        0x8 src/gfx_mono/gfx_mono_text.o
@@ -574,7 +654,7 @@ Discarded input sections
                 0x00000000       0x40 src/gfx_mono/gfx_mono_text.o
  .debug_ranges  0x00000000       0x30 src/gfx_mono/gfx_mono_text.o
  .debug_macro   0x00000000      0x17a src/gfx_mono/gfx_mono_text.o
- .debug_macro   0x00000000      0xa4e src/gfx_mono/gfx_mono_text.o
+ .debug_macro   0x00000000      0xa54 src/gfx_mono/gfx_mono_text.o
  .debug_macro   0x00000000      0x166 src/gfx_mono/gfx_mono_text.o
  .debug_macro   0x00000000       0x1c src/gfx_mono/gfx_mono_text.o
  .debug_macro   0x00000000       0x35 src/gfx_mono/gfx_mono_text.o
@@ -598,9 +678,9 @@ Discarded input sections
  .debug_macro   0x00000000       0x2c src/gfx_mono/gfx_mono_text.o
  .debug_macro   0x00000000      0x100 src/gfx_mono/gfx_mono_text.o
  .debug_macro   0x00000000       0x88 src/gfx_mono/gfx_mono_text.o
- .debug_macro   0x00000000       0x7a src/gfx_mono/gfx_mono_text.o
- .debug_line    0x00000000      0x596 src/gfx_mono/gfx_mono_text.o
- .debug_str     0x00000000     0xf701 src/gfx_mono/gfx_mono_text.o
+ .debug_macro   0x00000000       0x7b src/gfx_mono/gfx_mono_text.o
+ .debug_line    0x00000000      0x59c src/gfx_mono/gfx_mono_text.o
+ .debug_str     0x00000000     0xf703 src/gfx_mono/gfx_mono_text.o
  .comment       0x00000000       0x31 src/gfx_mono/gfx_mono_text.o
  .debug_frame   0x00000000      0x10c src/gfx_mono/gfx_mono_text.o
  .group         0x00000000        0x8 src/gfx_mono/sysfont.o
@@ -641,7 +721,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x18 src/gfx_mono/sysfont.o
  .debug_macro   0x00000000      0x180 src/gfx_mono/sysfont.o
- .debug_macro   0x00000000      0xa4e src/gfx_mono/sysfont.o
+ .debug_macro   0x00000000      0xa54 src/gfx_mono/sysfont.o
  .debug_macro   0x00000000      0x1c9 src/gfx_mono/sysfont.o
  .debug_macro   0x00000000       0x22 src/gfx_mono/sysfont.o
  .debug_macro   0x00000000      0x166 src/gfx_mono/sysfont.o
@@ -667,9 +747,9 @@ Discarded input sections
  .debug_macro   0x00000000       0x40 src/gfx_mono/sysfont.o
  .debug_macro   0x00000000      0x100 src/gfx_mono/sysfont.o
  .debug_macro   0x00000000       0x88 src/gfx_mono/sysfont.o
- .debug_macro   0x00000000       0x7a src/gfx_mono/sysfont.o
- .debug_line    0x00000000      0x39a src/gfx_mono/sysfont.o
- .debug_str     0x00000000    0x10549 src/gfx_mono/sysfont.o
+ .debug_macro   0x00000000       0x7b src/gfx_mono/sysfont.o
+ .debug_line    0x00000000      0x3a0 src/gfx_mono/sysfont.o
+ .debug_str     0x00000000    0x1054c src/gfx_mono/sysfont.o
  .comment       0x00000000       0x31 src/gfx_mono/sysfont.o
  .group         0x00000000        0x8 src/isr.o
  .group         0x00000000        0x8 src/isr.o
@@ -710,7 +790,7 @@ Discarded input sections
  .text          0x00000000        0x0 src/isr.o
  .data          0x00000000        0x0 src/isr.o
  .bss           0x00000000        0x0 src/isr.o
- .debug_macro   0x00000000      0xa4e src/isr.o
+ .debug_macro   0x00000000      0xa54 src/isr.o
  .debug_macro   0x00000000       0x10 src/isr.o
  .debug_macro   0x00000000      0x1c9 src/isr.o
  .debug_macro   0x00000000      0x2fc src/isr.o
@@ -781,7 +861,7 @@ Discarded input sections
  .bss           0x00000000        0x0 src/lcd.o
  .text.lcd_bus_read_ram
                 0x00000000       0x42 src/lcd.o
- .debug_macro   0x00000000      0xa4e src/lcd.o
+ .debug_macro   0x00000000      0xa54 src/lcd.o
  .debug_macro   0x00000000       0x10 src/lcd.o
  .debug_macro   0x00000000      0x1c9 src/lcd.o
  .debug_macro   0x00000000      0x2fc src/lcd.o
@@ -856,7 +936,7 @@ Discarded input sections
  .text          0x00000000        0x0 src/twi.o
  .data          0x00000000        0x0 src/twi.o
  .bss           0x00000000        0x0 src/twi.o
- .debug_macro   0x00000000      0xa4e src/twi.o
+ .debug_macro   0x00000000      0xa54 src/twi.o
  .debug_macro   0x00000000       0x10 src/twi.o
  .debug_macro   0x00000000      0x1c9 src/twi.o
  .debug_macro   0x00000000      0x2fc src/twi.o
@@ -930,7 +1010,7 @@ Discarded input sections
  .text          0x00000000        0x0 src/ASF/common/boards/user_board/init.o
  .data          0x00000000        0x0 src/ASF/common/boards/user_board/init.o
  .bss           0x00000000        0x0 src/ASF/common/boards/user_board/init.o
- .debug_macro   0x00000000      0xa4e src/ASF/common/boards/user_board/init.o
+ .debug_macro   0x00000000      0xa54 src/ASF/common/boards/user_board/init.o
  .debug_macro   0x00000000       0x10 src/ASF/common/boards/user_board/init.o
  .debug_macro   0x00000000      0x1c9 src/ASF/common/boards/user_board/init.o
  .debug_macro   0x00000000      0x2fc src/ASF/common/boards/user_board/init.o
@@ -1006,7 +1086,7 @@ Discarded input sections
  .data          0x00000000        0x0 src/main.o
  .bss           0x00000000        0x0 src/main.o
  .text.halt     0x00000000        0x6 src/main.o
- .debug_macro   0x00000000      0xa4e src/main.o
+ .debug_macro   0x00000000      0xa54 src/main.o
  .debug_macro   0x00000000       0x10 src/main.o
  .debug_macro   0x00000000      0x1c9 src/main.o
  .debug_macro   0x00000000      0x2fc src/main.o
@@ -1249,6 +1329,7 @@ LOAD src/ASF/common/services/clock/mega/sysclk.o
 LOAD src/ASF/mega/drivers/usart/usart_mega.o
 LOAD src/gfx_mono/gfx_mono_framebuffer.o
 LOAD src/gfx_mono/gfx_mono_generic.o
+LOAD src/gfx_mono/gfx_mono_lcd_uc1608.o
 LOAD src/gfx_mono/gfx_mono_null.o
 LOAD src/gfx_mono/gfx_mono_text.o
 LOAD src/gfx_mono/sysfont.o
@@ -1836,21 +1917,21 @@ END GROUP
  .debug_frame   0x00000598       0x24 src/ASF/common/boards/user_board/init.o
  .debug_frame   0x000005bc       0x80 src/main.o
 
-.debug_str      0x00000000    0x12351
+.debug_str      0x00000000    0x12367
  *(.debug_str)
  .debug_str     0x00000000      0x208 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega328p/avr5/crtatmega328p.o
- .debug_str     0x00000208     0xfa3d src/ASF/common/services/clock/mega/sysclk.o
-                               0xfc06 (size before relaxing)
- .debug_str     0x0000fc45      0xe9e src/isr.o
-                              0x109d9 (size before relaxing)
- .debug_str     0x00010ae3     0x12d3 src/lcd.o
-                              0x1196c (size before relaxing)
- .debug_str     0x00011db6       0xbe src/twi.o
-                              0x10788 (size before relaxing)
- .debug_str     0x00011e74       0xca src/ASF/common/boards/user_board/init.o
-                              0x107eb (size before relaxing)
- .debug_str     0x00011f3e      0x413 src/main.o
-                              0x10fba (size before relaxing)
+ .debug_str     0x00000208     0xfa53 src/ASF/common/services/clock/mega/sysclk.o
+                               0xfc1c (size before relaxing)
+ .debug_str     0x0000fc5b      0xe9e src/isr.o
+                              0x109ef (size before relaxing)
+ .debug_str     0x00010af9     0x12d3 src/lcd.o
+                              0x11982 (size before relaxing)
+ .debug_str     0x00011dcc       0xbe src/twi.o
+                              0x1079e (size before relaxing)
+ .debug_str     0x00011e8a       0xca src/ASF/common/boards/user_board/init.o
+                              0x10801 (size before relaxing)
+ .debug_str     0x00011f54      0x413 src/main.o
+                              0x10fd0 (size before relaxing)
 
 .debug_loc      0x00000000     0x1582
  *(.debug_loc)

@@ -1,9 +1,9 @@
 /**
  * \file
  *
- * \brief Monochrome graphic library NULL display device with framebuffer
+ * \brief Monochrome graphic library for the UC1608 LCD controller
  *
- * Copyright (c) 2011-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2011-2017 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -44,32 +44,29 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 
-#ifndef GFX_MONO_NULL_H
-#define GFX_MONO_NULL_H
+#ifndef GFX_MONO_LCD_UC1608_H
+#define GFX_MONO_LCD_UC1608_H
 
 #include "gfx_mono.h"
 #include "gfx_mono_framebuffer.h"
 
 /**
  * \ingroup gfx_mono
- * \defgroup gfx_mono_null NULL display device
+ * \defgroup gfx_mono_lcd_uc1608 UC1608 LCD display device
  *
- * This module provides empty read/write functions to a null device
- * (framebuffer in RAM), removing the need for an actual display or
- * controller during testing, and enabling the use of most XMEGA boards.
+ * This module provides read/write functions to the UC1608 LCD device.
  *
  * @{
  */
 
-#ifndef GFX_MONO_LCD_WIDTH
-
-# define GFX_MONO_LCD_WIDTH              128
-# define GFX_MONO_LCD_HEIGHT             32
-# define GFX_MONO_LCD_PIXELS_PER_BYTE    8
-# define GFX_MONO_LCD_PAGES              (GFX_MONO_LCD_HEIGHT / \
+#define GFX_MONO_LCD_WIDTH              240
+#define GFX_MONO_LCD_HEIGHT             128
+#define GFX_MONO_LCD_PIXELS_PER_BYTE    8
+#define GFX_MONO_LCD_PAGES              (GFX_MONO_LCD_HEIGHT / \
 	GFX_MONO_LCD_PIXELS_PER_BYTE)
-# define GFX_MONO_LCD_FRAMEBUFFER_SIZE   ((GFX_MONO_LCD_WIDTH * \
+#define GFX_MONO_LCD_FRAMEBUFFER_SIZE   ((GFX_MONO_LCD_WIDTH * \
 	GFX_MONO_LCD_HEIGHT) / GFX_MONO_LCD_PIXELS_PER_BYTE)
+
 
 #define gfx_mono_draw_horizontal_line(x, y, length, color) \
 	gfx_mono_generic_draw_horizontal_line(x, y, length, color)
@@ -99,37 +96,53 @@
 	gfx_mono_generic_put_bitmap(bitmap, x, y)
 
 #define gfx_mono_draw_pixel(x, y, color) \
-	gfx_mono_framebuffer_draw_pixel(x, y, color)
+	gfx_mono_lcd_uc1608_draw_pixel(x, y, color)
 
 #define gfx_mono_get_pixel(x, y) \
-	gfx_mono_framebuffer_get_pixel(x, y)
+	gfx_mono_lcd_uc1608_get_pixel(x, y)
 
 #define gfx_mono_init()	\
-	gfx_mono_null_init()
+	;
 
 #define gfx_mono_put_page(data, page, column, width) \
-	gfx_mono_framebuffer_put_page(data, page, column, width)
+	gfx_mono_lcd_uc1608_put_page(data, page, column, width)
 
 #define gfx_mono_get_page(data, page, column, width) \
-	gfx_mono_framebuffer_get_page(data, page, column, width)
+	gfx_mono_lcd_uc1608_get_page(data, page, column, width)
 
 #define gfx_mono_put_byte(page, column, data) \
-	gfx_mono_framebuffer_put_byte(page, column, data)
+	gfx_mono_lcd_uc1608_put_byte(page, column, data)
 
 #define gfx_mono_get_byte(page, column)	\
-	gfx_mono_framebuffer_get_byte(page, column)
+	gfx_mono_lcd_uc1608_get_byte(page, column)
 
 #define gfx_mono_mask_byte(page, column, pixel_mask, color) \
-	gfx_mono_framebuffer_mask_byte(page, column, pixel_mask, color)
+	gfx_mono_lcd_uc1608_mask_byte(page, column, pixel_mask, color)
 
 #define gfx_mono_put_framebuffer() \
 	;
 
-#endif
 
+void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page,
+gfx_coord_t page_offset, gfx_coord_t width);
 
-void gfx_mono_null_init(void);
+void gfx_mono_lcd_uc1608_get_page(gfx_mono_color_t *data, gfx_coord_t page,
+gfx_coord_t page_offset, gfx_coord_t width);
+
+void gfx_mono_lcd_uc1608_draw_pixel(gfx_coord_t x, gfx_coord_t y,
+gfx_mono_color_t color);
+
+uint8_t gfx_mono_lcd_uc1608_get_pixel(gfx_coord_t x, gfx_coord_t y);
+
+void gfx_mono_lcd_uc1608_put_byte(gfx_coord_t page, gfx_coord_t column,
+uint8_t data);
+
+uint8_t gfx_mono_lcd_uc1608_get_byte(gfx_coord_t page, gfx_coord_t column);
+
+void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column,
+gfx_mono_color_t pixel_mask, gfx_mono_color_t color);
+
 
 /** @} */
 
-#endif /* GFX_MONO_NULL_H */
+#endif /* GFX_MONO_LCD_UC1608_H */
