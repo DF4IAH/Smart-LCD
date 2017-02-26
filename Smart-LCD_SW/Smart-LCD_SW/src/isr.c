@@ -58,6 +58,7 @@ static void s_bad_interrupt(void);
 void asm_break(void)
 {
 	__asm__ __volatile__ ("break" ::: "memory");
+	nop();
 }
 
 
@@ -173,35 +174,35 @@ ISR(__vector_21, ISR_BLOCK)  // ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
 {	/* ADC */
 	uint16_t adc_val;
 	uint8_t  reason = g_adc_state;
-	
+
 	/* CLI part */
 	adc_val  = ADCL;
 	adc_val |= ADCH << 8;
-	
+
 	switch (g_adc_state) {
 		case ADC_STATE_PRE_LDR:
 		// drop one ADC value after switching MUX
 		g_adc_state = ADC_STATE_VLD_LDR;
 		break;
-		
+
 		case ADC_STATE_VLD_LDR:
 		adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 		g_adc_state = ADC_STATE_PRE_TEMP;
 		break;
-		
+
 		case ADC_STATE_PRE_TEMP:
 		// drop one ADC value after switching MUX
 		g_adc_state = ADC_STATE_VLD_TEMP;
 		break;
-		
+
 		case ADC_STATE_VLD_TEMP:
 		// fall-through
-		
+
 		default:
 		adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 		g_adc_state = ADC_STATE_PRE_LDR;
 	}
-	
+
 	/* SEI part */
 	sei();
 	__vector_21__bottom(reason, adc_val);
@@ -211,10 +212,10 @@ ISR(__vector_21, ISR_BLOCK)  // ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
 void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
 {
 	/* Low pass filtering and enhancing the data depth */
-	
+
 	if (reason == ADC_STATE_VLD_LDR) {
 		g_adc_ldr	= 0.90f * g_adc_ldr		+ 0.10f * adc_val;
-		
+
 		} else if (reason == ADC_STATE_VLD_TEMP) {
 		g_adc_temp	= 0.97f * g_adc_temp	+ 0.03f * adc_val;
 	}
@@ -234,7 +235,7 @@ ISR(__vector_24, ISR_BLOCK)
 {	/* TWI */
 	uint8_t tws = TWSR & (0b1111 << TWS4);
 	uint8_t twd = TWDR;
-	
+
 	/* SEI part */
 	sei();
 	__vector_24__bottom(tws, twd);

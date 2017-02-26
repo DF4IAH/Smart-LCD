@@ -21,7 +21,6 @@ enum ADC_STATES {
 
 enum TWI_FSM_STATUS {
 	TWI_FSM_STATUS_BLOCKING_BM = _BV(0),
-	
 };
 
 
