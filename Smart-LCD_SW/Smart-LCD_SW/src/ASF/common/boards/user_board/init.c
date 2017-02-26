@@ -15,14 +15,21 @@
 void board_init(void)
 {
 	/* PWM */
+#if 0
+	// Already done in  s_io_preinit(void) in main.c
+	//
 	ioport_set_pin_dir(AUDIO_PWM, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(AUDIO_PWM, IOPORT_MODE_PULLDOWN);
 
 	ioport_set_pin_dir(LCDBL_PWM, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_level(LCDBL_PWM, false);
+#endif
 
 
 	/* LCD interface */
+#if 0
+	// Already done in  s_io_preinit(void) in main.c
+	//
 	ioport_set_pin_dir(LCD_CD, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_level(LCD_CD, false);
 
@@ -61,17 +68,25 @@ void board_init(void)
 	
 	ioport_set_pin_dir(LCD_D7, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D7, IOPORT_MODE_PULLDOWN);
+#endif
 	
 
 	/* Status LEDs */
+#if 0
+	// Already done in  s_io_preinit(void) in main.c
+	//
 	ioport_set_pin_dir(LED_RD, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_level(LED_RD, false);
 
 	ioport_set_pin_dir(LED_GN, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_level(LED_GN, false);
+#endif
 
 
 	/* Contacts: Knob and Push button */
+#if 0
+	// Already done in  s_io_preinit(void) in main.c
+	//
 	ioport_set_pin_dir(CNTCT_P, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(CNTCT_P, IOPORT_MODE_PULLDOWN);
 
@@ -80,17 +95,26 @@ void board_init(void)
 
 	ioport_set_pin_dir(CNTCT_Q, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(CNTCT_Q, IOPORT_MODE_PULLDOWN);
+#endif
 
 
 	/* ADC: LDR ambient light detection */
+#if 0
+	// Already done in  s_io_preinit(void) in main.c
+	//
 	ioport_set_pin_dir(LDR_ADC, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LDR_ADC, IOPORT_MODE_PULLDOWN);
+#endif
 
 
 	/* I2C / TWI interface */
+#if 0
+	// Already done in  s_io_preinit(void) in main.c
+	//
 	ioport_set_pin_dir(SDA_GPIO, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(SDA_GPIO, IOPORT_MODE_PULLUP);
 
 	ioport_set_pin_dir(SCL_GPIO, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(SCL_GPIO, IOPORT_MODE_PULLUP);
+#endif
 }

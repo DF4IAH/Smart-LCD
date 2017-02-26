@@ -12,25 +12,26 @@
 #include <stdint.h>
 
 
-// Bias Ratio = 11.3
-#define C_LCD_BIASRATIO	(1 << 0)
+// MUX: 1 = 128; Power Control: 0b01 = 26nF .. 43nF
+#define C_LCD_PWR_CTRL	0b101
 
-// Gain = 0, PM = 32/63 abt. 50%
-#define C_LCD_GAIN_PM	((0 << 6) | (32 << 0))
+// Bias Ratio = 0: 10.7; 1: 11.3, 2:12.0, 3:12.7
+#define C_LCD_BIASRATIO	2
 
-// MUX rate = 128, Temp Compensation = -0.05% / K
-#define C_LCD_MR_TC		((1 << 2) | (1 << 0))
+// Gain: 0, 1, 2, 3; PM: 32/63 = 50%
+#define C_LCD_GAIN_PM	((2 << 6) | 32)
 
-#define C_LCD_PWR_CTRL	(0b101 << 0)
+// MUX rate: 128, Temp Compensation: 0: 0.00, 1: -0.05, 2: -0.10, 3: -0.20% / K
+#define C_LCD_MR_TC		((1 << 2) | 0)
 
-// Mapping: no MX, no MY, no MSF
-#define C_LCD_MAPPING	(0 << 0)
+// Mapping: no MY, no MX, 0, no MSF
+#define C_LCD_MAPPING	0b1000
 
-// Address Control: Cursor update mode, Page Address increment, no Wrap Around column/page
-#define C_LCD_AC		(0b1000 << 0)
+// Address Control: Page Address increment, no Wrap Around column/page
+#define C_LCD_AC		0b000
 
 
-#define C_LCD_STATUS_M	0b10010000
+#define C_LCD_STATUS_M	0b10000000
 
 
 
@@ -39,6 +40,12 @@ void	lcd_bus_wait_ready(void);
 void	lcd_bus_write_cmd(uint8_t cmd);
 void	lcd_bus_write_ram(uint8_t data);
 uint8_t lcd_bus_read_ram(void);
+
+void lcd_page_set(uint8_t page);
+void lcd_col_set(uint8_t col);
+void lcd_cr(void);
+void lcd_home(void);
+void lcd_cls(void);
 
 uint8_t	lcd_init(void);
 void	lcd_shutdown(void);
