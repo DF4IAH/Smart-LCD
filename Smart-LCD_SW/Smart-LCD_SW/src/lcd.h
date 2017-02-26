@@ -19,7 +19,13 @@
 #define C_LCD_BIASRATIO	2
 
 // Gain: 0, 1, 2, 3; PM: 32/63 = 50%
-#define C_LCD_GAIN_PM	((2 << 6) | 32)
+#define C_LCD_GAIN_PM	((2 << 6) | 28)
+// NOTES: Optimum=15.6V, Max=16.0V
+// BR=2&Gain=2&PM=0  --> 14.89V
+// BR=2&Gain=2&PM=28 --> 15.50V
+// BR=2&Gain=2&PM=32 --> 15.62V
+// BR=2&Gain=2&PM=51 --> 15.99V
+
 
 // MUX rate: 128, Temp Compensation: 0: 0.00, 1: -0.05, 2: -0.10, 3: -0.20% / K
 #define C_LCD_MR_TC		((1 << 2) | 0)
@@ -41,6 +47,8 @@ void	lcd_bus_write_cmd(uint8_t cmd);
 void	lcd_bus_write_ram(uint8_t data);
 uint8_t lcd_bus_read_ram(void);
 
+uint8_t lcd_bounds_x(int x);
+uint8_t lcd_bounds_y(int y);
 void lcd_page_set(uint8_t page);
 void lcd_col_set(uint8_t col);
 void lcd_cr(void);

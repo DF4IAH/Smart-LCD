@@ -184,11 +184,11 @@ void gfx_mono_generic_draw_line(gfx_coord_t x1, gfx_coord_t y1,
 	uint8_t i;
 	uint8_t x;
 	uint8_t y;
-	int8_t xinc;
-	int8_t yinc;
-	int8_t dx;
-	int8_t dy;
-	int8_t e;
+	int16_t xinc;
+	int16_t yinc;
+	int16_t dx;
+	int16_t dy;
+	int16_t e;
 
 	/* swap x1,y1  with x2,y2 */
 	if (x1 > x2) {
