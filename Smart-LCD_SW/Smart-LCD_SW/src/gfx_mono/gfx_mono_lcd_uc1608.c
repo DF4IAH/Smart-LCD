@@ -65,20 +65,16 @@
 void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_coord_t page_offset, gfx_coord_t width)
 {
 	if (data &&
-		(page					< GFX_MONO_LCD_PAGES) && 
-	    (page_offset			< GFX_MONO_LCD_WIDTH) && 
-		((page_offset + width)	< GFX_MONO_LCD_WIDTH)) {
+		(page					<  GFX_MONO_LCD_PAGES) && 
+	    (page_offset			<  GFX_MONO_LCD_WIDTH) && 
+		((page_offset + width)	<= GFX_MONO_LCD_WIDTH)) {
 		
 		gfx_mono_color_t *data_pt = data;
 		
-		lcd_bus_write_cmd(0b10000100 | C_LCD_AC);							// Set RAM Address Control
+		lcd_page_set(page);
+		lcd_col_set(page_offset);
 		
-		lcd_bus_write_cmd(0b10110000 | ( page              & 0b00001111));	// Set Page Address
-		
-		lcd_bus_write_cmd(0b00000000 | ( page_offset       & 0b00001111));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((page_offset >> 4) & 0b00001111));	// Set Column Address MSB
-		
-		for (uint8_t cnt = width + 1; cnt; --cnt) {
+		for (uint8_t cnt = width; cnt; --cnt) {
 			lcd_bus_write_ram(*(data_pt++));								// Write byte slice to LCD panel
 		}
 	}
@@ -95,20 +91,16 @@ void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_
 void gfx_mono_lcd_uc1608_get_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_coord_t page_offset, gfx_coord_t width)
 {
 	if (data &&
-	(page					< GFX_MONO_LCD_PAGES) &&
-	(page_offset			< GFX_MONO_LCD_WIDTH) &&
-	((page_offset + width)	< GFX_MONO_LCD_WIDTH)) {
+	(page					<  GFX_MONO_LCD_PAGES) &&
+	(page_offset			<  GFX_MONO_LCD_WIDTH) &&
+	((page_offset + width)	<= GFX_MONO_LCD_WIDTH)) {
 		
 		gfx_mono_color_t *data_pt = data;
 		
-		lcd_bus_write_cmd(0b10000100 | C_LCD_AC);							// Set RAM Address Control
+		lcd_page_set(page);
+		lcd_col_set(page_offset);
 		
-		lcd_bus_write_cmd(0b10110000 | ( page              & 0b00001111));	// Set Page Address
-		
-		lcd_bus_write_cmd(0b00000000 | ( page_offset       & 0b00001111));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((page_offset >> 4) & 0b00001111));	// Set Column Address MSB
-		
-		for (uint8_t cnt = width + 1; cnt; --cnt) {
+		for (uint8_t cnt = width; cnt; --cnt) {
 			*(data_pt++) = lcd_bus_read_ram();								// Read byte slice from LCD panel
 		}
 	}
@@ -145,9 +137,8 @@ uint8_t gfx_mono_lcd_uc1608_get_pixel(gfx_coord_t x, gfx_coord_t y)
 	if ((x < GFX_MONO_LCD_WIDTH) && (y < GFX_MONO_LCD_HEIGHT)) {
 		gfx_coord_t			page		= y / GFX_MONO_LCD_PIXELS_PER_BYTE;
 		gfx_mono_color_t	pixel_mask	= 1 << (y % GFX_MONO_LCD_PIXELS_PER_BYTE);
-		uint8_t				byte;
+		uint8_t				byte = gfx_mono_lcd_uc1608_get_byte(page, x);
 		
-		byte = gfx_mono_lcd_uc1608_get_byte(page, x);
 		isSet = (byte & pixel_mask) ?  GFX_PIXEL_SET : GFX_PIXEL_CLR;
 	}
 	return isSet;
@@ -163,11 +154,8 @@ uint8_t gfx_mono_lcd_uc1608_get_pixel(gfx_coord_t x, gfx_coord_t y)
 void gfx_mono_lcd_uc1608_put_byte(gfx_coord_t page, gfx_coord_t column, uint8_t data)
 {
 	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
-		lcd_bus_write_cmd(0b10110000 | (page & 0b00001111));			// Set Page Address
-		
-		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
-		
+		lcd_page_set(page);
+		lcd_col_set(column);
 		lcd_bus_write_ram(data);										// Write byte slice to RAM
 	}
 }
@@ -184,11 +172,8 @@ uint8_t gfx_mono_lcd_uc1608_get_byte(gfx_coord_t page, gfx_coord_t column)
 	uint8_t data = 0;
 	
 	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
-		lcd_bus_write_cmd(0b10110000 | (page & 0b00001111));			// Set Page Address
-		
-		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
-		
+		lcd_page_set(page);
+		lcd_col_set(column);
 		data = lcd_bus_read_ram();										// Read byte slice from RAM
 	}
 	return data;
@@ -211,12 +196,8 @@ void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column, gfx_mon
 	uint8_t data = 0;
 	
 	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
-		lcd_bus_write_cmd(0b10110000 | (page & 0b00001111));			// Set Page Address
+		data = gfx_mono_lcd_uc1608_get_byte(page, column);
 		
-		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
-		
-		data = lcd_bus_read_ram();										// Read byte slice from RAM
 		switch (color) {
 			case GFX_PIXEL_CLR:
 				data &= ~pixel_mask;
@@ -230,10 +211,8 @@ void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column, gfx_mon
 				data ^= pixel_mask;
 				break;
 		}
-
-		lcd_bus_write_cmd(0b00000000 |  (column       & 0b00001111));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((column >> 4) & 0b00001111));	// Set Column Address MSB
-
+		
+		lcd_col_set(column);
 		lcd_bus_write_ram(data);										// Write byte slice to RAM
 	}
 }

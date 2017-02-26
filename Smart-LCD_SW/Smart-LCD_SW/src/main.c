@@ -49,10 +49,20 @@ float				g_temp								= 0.f;
 float				g_temp_lcd_last						= 0.f;
 
 
+uint8_t				g_u8_DEBUG11						= 0,
+					g_u8_DEBUG12						= 0,
+					g_u8_DEBUG13						= 0;
+
+uint_fast32_t		g_u32_DEBUG21						= 0;
+
+float				g_f_DEBUG31							= 0.f,
+					g_f_DEBUG32							= 0.f;
+
+
 
 /* MAIN STATIC section */
 
-static uint8_t		runmode								= 0;			// global runmode
+static uint8_t		runmode								= 0;			// static runmode of main.c
 
 
 
@@ -74,6 +84,23 @@ static void s_reset_global_vars(void)
 
 
 /* INIT section */
+
+static void s_io_preinit(void)
+{
+	/* LCD interface */
+	
+	PORTC = 0b01111110;		// PC0: LDR-ADC in-NoPU, PC1: SW_I in-PU, PC2: SW_Q in-PU, PC3: LCD-CS out-HI
+	DDRC  = 0b00001000;		// PC4: I2C-SDA in-PU-AF-TWI, PC5: I2C-SCL in-PU-AF-TWI, PC6: RESET in-PU, PC7: -
+	
+	PORTB = 0b00010100;		// PB0: LCD-CD out-LO, PB1: AUDIO out-AF-OC1A, PB2: SW_P in-PU, PB3: LCDBL out-AF-OC2A,
+	DDRB  = 0b11111011;		// PB4: LCD-R/!W out-HI, PB5: LCD-EN out-LO, PB6: LEDRD out-LO, LEDGN out-LO
+	
+	PORTD = 0xff;			// PD0..PD7: LCD-D0..LCD-D7 in-PU
+	DDRD  = 0x00;
+	
+	// Analog input: Digital Disable Register
+	DIDR0 = 0b00000001;		// PC0: LDR-ADC
+}
 
 static void s_tc_init(void)
 {
@@ -280,8 +307,14 @@ static void s_task_backlight(float adc_ldr)
 	if (intensity < BL_OFF_INTENSITY) {
 		pwm = BL_MIN_PWM + (uint8_t)((255 - BL_MIN_PWM) * (intensity / BL_OFF_INTENSITY));
 	}
-	
+
+#if 0	
 	OCR2A = pwm;								// no interrupt lock needed
+#else
+	g_f_DEBUG31  = intensity;
+	g_f_DEBUG32  = adc_ldr;
+	g_u8_DEBUG13 = pwm;
+#endif
 }
 
 static void s_task_temp(float adc_temp)
@@ -318,14 +351,19 @@ static void s_task(void)
 	float l_adc_temp		= g_adc_temp;
 	cpu_irq_restore(flags);
 	
+#if 1
+	static uint8_t pwm = 0;
+	OCR2A = ++pwm;
+#endif
+
 	/* calculate new backlight PWM value and set that */
-	if (abs(l_adc_ldr - l_adc_ldr_last) >= 0.5f) {
+	//if (abs(l_adc_ldr - l_adc_ldr_last) >= 0.5f) {
 		s_task_backlight(l_adc_ldr);
 		
 		flags = cpu_irq_save();
 		g_adc_ldr_last = l_adc_ldr;
 		cpu_irq_restore(flags);
-	}
+	//}
 	
 	/* calculate new current temperature */
 	s_task_temp(l_adc_temp);
@@ -353,6 +391,8 @@ void halt(void)
 int main (void)
 {
 	uint8_t retcode = 0;
+	
+	s_io_preinit();
 	
 	/* Init of sub-modules */
 	sysclk_init();
@@ -386,6 +426,7 @@ int main (void)
 	lcd_init();
 	
 	/* main loop */
+	runmode = 1;
     while (runmode) {
 	    s_task();
 	    s_enter_sleep(SLEEP_MODE_IDLE);
@@ -394,7 +435,7 @@ int main (void)
 	
 	/* Shutdown external components */
 	lcd_shutdown();
-
+	
 	cpu_irq_disable();
     
 	/* disable sub-modules */
@@ -406,6 +447,6 @@ int main (void)
 	s_tc_disable();
 	
     s_enter_sleep(SLEEP_MODE_PWR_DOWN);
-    
+	
     return retcode;								// should never be reached
 }
