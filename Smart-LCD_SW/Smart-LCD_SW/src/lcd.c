@@ -50,6 +50,7 @@ static uint8_t s_lcd_ram_read_nonvalid = 0;
 // hold a copy of a font size in the PROG memory section
 SYSFONT_DEFINE_GLYPHS;
 
+
 uint8_t lcd_bus_read_status(void)
 {
 	uint8_t data;
@@ -59,21 +60,8 @@ uint8_t lcd_bus_read_status(void)
 	DDRD  = 0x00;													// Disable bus-drivers
 	ioport_set_pin_level(LCD_CD, false);							// Select command-interface
 	ioport_set_pin_level(LCD_RW, true);								// Bus-read
-	barrier();
-	nop();
-	barrier();
-	nop();
-	barrier();
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
-	barrier();
-	nop();
-	barrier();
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
-	barrier();
-	nop();
-	barrier();
-	nop();
-	barrier();
 	data = PIND;													// Access needs 50ns: therefore take 2 cycles with 33ns each
 
 	cpu_irq_restore(flags);
