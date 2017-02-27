@@ -94,7 +94,7 @@ enum power_red_id {
 
 /****************************************************
  * Given a dummy type but not used for these groups
- * to support for otherthen megaRF device.
+ * to support for other than megaRF device.
  **************************************************/
 #if MEGA_XX8 || MEGA_XX8_A || MEGA_UNSPECIFIED
 #if AVR8_PART_IS_DEFINED(ATmega328PB) || MEGA_UNCATEGORIZED

@@ -258,12 +258,16 @@ void lcd_cls(void)
 
 static void s_lcd_test_lines(void)
 {
-	static int i = 0;
-	uint8_t m = i++ % 18;
+	static int loop = 0;
+	uint8_t m = ++loop % 18;
 	uint8_t y1 = 10 + m;
 	uint8_t y2 = 26 - m;
 
-	gfx_mono_generic_draw_line (0, y1, 239, y2, (i / 18) % 3);
+	gfx_mono_generic_draw_line (0, y1, 239, y2, (loop / 18) % 3);
+
+	if (loop >= 1024 * 18) {
+		loop = 0;
+	}
 }
 
 static void s_lcd_test_temp(void)
@@ -272,9 +276,14 @@ static void s_lcd_test_temp(void)
 	float	t;
 
 	s_task();
+
 	irqflags_t flags = cpu_irq_save();
 	t = g_temp;
 	cpu_irq_restore(flags);
+
+	if (t < 0.f) {
+		t = 0.f;
+	}
 
 	buf[0] = '0' + (uint8_t)(((int)(t /  10.f)) % 10);
 	buf[1] = '0' + (uint8_t)(((int) t         ) % 10);

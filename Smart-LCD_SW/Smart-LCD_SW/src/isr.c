@@ -70,7 +70,7 @@ static void s_bad_interrupt(void)
 }
 
 
-ISR(__vector_1, ISR_BLOCK)
+ISR(__vector_1, ISR_BLOCK)  // variants: ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
 {	/* INT0 */
 	s_bad_interrupt();
 }
@@ -170,7 +170,7 @@ ISR(__vector_20, ISR_BLOCK)
 	s_bad_interrupt();
 }
 
-ISR(__vector_21, ISR_BLOCK)  // ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
+ISR(__vector_21, ISR_BLOCK)
 {	/* ADC */
 	uint16_t adc_val;
 	uint8_t  reason = g_adc_state;
@@ -214,10 +214,18 @@ void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
 	/* Low pass filtering and enhancing the data depth */
 
 	if (reason == ADC_STATE_VLD_LDR) {
-		g_adc_ldr	= 0.90f * g_adc_ldr		+ 0.10f * adc_val;
+		float calc = 0.90f * g_adc_ldr		+ 0.10f * adc_val;
 
-		} else if (reason == ADC_STATE_VLD_TEMP) {
-		g_adc_temp	= 0.97f * g_adc_temp	+ 0.03f * adc_val;
+		cli();
+		g_adc_ldr  = calc;
+		sei();
+
+	} else if (reason == ADC_STATE_VLD_TEMP) {
+		float calc = 0.97f * g_adc_temp	+ 0.03f * adc_val;
+
+		cli();
+		g_adc_temp = calc;
+		sei();
 	}
 }
 
