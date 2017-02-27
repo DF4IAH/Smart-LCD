@@ -110,11 +110,11 @@ static void s_tc_init(void)
 
 	/* Timer Synchronous Mode - prepare for  s_tc_start(void) */
 #if 0
-	GTCCR   = _BV(TSM)							// Timer Synchronous Mode active
-		    | _BV(PSRASY)						// Timer 2   prescaler is synced
-		    | _BV(PSRSYNC);						// Timer 0/1 prescaler is synced
+	GTCCR = _BV(TSM)							// Timer Synchronous Mode active
+		  | _BV(PSRASY)							// Timer 2   prescaler is synced
+		  | _BV(PSRSYNC);						// Timer 0/1 prescaler is synced
 #else
-	GTCCR   = (0b11 << PSRSYNC);
+	GTCCR = 0;
 #endif
 
 	/* TC0: not in use */
@@ -123,7 +123,8 @@ static void s_tc_init(void)
 
 	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 10-bit resolution - overflows with 15625 Hz */
 	{
-		sysclk_enable_module(POWER_RED_REG0, PRTIM1);
+		//sysclk_enable_module(POWER_RED_REG0, PRTIM1);
+		PRR &= ~_BV(PRTIM1);
 
 		TCCR1A  = (0b10  << COM1A0)		 		// HI --> LO when compare value is reached - non-inverted PWM mode
 				| (0b11  << WGM10);				// WGM: 0b0111 = Fast PWM 10 bit
@@ -151,7 +152,8 @@ static void s_tc_init(void)
 
 	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
 	{
-		sysclk_enable_module(POWER_RED_REG0, PRTIM2);
+		//sysclk_enable_module(POWER_RED_REG0, PRTIM2);
+		PRR &= ~_BV(PRTIM2);
 
 		TCCR2A  = (0b10  << COM2A0)				// HI --> LO when compare value is reached - non-inverted PWM mode
 				| (0b11  << WGM20);				// WGM: 0b011 = Fast PWM mode 8 bit
@@ -178,19 +180,6 @@ static void s_tc_start(void)
 	{
 		/* Timer Synchronous Mode - trigger */
 		GTCCR = 0;								// trigger the sync for all counters
-
-		uint_fast32_t time = 0;
-		while (!time) {
-			irqflags_t flags = cpu_irq_save();
-			g_u32_DEBUG21  =  TCNT1L;
-			g_u32_DEBUG21 |= (TCNT1H << 8);
-			time = g_u32_DEBUG21;
-			cpu_irq_restore(flags);
-			nop();
-		}
-		nop();
-		nop();
-		nop();
 	}
 }
 
@@ -200,7 +189,8 @@ static void s_tc_disable(void)
 
 	/* TC0: not in use */
 	{
-		sysclk_disable_module(POWER_RED_REG0, PRTIM0);
+		//sysclk_disable_module(POWER_RED_REG0, PRTIM0);
+		PRR |= _BV(PRTIM0);
 	}
 
 	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 10-bit resolution - overflows with 15625 Hz */
@@ -215,7 +205,8 @@ static void s_tc_disable(void)
 
 		TIMSK1  = 0;							// no interrupts
 
-		sysclk_disable_module(POWER_RED_REG0, PRTIM1);
+		//sysclk_disable_module(POWER_RED_REG0, PRTIM1);
+		PRR |= _BV(PRTIM1);
 	}
 
 	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
@@ -230,7 +221,8 @@ static void s_tc_disable(void)
 
 		ASSR    = 0;							// no async TOSC1 mode
 
-		sysclk_disable_module(POWER_RED_REG0, PRTIM2);
+		//sysclk_disable_module(POWER_RED_REG0, PRTIM2);
+		PRR |= _BV(PRTIM2);
 	}
 
 	sysclk_set_prescalers(SYSCLK_PSDIV_256);
@@ -241,42 +233,35 @@ static void s_tc_disable(void)
 
 static void s_adc_init(void)
 {
-	sysclk_enable_module(POWER_RED_REG0, PRADC);	// enable ADC sub-module
-	adc_init(ADC_PRESCALER_DIV128);
-
-	irqflags_t flags = cpu_irq_save();
+	//sysclk_enable_module(POWER_RED_REG0, PRADC);	// enable ADC sub-module
+	PRR &= ~_BV(PRADC);
 
 	adc_disable_digital_inputs(_BV(ADC0D));		// disable the digital input on the ADC0 port
-#if 1
+
+	adc_init(ADC_PRESCALER_DIV128);
 	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-#else
-	adc_set_mux(ADC_MUX_ADC0);
-	adc_set_voltage_reference(ADC_VREF_1V1);
-#endif
 
 	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
-	adc_enable_interrupt();						// enable the ADC interrupt
 
-	cpu_irq_restore(flags);
+	adc_enable_interrupt();						// enable the ADC interrupt
+	adc_start_conversion();
 }
 
 static void s_adc_disable(void)
 {
-	irqflags_t flags = cpu_irq_save();
-
 	adc_disable_interrupt();					// disable the ADC interrupt
 	adc_set_autotrigger_source(0);
 	adc_set_admux(0);
 	adc_disable_digital_inputs(0);
 
-	sysclk_disable_module(POWER_RED_REG0, PRADC);	// disable ADC sub-module
-
-	cpu_irq_restore(flags);
+	//sysclk_disable_module(POWER_RED_REG0, PRADC);	// disable ADC sub-module
+	PRR |= _BV(PRADC);
 }
 
 static void s_twi_init(void)
 {
-	sysclk_enable_module(POWER_RED_REG0, PRTWI);
+	//sysclk_enable_module(POWER_RED_REG0, PRTWI);
+	PRR &= ~_BV(PRTWI);
 
 	irqflags_t flags = cpu_irq_save();
 
@@ -307,7 +292,8 @@ static void s_twi_disable(void)
 
 	cpu_irq_restore(flags);
 
-	sysclk_disable_module(POWER_RED_REG0, PRTWI);
+	// sysclk_disable_module(POWER_RED_REG0, PRTWI);
+	PRR |= _BV(PRTWI);
 }
 
 
@@ -417,7 +403,7 @@ int main (void)
 	s_io_preinit();
 
 	/* Init of sub-modules */
-	sysclk_init();	sysclk_enable_module(POWER_RED_REG0, PRSPI);	// For debugging this module has to be powered on, again
+	sysclk_init();	PRR = 0b11101011;			// For debugging this module has to be powered on, again
 	ioport_init();
 	s_tc_init();
 	s_adc_init();
@@ -440,13 +426,13 @@ int main (void)
 	//s_twi_init();
 
 	/* All interrupt sources prepared here - IRQ activation */
-	//cpu_irq_enable();
+	cpu_irq_enable();
 
 	/* Start of sub-modules */
 	s_tc_start();								// All clocks and PWM timers start here
 
 	/* Initialize external components */
-	//lcd_init();
+	lcd_init();
 
 	/* main loop */
 	runmode = 1;
@@ -463,8 +449,13 @@ int main (void)
 
 	/* disable sub-modules */
 	ACSR |= _BV(ACD);							// disable AnalogCompare sub-module
-	sysclk_disable_module(POWER_RED_REG0, PRSPI);
-	sysclk_disable_module(POWER_RED_REG0, PRUSART0);
+
+	//sysclk_disable_module(POWER_RED_REG0, PRSPI);
+	PRR  |= _BV(PRSPI);
+
+	//sysclk_disable_module(POWER_RED_REG0, PRUSART0);
+	PRR  |= _BV(PRUSART0);
+
 	s_twi_disable();
 	s_adc_disable();
 	s_tc_disable();
