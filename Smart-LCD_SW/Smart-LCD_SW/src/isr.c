@@ -213,8 +213,19 @@ ISR(__vector_21, ISR_BLOCK)
 /* do not static this function to avoid code inlining that would inherit many push operations in the critical section */
 void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
 {
+	static uint16_t test1  = 0;
+	static uint16_t test2  = 0;
+	static uint8_t  test2b = 0;
+	uint8_t l_ocr1ah = 0x01 & (++test1 >> 8);
+	uint8_t l_ocr1al = 0xff & test1;
+	static uint8_t l_ocr2a = 0;
+	
+	if (++test2 > 100) {
+		test2 = 0;
+		l_ocr2a = 0xff & ++test2b;
+	}
+	
 	/* Low pass filtering and enhancing the data depth */
-
 	if (reason == ADC_STATE_VLD_LDR) {
 		float calc = 0.90f * g_adc_ldr		+ 0.10f * adc_val;
 
@@ -229,6 +240,12 @@ void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
 		g_adc_temp = calc;
 		sei();
 	}
+
+	cli();
+	OCR1AH = l_ocr1ah;
+	OCR1AL = l_ocr1al;
+	OCR2A  = l_ocr2a;
+	sei();
 }
 
 ISR(__vector_22, ISR_BLOCK)

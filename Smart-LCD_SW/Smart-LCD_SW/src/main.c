@@ -122,7 +122,7 @@ static void s_tc_init(void)
 		sysclk_enable_module(POWER_RED_REG0, PRTIM1_bm);
 
 		TCCR1A  = (0b10  << COM1A0)		 		// HI --> LO when compare value is reached - non-inverted PWM mode
-				| (0b11  << WGM10);				// WGM: 0b0111 = Fast PWM 10 bit
+				| (0b10  << WGM10);				// WGM: 0b0110 = Fast PWM 9 bit
 
 		TCCR1B  = ( 0b01 << WGM12)
 				| (0b001 << CS10);				// CLKio DIV1 = 8 MHz
@@ -131,7 +131,7 @@ static void s_tc_init(void)
 		barrier();
 		TCNT1L	=            0b00000000;
 
-		OCR1AH  =       0b10           ;		// Mid-range compare value for zero audio output
+		OCR1AH  =        0b1           ;		// Mid-range compare value for zero audio output
 		OCR1AL  =            0b00000000;
 
 		TIMSK1  = 0b00000000;					// No interrupts (when restarting without reset)
@@ -298,7 +298,7 @@ static void s_task_backlight(float adc_ldr)
 		pwm = BL_MIN_PWM + (uint8_t)((255 - BL_MIN_PWM) * (intensity / BL_OFF_INTENSITY));
 	}
 
-#if 0	
+#if 0
 	OCR2A = pwm;								// no interrupt lock needed
 #else
 	g_f_DEBUG31  = intensity;
