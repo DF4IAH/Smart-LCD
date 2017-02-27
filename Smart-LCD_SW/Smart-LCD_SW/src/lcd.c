@@ -50,57 +50,35 @@ static uint8_t s_lcd_ram_read_nonvalid = 0;
 // hold a copy of a font size in the PROG memory section
 SYSFONT_DEFINE_GLYPHS;
 
-
 uint8_t lcd_bus_read_status(void)
 {
 	uint8_t data;
 	irqflags_t flags = cpu_irq_save();
 
-	PORTD = 0xff;													// Enable pull-ups
+	PORTD = 0xff;													// Enable pull-ups (when bus-drivers are disabled)
 	DDRD  = 0x00;													// Disable bus-drivers
 	ioport_set_pin_level(LCD_CD, false);							// Select command-interface
 	ioport_set_pin_level(LCD_RW, true);								// Bus-read
 	barrier();
-
+	nop();
+	barrier();
+	nop();
+	barrier();
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
+	barrier();
 	nop();
 	barrier();
-
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
+	barrier();
 	nop();
 	barrier();
-
+	nop();
+	barrier();
 	data = PIND;													// Access needs 50ns: therefore take 2 cycles with 33ns each
+
 	cpu_irq_restore(flags);
 
 	return data;
-}
-
-void lcd_bus_wait_ready(void)
-{
-	irqflags_t flags;
-	uint8_t data;
-
-	data = lcd_bus_read_status();
-	flags = cpu_irq_save();
-
-	while (data & C_LCD_STATUS_M) {
-		ioport_set_pin_level(LCD_EN, true);							// Bus-enable
-		nop();
-		barrier();
-
-		ioport_set_pin_level(LCD_EN, false);						// Bus-disable
-		nop();
-		barrier();
-
-		data = PIND;												// Access needs 50ns: therefore take 2 cycles with 33ns each
-
-		cpu_irq_restore(flags);
-		nop();														// Allow to get interrupted
-		flags = cpu_irq_save();
-	}
-
-	cpu_irq_restore(flags);
 }
 
 void lcd_bus_write_cmd(uint8_t cmd)
@@ -113,11 +91,20 @@ void lcd_bus_write_cmd(uint8_t cmd)
 	DDRD  = 0xff;													// Enable bus-drivers
 	ioport_set_pin_level(LCD_CD, false);							// Select command-interface
 	ioport_set_pin_level(LCD_RW, false);							// Bus-write
+	barrier();
+	nop();
+	barrier();
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
+	barrier();
+	nop();
+	barrier();
 	nop();
 	barrier();
 
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
+	barrier();
+	nop();
+	nop();
 
 	cpu_irq_restore(flags);
 }
@@ -133,12 +120,20 @@ void lcd_bus_write_ram(uint8_t data)
 	ioport_set_pin_level(LCD_CD, true);								// Select RAM-interface
 	ioport_set_pin_level(LCD_RW, false);							// Bus-write
 	barrier();
-
+	nop();
+	barrier();
+	nop();
+	barrier();
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
+	barrier();
+	nop();
+	barrier();
 	nop();
 	barrier();
 
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
+	barrier();
+	nop();
 	nop();
 
 	cpu_irq_restore(flags);
@@ -151,32 +146,21 @@ uint8_t lcd_bus_read_ram(void)
 
 	flags = cpu_irq_save();
 
-	PORTD = 0xff;													// Enable pull-ups
+	PORTD = 0xff;													// Enable pull-ups (when bus-drivers are disabled)
 	DDRD  = 0x00;													// Disable bus-drivers
 	ioport_set_pin_level(LCD_CD, true);								// Select RAM-interface
 	ioport_set_pin_level(LCD_RW, true);								// Bus-read
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
-	nop();
-	barrier();
-
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
-	nop();
-	barrier();
 
 	if (s_lcd_ram_read_nonvalid) {
 		data = PIND;												// Discard void data from pipeline
-
 		ioport_set_pin_level(LCD_EN, true);							// Bus-enable
-		nop();
-		barrier();
-
 		ioport_set_pin_level(LCD_EN, false);						// Bus-disable
-		nop();
-		s_lcd_ram_read_nonvalid = false;							// since here read returns valid data
-		barrier();
 	}
-
 	data = PIND;													// Access needs 50ns: therefore take 2 cycles with 33ns each
+
+	s_lcd_ram_read_nonvalid = false;								// since here read returns valid data
 	cpu_irq_restore(flags);
 
 	return data;
