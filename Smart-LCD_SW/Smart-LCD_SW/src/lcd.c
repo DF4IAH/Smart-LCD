@@ -91,20 +91,8 @@ void lcd_bus_write_cmd(uint8_t cmd)
 	DDRD  = 0xff;													// Enable bus-drivers
 	ioport_set_pin_level(LCD_CD, false);							// Select command-interface
 	ioport_set_pin_level(LCD_RW, false);							// Bus-write
-	barrier();
-	nop();
-	barrier();
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
-	barrier();
-	nop();
-	barrier();
-	nop();
-	barrier();
-
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
-	barrier();
-	nop();
-	nop();
 
 	cpu_irq_restore(flags);
 }
