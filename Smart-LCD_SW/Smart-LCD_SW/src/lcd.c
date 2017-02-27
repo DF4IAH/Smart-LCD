@@ -119,22 +119,8 @@ void lcd_bus_write_ram(uint8_t data)
 	DDRD  = 0xff;													// Enable bus-drivers
 	ioport_set_pin_level(LCD_CD, true);								// Select RAM-interface
 	ioport_set_pin_level(LCD_RW, false);							// Bus-write
-	barrier();
-	nop();
-	barrier();
-	nop();
-	barrier();
 	ioport_set_pin_level(LCD_EN, true);								// Bus-enable
-	barrier();
-	nop();
-	barrier();
-	nop();
-	barrier();
-
 	ioport_set_pin_level(LCD_EN, false);							// Bus-disable
-	barrier();
-	nop();
-	nop();
 
 	cpu_irq_restore(flags);
 }
