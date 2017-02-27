@@ -204,15 +204,28 @@ void lcd_cls(void)
 
 static void s_lcd_test_lines(void)
 {
+	const int oy = 10;
+	const int h = 18;
+	const int w = GFX_MONO_LCD_WIDTH;
+
 	static int loop = 0;
-	uint8_t m = ++loop % 18;
-	uint8_t y1 = 10 + m;
-	uint8_t y2 = 26 - m;
+	static uint8_t sw = 0;
 
-	gfx_mono_generic_draw_line (0, y1, 239, y2, (loop / 18) % 3);
+	if (loop++ < h) {
+		uint8_t y11 = oy + loop;
+		uint8_t y12 = oy + h - loop - 1;
+		gfx_mono_generic_draw_line (0, y11, w - 1, y12, sw % 3);
 
-	if (loop >= 1024 * 18) {
+	} else if (loop < (h + w)) {
+		uint8_t x21 = (loop - h);
+		uint8_t x22 = w - (loop - h) - 1;
+		gfx_mono_generic_draw_line (x21, oy, x22, oy + h - 1, sw % 3);
+
+	} else {
 		loop = 0;
+		if (++sw >= 3) {
+			sw = 0;
+		}
 	}
 }
 
@@ -298,7 +311,7 @@ static void s_lcd_animation(void)
 	gfx_mono_generic_draw_filled_rect(0, (GFX_MONO_LCD_PAGES - 1) * GFX_MONO_LCD_PIXELS_PER_BYTE, GFX_MONO_LCD_WIDTH, GFX_MONO_LCD_PIXELS_PER_BYTE, GFX_PIXEL_CLR);
 
 	do {
-		if (!(i++ % 6)) {
+		if (!(i++ % 8)) {
 			origin += dx;
 
 			if (origin <= (-10 - blank_len)) {
@@ -325,14 +338,11 @@ static void s_lcd_animation(void)
 			}
 		}
 
-		if (!(i % 20)) {
+		if (!(i % 100)) {
 			s_lcd_test_temp();
 		}
 
 		s_lcd_test_lines();
-
-		for (long delay = 1000; delay; --delay)
-			nop();
 	} while(true);
 }
 

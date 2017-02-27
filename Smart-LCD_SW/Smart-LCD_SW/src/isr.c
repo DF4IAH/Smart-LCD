@@ -219,12 +219,12 @@ void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
 	uint8_t l_ocr1ah = 0x01 & (++test1 >> 8);
 	uint8_t l_ocr1al = 0xff & test1;
 	static uint8_t l_ocr2a = 0;
-	
+
 	if (++test2 > 100) {
 		test2 = 0;
 		l_ocr2a = 0xff & ++test2b;
 	}
-	
+
 	/* Low pass filtering and enhancing the data depth */
 	if (reason == ADC_STATE_VLD_LDR) {
 		float calc = 0.90f * g_adc_ldr		+ 0.10f * adc_val;
