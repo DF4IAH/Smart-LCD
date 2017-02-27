@@ -379,7 +379,7 @@ static void s_lcd_animation(void)
 			}
 		}
 
-		if (!(i % 100)) {
+		if (!(i % 20)) {
 			s_lcd_test_temp();
 		}
 

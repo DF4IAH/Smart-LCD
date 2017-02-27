@@ -179,6 +179,8 @@ ISR(__vector_21, ISR_BLOCK)
 	adc_val  = ADCL;
 	adc_val |= ADCH << 8;
 
+	TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (no ISR for TOV1 activated!)
+
 	switch (g_adc_state) {
 		case ADC_STATE_PRE_LDR:
 		// drop one ADC value after switching MUX
@@ -221,7 +223,7 @@ void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
 		sei();
 
 	} else if (reason == ADC_STATE_VLD_TEMP) {
-		float calc = 0.97f * g_adc_temp	+ 0.03f * adc_val;
+		float calc = 0.9995f * g_adc_temp	+ 0.0005f * adc_val;
 
 		cli();
 		g_adc_temp = calc;
