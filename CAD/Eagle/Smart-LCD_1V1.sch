@@ -7640,6 +7640,7 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <part name="R454" library="rcl" deviceset="R-EU_" device="R0805" value="22kR"/>
 <part name="C455" library="rcl" deviceset="C-EU" device="C0805" value="470nF"/>
 <part name="C452" library="rcl" deviceset="C-EU" device="C0805" value="470pF"/>
+<part name="R132" library="rcl" deviceset="R-EU_" device="R0805" value="5.6kR"/>
 </parts>
 <sheets>
 <sheet>
@@ -7692,6 +7693,7 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 </instance>
 <instance part="GND111" gate="1" x="154.94" y="53.34"/>
 <instance part="X141" gate="G$1" x="134.62" y="152.4"/>
+<instance part="R132" gate="G$1" x="162.56" y="137.16"/>
 </instances>
 <busses>
 <bus name="LCD_BUS:VB1_N,VB1_P,VB0_N,VB0_P,VLCD,VBIAS,D[0..7],WR[0..1],CD,CS,!RST,LED_K">
@@ -7711,6 +7713,9 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <segment>
 <pinref part="C131" gate="G$1" pin="2"/>
 <pinref part="GND131" gate="1" pin="GND"/>
+<pinref part="R132" gate="G$1" pin="2"/>
+<wire x1="172.72" y1="137.16" x2="167.64" y2="137.16" width="0.1524" layer="91"/>
+<junction x="172.72" y="137.16"/>
 </segment>
 <segment>
 <pinref part="GND141" gate="1" pin="GND"/>
@@ -7937,6 +7942,10 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <junction x="172.72" y="147.32"/>
 <pinref part="X131" gate="A" pin="2"/>
 <pinref part="U101" gate="G$1" pin="PC0(ADC0)"/>
+<wire x1="154.94" y1="139.7" x2="154.94" y2="137.16" width="0.1524" layer="91"/>
+<pinref part="R132" gate="G$1" pin="1"/>
+<wire x1="154.94" y1="137.16" x2="157.48" y2="137.16" width="0.1524" layer="91"/>
+<junction x="154.94" y="139.7"/>
 </segment>
 </net>
 <net name="LDR_P" class="0">
