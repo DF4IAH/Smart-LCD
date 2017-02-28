@@ -1641,6 +1641,60 @@ NS Package M08A</description>
 </package>
 </packages>
 </library>
+<library name="df4iah_fiducial">
+<description>&lt;b&gt;DF4IAH Library - Fiducial marks and check windows&lt;/b&gt;&lt;p&gt;</description>
+<packages>
+<package name="FIDUCIAL_MARK_1MM">
+<description>&lt;h1&gt;Fiducial Mark&lt;/h1&gt;&lt;p&gt;
+Diameter = 1mm, Clearance = 3R</description>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="1"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="2"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="15"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="16"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="39"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="40"/>
+<wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="22"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.127" layer="22"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="22"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="22"/>
+<text x="-1.5" y="2" size="0.8128" layer="25">&gt;NAME</text>
+<text x="-1.5" y="-3" size="0.8128" layer="27">&gt;VALUE</text>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="41"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="42"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="43"/>
+<polygon width="0.127" layer="16" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<polygon width="0.127" layer="15" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<polygon width="0.127" layer="2" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<polygon width="0.127" layer="1" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="49"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="51"/>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -2050,6 +2104,10 @@ Your Eurocircuits Team
 <attribute name="NAME" x="46.355" y="24.13" size="0.6096" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="48.26" y="27.94" size="1.27" layer="28" rot="MR270"/>
 </element>
+<element name="FM502" library="df4iah_fiducial" package="FIDUCIAL_MARK_1MM" value="FIDUCIAL_MARK_1MM" x="2.54" y="57.15" locked="yes"/>
+<element name="FM501" library="df4iah_fiducial" package="FIDUCIAL_MARK_1MM" value="FIDUCIAL_MARK_1MM" x="12.7" y="2.54" locked="yes"/>
+<element name="FM503" library="df4iah_fiducial" package="FIDUCIAL_MARK_1MM" value="FIDUCIAL_MARK_1MM" x="96.52" y="57.15" locked="yes"/>
+<element name="FM504" library="df4iah_fiducial" package="FIDUCIAL_MARK_1MM" value="FIDUCIAL_MARK_1MM" x="86.36" y="2.54" locked="yes"/>
 </elements>
 <signals>
 <signal name="GND">

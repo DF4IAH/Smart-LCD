@@ -7551,6 +7551,88 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 </deviceset>
 </devicesets>
 </library>
+<library name="df4iah_fiducial">
+<description>&lt;b&gt;DF4IAH Library - Fiducial marks and check windows&lt;/b&gt;&lt;p&gt;</description>
+<packages>
+<package name="FIDUCIAL_MARK_1MM">
+<description>&lt;h1&gt;Fiducial Mark&lt;/h1&gt;&lt;p&gt;
+Diameter = 1mm, Clearance = 3R</description>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="1"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="2"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="15"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="16"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="39"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="40"/>
+<wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="22"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.127" layer="22"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="22"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="22"/>
+<text x="-1.5" y="2" size="0.8128" layer="25">&gt;NAME</text>
+<text x="-1.5" y="-3" size="0.8128" layer="27">&gt;VALUE</text>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="41"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="42"/>
+<circle x="0" y="0" radius="0.75" width="1.5" layer="43"/>
+<polygon width="0.127" layer="16" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<polygon width="0.127" layer="15" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<polygon width="0.127" layer="2" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<polygon width="0.127" layer="1" pour="cutout">
+<vertex x="-1.5" y="1.5"/>
+<vertex x="1.5" y="1.5"/>
+<vertex x="1.5" y="-1.5"/>
+<vertex x="-1.5" y="-1.5"/>
+</polygon>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="49"/>
+<circle x="0" y="0" radius="0.25" width="0.5" layer="51"/>
+</package>
+</packages>
+<symbols>
+<symbol name="FIDUCIAL_MARK">
+<description>&lt;h1&gt;Fiducial Mark&lt;/h1&gt;&lt;p&gt;
+Clearance = 3R</description>
+<circle x="0" y="0" radius="0.635" width="1.27" layer="94"/>
+<text x="-2.54" y="3.81" size="1.27" layer="95">&gt;NAME</text>
+<wire x1="-2.54" y1="2.54" x2="2.54" y2="2.54" width="0.254" layer="94"/>
+<wire x1="2.54" y1="2.54" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="2.54" y1="-2.54" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-2.54" y1="-2.54" x2="-2.54" y2="2.54" width="0.254" layer="94"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="FIDUCIAL_MARK_1MM" prefix="FM">
+<description>&lt;h1&gt;Fiducial Mark&lt;/h1&gt;&lt;p&gt;
+Diameter = 1mm, Clearance = 3R</description>
+<gates>
+<gate name="G$1" symbol="FIDUCIAL_MARK" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="FIDUCIAL_MARK_1MM">
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -7641,6 +7723,10 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <part name="C455" library="rcl" deviceset="C-EU" device="C0805" value="470nF"/>
 <part name="C452" library="rcl" deviceset="C-EU" device="C0805" value="470pF"/>
 <part name="R132" library="rcl" deviceset="R-EU_" device="R0805" value="5.6kR"/>
+<part name="FM502" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
+<part name="FM501" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
+<part name="FM503" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
+<part name="FM504" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -8703,6 +8789,10 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <instance part="GND504" gate="1" x="205.74" y="137.16"/>
 <instance part="H511" gate="G$1" x="55.88" y="68.58"/>
 <instance part="H512" gate="G$1" x="195.58" y="66.04"/>
+<instance part="FM502" gate="G$1" x="58.42" y="132.08"/>
+<instance part="FM501" gate="G$1" x="58.42" y="78.74"/>
+<instance part="FM503" gate="G$1" x="193.04" y="78.74"/>
+<instance part="FM504" gate="G$1" x="193.04" y="132.08"/>
 </instances>
 <busses>
 </busses>
