@@ -1975,7 +1975,7 @@ Your Eurocircuits Team
 <attribute name="NAME" x="66.04" y="25.4" size="0.6096" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="66.04" y="30.48" size="0.6096" layer="28" rot="MR270"/>
 </element>
-<element name="C111" library="rcl" package="C0805" value="22nF" x="68.58" y="29.845" smashed="yes" rot="MR90">
+<element name="C111" library="rcl" package="C0805" value="100nF" x="68.58" y="29.845" smashed="yes" rot="MR90">
 <attribute name="NAME" x="68.58" y="25.4" size="0.6096" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="68.58" y="28.575" size="0.6096" layer="28" rot="MR90"/>
 </element>
