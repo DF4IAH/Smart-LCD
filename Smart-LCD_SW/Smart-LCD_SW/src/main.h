@@ -10,6 +10,10 @@
 #define MAIN_H_
 
 
+/* UTILITIES section */
+float get_abs_time(void);
+
+
 /* TASK section */
 void s_task(void);
 void halt(void);
