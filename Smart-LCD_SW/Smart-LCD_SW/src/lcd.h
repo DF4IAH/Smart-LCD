@@ -36,24 +36,26 @@
 // Address Control: Page Address increment, no Wrap Around column/page
 #define C_LCD_AC		0b000
 
-
-#define C_LCD_STATUS_M	0b10000000
-
+// Status: BZ flag
+#define C_LCD_STATUS_M	_BV(7)
 
 
 uint8_t	lcd_bus_read_status(void);
-void	lcd_bus_wait_ready(void);
 void	lcd_bus_write_cmd(uint8_t cmd);
 void	lcd_bus_write_ram(uint8_t data);
 uint8_t lcd_bus_read_ram(void);
 
 uint8_t lcd_bounds_x(int x);
 uint8_t lcd_bounds_y(int y);
+void lcd_enable(uint8_t on);
 void lcd_page_set(uint8_t page);
 void lcd_col_set(uint8_t col);
 void lcd_cr(void);
 void lcd_home(void);
 void lcd_cls(void);
+void lcd_animation_prepare(void);
+void lcd_animation_loop(void);
+void lcd_test(uint8_t pattern_bm);
 
 uint8_t	lcd_init(void);
 void	lcd_shutdown(void);

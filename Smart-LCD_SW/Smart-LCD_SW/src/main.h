@@ -10,26 +10,12 @@
 #define MAIN_H_
 
 
-/* HELPERS */
-//static void s_reset_global_vars(void);
-
-
-/* INIT section */
-//static void s_tc_init(void);
-//static void s_tc_disable(void);
-//static void s_tc_start(void);
-//static void s_adc_init(void);
-//static void s_adc_disable(void);
-//static void s_twi_init(void);
-//static void s_twi_disable(void);
+/* UTILITIES section */
+float get_abs_time(void);
 
 
 /* TASK section */
-//static void s_task_backlight(float adc_ldr);
-//static void s_task_temp(float adc_temp);
-//static void s_task(void);
 void s_task(void);
-//static void s_enter_sleep(uint8_t sleep_mode);
 void halt(void);
 
 

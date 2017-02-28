@@ -37,17 +37,22 @@
 #include "main.h"
 
 
+#define ADC_TEMP_DELTA	0.005f
+#define ADC_LDR_DELTA   5.0f
+
 
 /* GLOBAL section */
+
+uint_fast32_t		g_timer_abs_msb						= 0;
 
 uint8_t				g_adc_state							= 0;
 float				g_adc_ldr							= 0.f;
 float				g_adc_ldr_last						= 0.f;
 float				g_adc_temp							= 0.f;
+float				g_adc_temp_last						= 0.f;
 
 float				g_temp								= 0.f;
-float				g_temp_lcd_last						= 0.f;
-
+uint8_t				g_lcdbl_dimmer						= 0;
 
 uint8_t				g_u8_DEBUG11						= 0,
 					g_u8_DEBUG12						= 0,
@@ -76,8 +81,10 @@ static void s_reset_global_vars(void)
 	g_adc_ldr			= 0.f;
 	g_adc_ldr_last		= 0.f;
 	g_adc_temp			= 0.f;
-	g_temp				= 0.f;
-	g_temp_lcd_last		= 0.f;
+	g_adc_temp_last		= 0.f;
+
+	g_temp				= 25.f;
+	g_lcdbl_dimmer		= 64;
 
 	cpu_irq_restore(flags);
 }
@@ -109,13 +116,9 @@ static void s_tc_init(void)
 	/* This function is called prior enabled interrupts and thus does not lock interrupts. */
 
 	/* Timer Synchronous Mode - prepare for  s_tc_start(void) */
-#if 0
 	GTCCR = _BV(TSM)							// Timer Synchronous Mode active
 		  | _BV(PSRASY)							// Timer 2   prescaler is synced
 		  | _BV(PSRSYNC);						// Timer 0/1 prescaler is synced
-#else
-	GTCCR = 0;
-#endif
 
 	/* TC0: not in use */
 	{
@@ -123,37 +126,28 @@ static void s_tc_init(void)
 
 	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 10-bit resolution - overflows with 15625 Hz */
 	{
-		//sysclk_enable_module(POWER_RED_REG0, PRTIM1);
-		PRR &= ~_BV(PRTIM1);
+		sysclk_enable_module(POWER_RED_REG0, PRTIM1_bm);
 
 		TCCR1A  = (0b10  << COM1A0)		 		// HI --> LO when compare value is reached - non-inverted PWM mode
-				| (0b11  << WGM10);				// WGM: 0b0111 = Fast PWM 10 bit
-//				| (0b10  << WGM10);				// WGM: 0b1110 = Fast PWM, TOP = ICR1
+				| (0b10  << WGM10);				// WGM: 0b0110 = Fast PWM 9 bit
 
 		TCCR1B  = ( 0b01 << WGM12)
-//		TCCR1B  = ( 0b11 << WGM12)		 
 				| (0b001 << CS10);				// CLKio DIV1 = 8 MHz
-
-#if 0
-		ICR1H	=       0b11           ;
-		ICR1L	=            0b11111111;
-#endif
 
 		TCNT1H  = 0b00000000           ;		// Clear current value for synchronous start (when restarting without reset)
 		barrier();
 		TCNT1L	=            0b00000000;
 
-		OCR1AH  =       0b10           ;		// Mid-range compare value for zero audio output
+		OCR1AH  =        0b1           ;		// Mid-range compare value for zero audio output
 		OCR1AL  =            0b00000000;
 
-		TIMSK1  = 0;							// No interrupts (when restarting without reset)
+		TIMSK1  = _BV(TOIE1);					// TOIE1 interrupt
 		TIFR1   = 0b00100111;					// Clear all flags (when restarting without reset)
 	}
 
 	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
 	{
-		//sysclk_enable_module(POWER_RED_REG0, PRTIM2);
-		PRR &= ~_BV(PRTIM2);
+		sysclk_enable_module(POWER_RED_REG0, PRTIM2_bm);
 
 		TCCR2A  = (0b10  << COM2A0)				// HI --> LO when compare value is reached - non-inverted PWM mode
 				| (0b11  << WGM20);				// WGM: 0b011 = Fast PWM mode 8 bit
@@ -165,8 +159,8 @@ static void s_tc_init(void)
 
 		OCR2A   = 0x40;							// LCD backlight dimmed down to 25% 
 
-		TIMSK2  = 0;							// No interrupts (when restarting without reset)
-		TIFR2   = 0b00000111;					// Clear all flags (when restarting without reset)
+		TIMSK2  = 0b00000000;					// No interrupts
+		TIFR2   = 0b00000111;					// Clear all flags
 
 		ASSR    = 0;							// No async. TOSC1 mode
 	}
@@ -189,8 +183,7 @@ static void s_tc_disable(void)
 
 	/* TC0: not in use */
 	{
-		//sysclk_disable_module(POWER_RED_REG0, PRTIM0);
-		PRR |= _BV(PRTIM0);
+		sysclk_disable_module(POWER_RED_REG0, PRTIM0_bm);
 	}
 
 	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 10-bit resolution - overflows with 15625 Hz */
@@ -205,8 +198,7 @@ static void s_tc_disable(void)
 
 		TIMSK1  = 0;							// no interrupts
 
-		//sysclk_disable_module(POWER_RED_REG0, PRTIM1);
-		PRR |= _BV(PRTIM1);
+		sysclk_disable_module(POWER_RED_REG0, PRTIM1_bm);
 	}
 
 	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
@@ -221,8 +213,7 @@ static void s_tc_disable(void)
 
 		ASSR    = 0;							// no async TOSC1 mode
 
-		//sysclk_disable_module(POWER_RED_REG0, PRTIM2);
-		PRR |= _BV(PRTIM2);
+		sysclk_disable_module(POWER_RED_REG0, PRTIM2_bm);
 	}
 
 	sysclk_set_prescalers(SYSCLK_PSDIV_256);
@@ -233,35 +224,34 @@ static void s_tc_disable(void)
 
 static void s_adc_init(void)
 {
-	//sysclk_enable_module(POWER_RED_REG0, PRADC);	// enable ADC sub-module
-	PRR &= ~_BV(PRADC);
+	sysclk_enable_module(POWER_RED_REG0, PRADC_bm);	// enable ADC sub-module
 
 	adc_disable_digital_inputs(_BV(ADC0D));		// disable the digital input on the ADC0 port
 
 	adc_init(ADC_PRESCALER_DIV128);
 	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 
-	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
-
+	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
 	adc_enable_interrupt();						// enable the ADC interrupt
-	adc_start_conversion();
+
+	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
+	adc_enable_autotrigger();
 }
 
 static void s_adc_disable(void)
 {
 	adc_disable_interrupt();					// disable the ADC interrupt
+	adc_disable_autotrigger();
 	adc_set_autotrigger_source(0);
 	adc_set_admux(0);
 	adc_disable_digital_inputs(0);
 
-	//sysclk_disable_module(POWER_RED_REG0, PRADC);	// disable ADC sub-module
-	PRR |= _BV(PRADC);
+	sysclk_disable_module(POWER_RED_REG0, PRADC_bm);	// disable ADC sub-module
 }
 
 static void s_twi_init(void)
 {
-	//sysclk_enable_module(POWER_RED_REG0, PRTWI);
-	PRR &= ~_BV(PRTWI);
+	sysclk_enable_module(POWER_RED_REG0, PRTWI_bm);
 
 	irqflags_t flags = cpu_irq_save();
 
@@ -292,8 +282,30 @@ static void s_twi_disable(void)
 
 	cpu_irq_restore(flags);
 
-	// sysclk_disable_module(POWER_RED_REG0, PRTWI);
-	PRR |= _BV(PRTWI);
+	sysclk_disable_module(POWER_RED_REG0, PRTWI_bm);
+}
+
+
+/* UTILITIES section */
+
+float get_abs_time(void)
+{
+	const float ticks_per_sec = 8e6f;
+	float now;
+	uint8_t l_tmr_l;
+	uint8_t l_tmr_h;
+	uint_fast32_t l_tmr_msb;
+
+	irqflags_t flags = cpu_irq_save();
+	l_tmr_l = TCNT1L;
+	l_tmr_h = TCNT1H;
+	l_tmr_msb = g_timer_abs_msb;
+	cpu_irq_restore(flags);
+
+	/* calculate ticks to sec */
+	now  = ((l_tmr_h << 8) | l_tmr_l  ) / ticks_per_sec;
+	now += (        512.f  * l_tmr_msb) / ticks_per_sec;
+	return now;
 }
 
 
@@ -302,51 +314,33 @@ static void s_twi_disable(void)
 static void s_task_backlight(float adc_ldr)
 {
 	/* calculate the 8-bit backlight PWM value based on the ADC LDR voltage */
-	const uint16_t	MAX_INTENSITY		= 10000;
 	const uint16_t	BL_OFF_INTENSITY	=  1000;
 	const uint8_t	BL_MIN_PWM			=    26;  // 10%
-	float			intensity			= MAX_INTENSITY;
 	uint8_t			pwm					= 0;
 
-	if (adc_ldr >= 1.f) {
-		intensity = (MAX_INTENSITY >> 1) / adc_ldr;  // 1 <= adc <= 1023
-	}
+	if (adc_ldr < BL_OFF_INTENSITY) {
+		pwm = BL_MIN_PWM + (uint8_t)((255 - BL_MIN_PWM) * (adc_ldr / BL_OFF_INTENSITY));
 
-	if (intensity < BL_OFF_INTENSITY) {
-		pwm = BL_MIN_PWM + (uint8_t)((255 - BL_MIN_PWM) * (intensity / BL_OFF_INTENSITY));
+	} else {
+		// too much light for backlight
+		pwm = 0;
 	}
-
-#if 0	
-	OCR2A = pwm;								// no interrupt lock needed
-#else
-	g_f_DEBUG31  = intensity;
-	g_f_DEBUG32  = adc_ldr;
-	g_u8_DEBUG13 = pwm;
-#endif
+	OCR2A = pwm;	// no interrupt lock needed
 }
 
 static void s_task_temp(float adc_temp)
 {
 	const float C_temp_coef_k			= 1.0595703f;
 	const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 1.1f;
-	const float C_temp_coef_ofs			= 54.0f + C_temp_coef_ofs_atmel;
-	float l_temp_lcd_last;
+	const float C_temp_coef_ofs			= 59.25f + C_temp_coef_ofs_atmel;
 
 	/* Temperature calculation for °C */
-	float l_temp = 25.f + ((adc_temp	- C_temp_coef_ofs) * C_temp_coef_k);
+	float l_temp = 25.f + (adc_temp - C_temp_coef_ofs) * C_temp_coef_k;
 
 	irqflags_t flags = cpu_irq_save();
-	l_temp_lcd_last = g_temp_lcd_last;
 	g_temp = l_temp;
+	g_adc_temp_last = adc_temp;
 	cpu_irq_restore(flags);
-
-	if (abs(l_temp - l_temp_lcd_last) > 1.f) {
-		flags = cpu_irq_save();
-		g_temp_lcd_last = l_temp;
-		cpu_irq_restore(flags);
-
-		// lcd_temp(l_temp);
-	}
 }
 
 void s_task(void)
@@ -356,24 +350,27 @@ void s_task(void)
 	float l_adc_ldr			= g_adc_ldr;
 	float l_adc_ldr_last	= g_adc_ldr_last;
 	float l_adc_temp		= g_adc_temp;
+	float l_adc_temp_last	= g_adc_temp_last;
 	cpu_irq_restore(flags);
 
-#if 1
-	static uint8_t pwm = 0;
-	OCR2A = ++pwm;
-#endif
-
 	/* calculate new backlight PWM value and set that */
-	//if (abs(l_adc_ldr - l_adc_ldr_last) >= 0.5f) {
+	float ldr_diff = l_adc_ldr - l_adc_ldr_last;
+	if (ldr_diff <= -ADC_LDR_DELTA || ADC_LDR_DELTA <= ldr_diff) {
 		s_task_backlight(l_adc_ldr);
 
 		flags = cpu_irq_save();
 		g_adc_ldr_last = l_adc_ldr;
 		cpu_irq_restore(flags);
-	//}
+	}
 
 	/* calculate new current temperature */
-	s_task_temp(l_adc_temp);
+	float temp_diff = l_adc_temp - l_adc_temp_last;
+	if (temp_diff <= -ADC_TEMP_DELTA || ADC_TEMP_DELTA <= temp_diff) {
+		s_task_temp(l_adc_temp);
+	}
+
+	/* animated picture */
+	lcd_animation_loop();
 }
 
 static void s_enter_sleep(uint8_t sleep_mode)
@@ -433,6 +430,8 @@ int main (void)
 
 	/* Initialize external components */
 	lcd_init();
+	lcd_test(0b11110001);						// Debugging purposes
+
 
 	/* main loop */
 	runmode = 1;
@@ -450,11 +449,8 @@ int main (void)
 	/* disable sub-modules */
 	ACSR |= _BV(ACD);							// disable AnalogCompare sub-module
 
-	//sysclk_disable_module(POWER_RED_REG0, PRSPI);
-	PRR  |= _BV(PRSPI);
-
-	//sysclk_disable_module(POWER_RED_REG0, PRUSART0);
-	PRR  |= _BV(PRUSART0);
+	sysclk_disable_module(POWER_RED_REG0, PRSPI_bm);
+	sysclk_disable_module(POWER_RED_REG0, PRUSART0_bm);
 
 	s_twi_disable();
 	s_adc_disable();

@@ -43,6 +43,7 @@
 
 /* External vars */
 
+extern uint_fast32_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
 extern float				g_adc_ldr;
 extern float				g_adc_temp;
@@ -132,7 +133,7 @@ ISR(__vector_12, ISR_BLOCK)
 
 ISR(__vector_13, ISR_BLOCK)
 {	/* TIMER 1 OVF - Overflow */
-	s_bad_interrupt();
+	++g_timer_abs_msb;
 }
 
 ISR(__vector_14, ISR_BLOCK)
@@ -179,6 +180,8 @@ ISR(__vector_21, ISR_BLOCK)
 	adc_val  = ADCL;
 	adc_val |= ADCH << 8;
 
+	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (no ISR for TOV1 activated!)
+
 	switch (g_adc_state) {
 		case ADC_STATE_PRE_LDR:
 		// drop one ADC value after switching MUX
@@ -203,29 +206,30 @@ ISR(__vector_21, ISR_BLOCK)
 		g_adc_state = ADC_STATE_PRE_LDR;
 	}
 
+	uint16_t adc_ldr_last  = g_adc_ldr;
+	uint16_t adc_temp_last = g_adc_temp;
+
 	/* SEI part */
 	sei();
-	__vector_21__bottom(reason, adc_val);
+
+	__vector_21__bottom(reason, adc_val, adc_ldr_last, adc_temp_last);
 }
 
 /* do not static this function to avoid code inlining that would inherit many push operations in the critical section */
-void __vector_21__bottom(uint8_t reason, uint16_t adc_val)
+void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_ldr_last, uint16_t adc_temp_last)
 {
 	/* Low pass filtering and enhancing the data depth */
-
 	if (reason == ADC_STATE_VLD_LDR) {
-		float calc = 0.90f * g_adc_ldr		+ 0.10f * adc_val;
+		float calc = g_adc_ldr ?  0.90f * g_adc_ldr + 0.10f * adc_val : adc_val;			// load with initial value if none is set before
 
 		cli();
-		g_adc_ldr  = calc;
-		sei();
+		g_adc_ldr = calc;
 
 	} else if (reason == ADC_STATE_VLD_TEMP) {
-		float calc = 0.97f * g_adc_temp	+ 0.03f * adc_val;
+		float calc = g_adc_temp ?  0.9995f * g_adc_temp + 0.0005f * adc_val : adc_val;		// load with initial value if none is set before
 
 		cli();
 		g_adc_temp = calc;
-		sei();
 	}
 }
 
