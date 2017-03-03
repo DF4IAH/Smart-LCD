@@ -10,13 +10,14 @@
 #define TWI_H_
 
 
-#define TWI_SLAVE_ADDR		0b0111100
+//#define TWI_SLAVE_ADDR	0b0111100
+#define TWI_SLAVE_ADDR		0x20
 #define TWI_SLAVE_ADDR_BM   0b1111111
 
 #define TWI_SLAVE_ADDR_GCE	0b1
 
 
-void __vector_24__bottom(uint8_t tws, uint8_t twd);
+uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur);
 
 
 #endif /* TWI_H_ */

@@ -12,6 +12,7 @@
 
 /* UTILITIES section */
 float get_abs_time(void);
+void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
 
 
 /* TASK section */

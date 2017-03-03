@@ -255,13 +255,13 @@ static void s_twi_init(void)
 
 	irqflags_t flags = cpu_irq_save();
 
-	TWSR = (0b00 << TWPS0);
-	TWBR = 12;	// TWI bit-rate = 400 kBit/sec @ 16 MHz when master mode active
+	TWSR = (0b00 << TWPS0);						// Prescaler value = 1
+	TWBR = 2;									// TWI bit-rate = 400 kBit/sec @ 8 MHz when master mode active
 
-	TWAR  = (TWI_SLAVE_ADDR    << TWA0) | (TWI_SLAVE_ADDR_GCE << TWGCE);
+	TWAR  = (TWI_SLAVE_ADDR    << TWA0) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
 	TWAMR = (TWI_SLAVE_ADDR_BM << TWAM0);
 
-	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);
+	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable
 
 	cpu_irq_restore(flags);
 }
@@ -306,6 +306,13 @@ float get_abs_time(void)
 	now  = ((l_tmr_h << 8) | l_tmr_l  ) / ticks_per_sec;
 	now += (        512.f  * l_tmr_msb) / ticks_per_sec;
 	return now;
+}
+
+void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
+{
+	for (int i = count; i; --i) {
+		*(buf++) = val;
+	}
 }
 
 
@@ -416,11 +423,11 @@ int main (void)
 		s_reset_global_vars();
 	} else {
 		/* DEBUG */
+		g_u32_DEBUG21 = rc;
 		asm_break();
-		nop();
 	}
 
-	//s_twi_init();
+	s_twi_init();
 
 	/* All interrupt sources prepared here - IRQ activation */
 	cpu_irq_enable();

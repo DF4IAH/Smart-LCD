@@ -247,11 +247,10 @@ ISR(__vector_24, ISR_BLOCK)
 {	/* TWI */
 	uint8_t tws = TWSR & (0b1111 << TWS4);
 	uint8_t twd = TWDR;
+	uint8_t twcr_cur = TWCR;
 
-	/* SEI part */
-	sei();
-	__vector_24__bottom(tws, twd);
-	TWCR = _BV(TWINT);
+	uint8_t twcr_new = __vector_24__bottom(tws, twd, twcr_cur);
+	TWCR = _BV(TWINT) | twcr_new;
 }
 
 ISR(__vector_25, ISR_BLOCK)
