@@ -428,6 +428,7 @@ int main (void)
 		asm_break();
 	}
 
+	/* I2C interface */
 	s_twi_init();
 
 	/* All interrupt sources prepared here - IRQ activation */
@@ -445,7 +446,7 @@ int main (void)
 	runmode = 1;
     while (runmode) {
 	    s_task();
-	    //s_enter_sleep(SLEEP_MODE_IDLE);
+	    s_enter_sleep(SLEEP_MODE_IDLE);
     }
 
 
