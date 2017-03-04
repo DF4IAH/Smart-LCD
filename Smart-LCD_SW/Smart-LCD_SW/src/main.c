@@ -261,7 +261,8 @@ static void s_twi_init(void)
 	TWAR  = (TWI_SLAVE_ADDR    << TWA0) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
 	TWAMR = (TWI_SLAVE_ADDR_BM << TWAM0);
 
-	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable
+	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable, no START or STOP bit
+	//TWCR = _BV(TWSTA) | _BV(TWEN) | _BV(TWIE);	// TEST: Enable START, ENable TWI port, Interrupt Enable
 
 	cpu_irq_restore(flags);
 }

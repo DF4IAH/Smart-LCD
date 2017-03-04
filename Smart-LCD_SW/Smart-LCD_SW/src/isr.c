@@ -245,12 +245,12 @@ ISR(__vector_23, ISR_BLOCK)
 
 ISR(__vector_24, ISR_BLOCK)
 {	/* TWI */
-	uint8_t tws = TWSR & (0b1111 << TWS4);
+	uint8_t tws = TWSR & (0b11111 << TWS3);
 	uint8_t twd = TWDR;
 	uint8_t twcr_cur = TWCR;
 
 	uint8_t twcr_new = __vector_24__bottom(tws, twd, twcr_cur);
-	TWCR = _BV(TWINT) | twcr_new;
+	TWCR = twcr_new | _BV(TWINT) | _BV(TWEN) | _BV(TWIE);
 }
 
 ISR(__vector_25, ISR_BLOCK)

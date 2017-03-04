@@ -149,7 +149,19 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	case 0x08:									// Start condition transmitted
 		s_tx_lock = 1;
 		pos_o = 0;
+
+		cnt_o = 2;								// TEST
+		s_tx_d[0] = (0x12 << TWD1) | (0b0 << TWD0);	// TEST
+		s_tx_d[1] = 0x34;						// TEST
+		s_tx_d[2] = 0x56;						// TEST
+		s_tx_d[3] = 0x78;						// TEST
+		s_tx_d[4] = 0x9a;						// TEST
+
+		//twcr_new &= ~_BV(TWSTA);	// TODO: self-clearing?
+		// fall-through.
 	case 0x10:									// Repeated start condition transmitted
+		nop();
+		// fall-through.
 	case 0x18:									// SLA+W transmitted and ACK received
 		TWDR = s_tx_d[pos_o++];
 		break;
@@ -182,6 +194,8 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	/* Slave Receiver Mode */
 
 	case 0x60:									// SLA+W received and ACK sent
+		nop();
+		// fall-through.
 	case 0x68:
 		s_rx_lock = 1;
 		mem_set(s_rx_d, 8, 0x00);
@@ -191,6 +205,8 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		break;
 
 	case 0x70:									// GCA received and ACK sent
+		nop();
+		// fall-through.
 	case 0x78:
 		s_rx_lock = 1;
 		s_rx_d[0] = twd;						// GCA
@@ -199,30 +215,25 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		break;
 
 	case 0x80:									// Data after SLA+W received
+		nop();
+		// fall-through.
 	case 0x90:
-		if (cnt_i == 0b111) {					// Open parameter form
-			s_rx_d[2] = twd;
-			if (!s_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
-				twcr_new |= _BV(TWEA);			// Send after next coming data byte ACK
-			} else {
-				twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
-				pos_i = 0;
-				cnt_i = 0;
-				mem_set(s_rx_d, 8, 0x00);
-			}
-
-		} else {								// Closed parameter form
+		if (cnt_i != 0b111) {					// Closed parameter form
 			if (pos_i <= 0b111) {
 				s_rx_d[pos_i] = twd;
 			}
 			if (pos_i == 1) {
 				//cnt_i = ((twd >> 5) & 0b111) + 1;
 				switch (s_rx_d[1]) {
-					case 0x0a:
+#if 0
+					case 0x12:
 						cnt_i = 2;
 						break;
+#endif
+
 					default:
-						cnt_i = 3;
+						//cnt_i = 3;
+						cnt_i = 13;
 				}
 			}
 			if (pos_i < 0b111) {
@@ -232,12 +243,27 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 			if (pos_i <= cnt_i) {
 				twcr_new |= _BV(TWEA);			// Send after next coming data byte ACK
 			} else {
-				twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
+				//twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
+				twcr_new |= _BV(TWEA); // TEST
+			}
+
+		} else {								// Open parameter form
+			s_rx_d[2] = twd;
+			if (!s_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
+				twcr_new |= _BV(TWEA);			// Send after next coming data byte ACK
+			} else {
+				//twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
+				twcr_new |= _BV(TWEA); // TEST
+				pos_i = 0;
+				cnt_i = 0;
+				mem_set(s_rx_d, 8, 0x00);
 			}
 		}
 		break;
 
 	case 0x88:									// NACK after last data byte sent
+		nop();
+		// fall-through.
 	case 0x98:
 		if (cnt_i != 0b111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
@@ -248,9 +274,10 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		cnt_i = 0;
 		mem_set(s_rx_d, 8, 0x00);
 		s_rx_lock = 0;
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		break;
 
-	case 0xA0:									// STOP or RSTART received while still addressed as slave
+	case 0xA0:									// STOP or RESTART received while still addressed as slave
 		if (cnt_i != 0b111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
@@ -267,6 +294,8 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	/* Slave Transmitter Mode */
 
 	case 0xA8:									// SLA+R received and ACK has been returned
+		nop();
+		// fall-through.
 	case 0xB0:
 		s_rx_lock = 1;
 		pos_o = 0;
