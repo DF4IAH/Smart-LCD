@@ -7569,8 +7569,8 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <part name="GND302" library="df4iah_supply" deviceset="GND" device=""/>
 <part name="+3V3_301" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="+5V0_301" library="df4iah_supply" deviceset="+5V" device=""/>
-<part name="R391" library="rcl" deviceset="R-EU_" device="R0603" value="1.5kR"/>
-<part name="R392" library="rcl" deviceset="R-EU_" device="R0603" value="1.5kR"/>
+<part name="R391" library="rcl" deviceset="R-EU_" device="R0603" value="1kR"/>
+<part name="R392" library="rcl" deviceset="R-EU_" device="R0603" value="1kR"/>
 <part name="FRAME4" library="df4iah_frame" deviceset="A4L-LOC" device="" value="Holes"/>
 <part name="X201" library="df4iah_connector" deviceset="LCD_23WAY__UC1608" device=""/>
 <part name="C201" library="rcl" deviceset="C-EU" device="C0805" value="4.7uF"/>
