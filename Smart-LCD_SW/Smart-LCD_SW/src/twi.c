@@ -32,6 +32,7 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
+#include "main.h"
 
 #include "twi.h"
 
@@ -46,38 +47,6 @@ static uint8_t s_rx_lock = 0;
 static uint8_t s_rx_d[8];
 
 
-static void s_twcr_ack(uint8_t set)
-{
-	irqflags_t flags = cpu_irq_save();
-
-	if (set) {
-		TWCR |=   _BV(TWEA);					// ACK
-	} else {
-		TWCR &= ~(_BV(TWEA));					// NACK
-	}
-
-	cpu_irq_restore(flags);
-}
-
-static void s_twcr_all(uint8_t ctrl)
-{
-	irqflags_t flags = cpu_irq_save();
-
-	TWCR = ctrl;
-
-	cpu_irq_restore(flags);
-}
-
-static void s_twdr(uint8_t data_o)
-{
-	irqflags_t flags = cpu_irq_save();
-
-	TWDR = data_o;
-
-	cpu_irq_restore(flags);
-}
-
-
 static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
 {
 	if (msgCnt && msg) {
@@ -87,7 +56,6 @@ static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
 				s_tx_d[idx] = msg[idx];
 			}
 			s_tx_len = msgCnt;
-			s_twdr(0b11100101);					// Start condition
 
 		} else if (s_tx_lock && !s_tx_next_len) {
 			// Stash message into next message facility
@@ -109,7 +77,6 @@ static void s_twi_tx_done(void)
 		}
 		s_tx_len = s_tx_next_len;
 		s_tx_next_len = 0;
-		s_twdr(0b11100101);						// Start condition
 	}
 }
 
@@ -127,6 +94,7 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 	uint8_t cmd		=  data[1];
 
 	if (isGCA) {
+		nop();
 		switch (cmd) {
 			case 0b0100000:						// IDENTIFY
 			// TODO: prepare ADR+R data
@@ -139,6 +107,7 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		}
 
 	} else {
+		nop();
 		switch (cmd) {
 			case 0b0000000:						// LCD reset
 			// TODO: LCD communication
@@ -165,12 +134,13 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 }
 
 
-void __vector_24__bottom(uint8_t tws, uint8_t twd)
+uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 {
 	static uint8_t pos_i	= 0;
 	static uint8_t pos_o	= 0;
 	static uint8_t cnt_i	= 0;
 	static uint8_t cnt_o	= 0;
+	uint8_t twcr_new = twcr_cur;
 
 	switch(tws) {
 
@@ -179,92 +149,144 @@ void __vector_24__bottom(uint8_t tws, uint8_t twd)
 	case 0x08:									// Start condition transmitted
 		s_tx_lock = 1;
 		pos_o = 0;
+
+		cnt_o = 2;								// TEST
+		s_tx_d[0] = (0x12 << TWD1) | (0b0 << TWD0);	// TEST
+		s_tx_d[1] = 0x34;						// TEST
+		s_tx_d[2] = 0x56;						// TEST
+		s_tx_d[3] = 0x78;						// TEST
+		s_tx_d[4] = 0x9a;						// TEST
+
+		//twcr_new &= ~_BV(TWSTA);	// TODO: self-clearing?
+		// fall-through.
 	case 0x10:									// Repeated start condition transmitted
+		nop();
+		// fall-through.
 	case 0x18:									// SLA+W transmitted and ACK received
-		s_twdr(s_tx_d[pos_o++]);
+		TWDR = s_tx_d[pos_o++];
 		break;
 
 	case 0x20:									// SLA+W transmitted and NACK received
-		s_twcr_all(0b10010101);					// Send NACK and STOP
+		twcr_new |= _BV(TWSTO);					// Send STOP
 		break;
 
 	case 0x28:									// Data byte sent and ACK received
 		if (pos_o < cnt_o) {
-			s_twdr(s_tx_d[pos_o++]);
-			s_twcr_all(0b11000101);				// Send new data byte and ACK send enable
+			TWDR = s_tx_d[pos_o++];				// Send new data byte
 		} else {
-			s_twcr_all(0b11010101);				// Send STOP and ACK send enable
+			twcr_new |= _BV(TWSTO);				// Send STOP - no more data available
 			s_tx_lock = 0;
 			s_twi_tx_done();					// Message sent
 		}
 		break;
 
 	case 0x30:									// Data byte sent and NACK received
-		s_twcr_all(0b10010101);					// Send NACK and STOP
+		twcr_new |= _BV(TWSTO);					// Send STOP - due to an error or slave not ready situation
 		s_tx_lock = 0;
 		s_twi_tx_done();						// Message failure
 		break;
 
 	case 0x38:									// Arbitration lost
-		s_twcr_all(0b11100101);					// Send START (again) and ACK send enable
+		twcr_new |= _BV(TWSTA);					// Send START (again)
 		break;
 
 
 	/* Slave Receiver Mode */
 
 	case 0x60:									// SLA+W received and ACK sent
+		nop();
+		// fall-through.
 	case 0x68:
 		s_rx_lock = 1;
+		mem_set(s_rx_d, 8, 0x00);
 		s_rx_d[0] = twd;						// Target address
 		pos_i = 1;								// Starting of reception
+		twcr_new |= _BV(TWEA);					// Send after next coming data byte ACK
 		break;
 
 	case 0x70:									// GCA received and ACK sent
+		nop();
+		// fall-through.
 	case 0x78:
 		s_rx_lock = 1;
 		s_rx_d[0] = twd;						// GCA
 		pos_i = 1;								// Starting of reception
+		twcr_new |= _BV(TWEA);					// Send after next coming data byte ACK
 		break;
 
 	case 0x80:									// Data after SLA+W received
+		nop();
+		// fall-through.
 	case 0x90:
-		if (cnt_i == 0b111) {					// Open parameter form
-			s_rx_d[2] = twd;
-			if (!s_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
-				s_twcr_ack(true);				// ACK
-			} else {
-				s_twcr_ack(false);				// NACK
-				cnt_i = 0;
-			}
-
-		} else {								// Closed parameter form
+		if (cnt_i != 0b111) {					// Closed parameter form
 			if (pos_i <= 0b111) {
 				s_rx_d[pos_i] = twd;
 			}
 			if (pos_i == 1) {
-				cnt_i = ((twd >> 5) & 0b111) + 1;
+				//cnt_i = ((twd >> 5) & 0b111) + 1;
+				switch (s_rx_d[1]) {
+#if 0
+					case 0x12:
+						cnt_i = 2;
+						break;
+#endif
+
+					default:
+						//cnt_i = 3;
+						cnt_i = 13;
+				}
 			}
 			if (pos_i < 0b111) {
 				++pos_i;
 			}
-			s_twcr_ack(pos_i <= cnt_i);			// ACK - NACK
+
+			if (pos_i <= cnt_i) {
+				twcr_new |= _BV(TWEA);			// Send after next coming data byte ACK
+			} else {
+				//twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
+				twcr_new |= _BV(TWEA); // TEST
+			}
+
+		} else {								// Open parameter form
+			s_rx_d[2] = twd;
+			if (!s_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
+				twcr_new |= _BV(TWEA);			// Send after next coming data byte ACK
+			} else {
+				//twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
+				twcr_new |= _BV(TWEA); // TEST
+				pos_i = 0;
+				cnt_i = 0;
+				mem_set(s_rx_d, 8, 0x00);
+			}
 		}
 		break;
 
 	case 0x88:									// NACK after last data byte sent
+		nop();
+		// fall-through.
 	case 0x98:
 		if (cnt_i != 0b111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
 			s_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
 		}
-		s_rx_lock = 0;
-		break;
-
-	case 0xA0:
-		s_twcr_all(0b11000101);					// Send nothing
 		pos_i = 0;
 		cnt_i = 0;
+		mem_set(s_rx_d, 8, 0x00);
+		s_rx_lock = 0;
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		break;
+
+	case 0xA0:									// STOP or RESTART received while still addressed as slave
+		if (cnt_i != 0b111) {
+			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
+		} else {
+			s_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
+		}
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		pos_i = 0;
+		cnt_i = 0;
+		mem_set(s_rx_d, 8, 0x00);
 		s_rx_lock = 0;
 		break;
 
@@ -272,28 +294,45 @@ void __vector_24__bottom(uint8_t tws, uint8_t twd)
 	/* Slave Transmitter Mode */
 
 	case 0xA8:									// SLA+R received and ACK has been returned
+		nop();
+		// fall-through.
 	case 0xB0:
 		s_rx_lock = 1;
 		pos_o = 0;
-		s_twdr(cnt_o > pos_o ?  s_rx_d[pos_o++] : 0);
-		s_twcr_ack(cnt_o > pos_o);				// ACK - NACK
+		TWDR = cnt_o > pos_o ?  s_rx_d[pos_o++] : 0;
+
+		if (cnt_o > pos_o) {
+			twcr_new |= _BV(TWEA);				// More data to send ACK
+		} else {
+			twcr_new &= ~_BV(TWEA);				// No more data to send NACK
+		}
 		break;
 
 	case 0xB8:									// Data sent and ACK has been returned
-		s_twdr(cnt_o > pos_o ?  s_rx_d[pos_o++] : 0);
-		s_twcr_ack(cnt_o > pos_o);				// ACK - NACK
+		TWDR = cnt_o > pos_o ?  s_rx_d[pos_o++] : 0;
+		if (cnt_o > pos_o) {
+			twcr_new |= _BV(TWEA);				// More data to send ACK
+			} else {
+			twcr_new &= ~_BV(TWEA);				// No more data to send NACK
+		}
 		break;
 
 	case 0xC0:									// Data sent and NACK has been returned
-		s_twcr_ack(false);						// NACK
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		pos_o = 0;
 		cnt_o = 0;
 		s_rx_lock = 0;
 		break;
 
-	case 0xC8:									// Superfluous ACK by master sent after NACK has been returned
-		s_twcr_all(0b11000101);					// Send nothing
+	case 0xC8:									// Last data sent and ACK has been returned
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		s_rx_lock = 0;
+		/* message transmitted successfully in slave mode */
 		break;
+		
+	default:
+		nop();
 	}
+
+	return twcr_new;
 }
