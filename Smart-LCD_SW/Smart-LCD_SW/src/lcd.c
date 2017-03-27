@@ -452,6 +452,11 @@ void lcd_test(uint8_t pattern_bm)
 	}
 }
 
+const void* lcd_get_sysfont(void)
+{
+	return &sysfont;
+}
+
 
 uint8_t lcd_init(void)
 {

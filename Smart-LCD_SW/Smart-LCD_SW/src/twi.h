@@ -10,8 +10,7 @@
 #define TWI_H_
 
 
-//#define TWI_SLAVE_ADDR	0b0111100
-#define TWI_SLAVE_ADDR		0b0100000
+#define TWI_SLAVE_ADDR		0x22
 #define TWI_SLAVE_ADDR_BM   0b0000000
 
 #define TWI_SLAVE_ADDR_GCE	0b1

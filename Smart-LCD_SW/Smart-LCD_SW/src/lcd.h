@@ -56,6 +56,7 @@ void lcd_cls(void);
 void lcd_animation_prepare(void);
 void lcd_animation_loop(void);
 void lcd_test(uint8_t pattern_bm);
+const void* lcd_get_sysfont(void);
 
 uint8_t	lcd_init(void);
 void	lcd_shutdown(void);
