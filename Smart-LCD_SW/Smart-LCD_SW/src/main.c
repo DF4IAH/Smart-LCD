@@ -30,15 +30,18 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
+#include <stdio.h>
+
 #include "isr.h"
 #include "twi.h"
 #include "lcd.h"
+#include "gfx_mono/sysfont.h"
 
 #include "main.h"
 
 
 #define ADC_TEMP_DELTA	0.005f
-#define ADC_LDR_DELTA   5.0f
+#define ADC_LDR_DELTA   25.0f
 
 
 /* GLOBAL section */
@@ -153,11 +156,11 @@ static void s_tc_init(void)
 				| (0b11  << WGM20);				// WGM: 0b011 = Fast PWM mode 8 bit
 
 		TCCR2B  = ( 0b0  << WGM22)
-				| (0b111 << CS20);				// CLKio DIV 1024 = 15625 Hz
+				| (0b101 << CS20);				// CLKio DIV 128 = 62500 Hz --> / 2**8 = 244 Hz looping rate
 
 		TCNT2   = 0;							// Clear current value for synchronous start (when restarting without reset)
 
-		OCR2A   = 0x40;							// LCD backlight dimmed down to 25% 
+		OCR2A   = 0x00;							// LCD backlight dimmed down
 
 		TIMSK2  = 0b00000000;					// No interrupts
 		TIFR2   = 0b00000111;					// Clear all flags
@@ -319,21 +322,27 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 
 /* TASK section */
 
-static void s_task_backlight(float adc_ldr)
+static void s_task_backlight(float adc_photo)
 {
-	/* calculate the 8-bit backlight PWM value based on the ADC LDR voltage */
-	const uint16_t	BL_OFF_INTENSITY	=  1000;
-	const uint8_t	BL_MIN_PWM			=    26;  // 10%
-	uint8_t			pwm					= 0;
+	char buf[16];
 
-	if (adc_ldr < BL_OFF_INTENSITY) {
-		pwm = BL_MIN_PWM + (uint8_t)((255 - BL_MIN_PWM) * (adc_ldr / BL_OFF_INTENSITY));
+	/* calculate the 8-bit backlight PWM value based on the ADC LDR voltage */
+	const uint16_t  BL_ADC_MAXVAL		=  1023;
+	const uint16_t	BL_OFF_INTENSITY	=   950;
+	uint16_t lum = (uint16_t) (BL_ADC_MAXVAL - adc_photo);
+
+	if (lum < BL_OFF_INTENSITY) {
+		OCR2A	= (uint8_t) (255.0f * (((float) lum) / (BL_OFF_INTENSITY - 1)));	// no interrupt lock needed
+		TCCR2A |= (0b10  << COM2A0);
 
 	} else {
 		// too much light for backlight
-		pwm = 0;
+		OCR2A   = 0;
+		TCCR2A &= ~(0b11  << COM2A0);
 	}
-	OCR2A = pwm;	// no interrupt lock needed
+
+	sprintf(buf, "LUM=%4d", lum);
+	gfx_mono_draw_string(buf, 120, 81, lcd_get_sysfont());
 }
 
 static void s_task_temp(float adc_temp)

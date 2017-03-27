@@ -109,19 +109,23 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 	} else {
 		nop();
 		switch (cmd) {
-			case 0b0000000:						// LCD reset
+			case 0b0000000:						// return version
+			// = VERSION;
+			break;
+
+			case 0b1000000:						// LCD reset
 			// TODO: LCD communication
 			break;
 
-			case 0b0000001:						// blank screen
+			case 0b1000001:						// blank screen
 			// TODO: LCD communication
 			break;
 
-			case 0b0000010:						// invert off
+			case 0b1000010:						// invert off
 			// TODO: LCD communication
 			break;
 
-			case 0b0000011:						// invert on
+			case 0b1000011:						// invert on
 			// TODO: LCD communication
 			break;
 

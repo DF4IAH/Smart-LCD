@@ -10,6 +10,10 @@
 #define MAIN_H_
 
 
+/* Version V1.0 */
+#define VERSION														0x10
+
+
 /* UTILITIES section */
 float get_abs_time(void);
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
