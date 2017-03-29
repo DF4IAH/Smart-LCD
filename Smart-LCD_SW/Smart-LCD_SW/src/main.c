@@ -41,7 +41,7 @@
 
 
 #define ADC_TEMP_DELTA	0.005f
-#define ADC_LDR_DELTA   25.0f
+#define ADC_LDR_DELTA   2.5f
 
 
 /* GLOBAL section */
@@ -261,8 +261,8 @@ static void s_twi_init(void)
 	TWSR = (0b00 << TWPS0);						// Prescaler value = 1
 	TWBR = 2;									// TWI bit-rate = 400 kBit/sec @ 8 MHz when master mode active
 
-	TWAR  = (TWI_SLAVE_ADDR    << TWA0) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
-	TWAMR = (TWI_SLAVE_ADDR_BM << TWAM0);
+	TWAR  = (TWI_SLAVE_ADDR    << 1) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
+	TWAMR = (TWI_SLAVE_ADDR_BM << 1);
 
 	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable, no START or STOP bit
 	//TWCR = _BV(TWSTA) | _BV(TWEN) | _BV(TWIE);	// TEST: Enable START, ENable TWI port, Interrupt Enable

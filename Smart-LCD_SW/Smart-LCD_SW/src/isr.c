@@ -220,7 +220,7 @@ void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_ldr_last
 {
 	/* Low pass filtering and enhancing the data depth */
 	if (reason == ADC_STATE_VLD_LDR) {
-		float calc = g_adc_ldr ?  0.90f * g_adc_ldr + 0.10f * adc_val : adc_val;			// load with initial value if none is set before
+		float calc = g_adc_ldr ?  0.998f * g_adc_ldr + 0.002f * adc_val : adc_val;			// load with initial value if none is set before
 
 		cli();
 		g_adc_ldr = calc;

@@ -45,6 +45,7 @@ static uint8_t s_tx_d[8];
 
 static uint8_t s_rx_lock = 0;
 static uint8_t s_rx_d[8];
+static uint8_t s_rx_len = 0;
 
 
 static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
@@ -80,6 +81,18 @@ static void s_twi_tx_done(void)
 	}
 }
 
+static void s_twi_rx_prepare(uint8_t msgCnt, uint8_t msg[])
+{
+	if (msgCnt && msg) {
+		if (!s_rx_lock) {
+			// Prepare master message buffer
+			for (int idx = msgCnt; idx >= 0; --idx) {
+				s_rx_d[idx] = msg[idx];
+			}
+			s_rx_len = msgCnt;
+		}
+	}
+}
 
 static uint8_t s_twi_rcvd_command_open_form(uint8_t data[], uint8_t pos)
 {
@@ -107,10 +120,13 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		}
 
 	} else {
+		uint8_t buf[4];
+
 		nop();
 		switch (cmd) {
-			case 0b0000000:						// return version
-			// = VERSION;
+			case TWI_SMART_LCD_CMD_GETVER:		// return version
+			buf[0] = VERSION;
+			s_twi_rx_prepare(1, buf);
 			break;
 
 			case 0b1000000:						// LCD reset
@@ -236,8 +252,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 #endif
 
 					default:
-						//cnt_i = 3;
-						cnt_i = 13;
+						cnt_i = 3;
 				}
 			}
 			if (pos_i < 0b111) {
@@ -256,11 +271,8 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 			if (!s_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
 				twcr_new |= _BV(TWEA);			// Send after next coming data byte ACK
 			} else {
-				//twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
-				twcr_new |= _BV(TWEA); // TEST
+				twcr_new &= ~_BV(TWEA);			// Send after next coming data byte NACK
 				pos_i = 0;
-				cnt_i = 0;
-				mem_set(s_rx_d, 8, 0x00);
 			}
 		}
 		break;
@@ -269,6 +281,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		nop();
 		// fall-through.
 	case 0x98:
+		s_rx_lock = 0;
 		if (cnt_i != 0b111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
@@ -282,6 +295,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		break;
 
 	case 0xA0:									// STOP or RESTART received while still addressed as slave
+		s_rx_lock = 0;
 		if (cnt_i != 0b111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
@@ -289,9 +303,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		}
 		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		pos_i = 0;
-		cnt_i = 0;
-		mem_set(s_rx_d, 8, 0x00);
-		s_rx_lock = 0;
 		break;
 
 
@@ -303,6 +314,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	case 0xB0:
 		s_rx_lock = 1;
 		pos_o = 0;
+		cnt_o = s_rx_len;
 		TWDR = cnt_o > pos_o ?  s_rx_d[pos_o++] : 0;
 
 		if (cnt_o > pos_o) {
