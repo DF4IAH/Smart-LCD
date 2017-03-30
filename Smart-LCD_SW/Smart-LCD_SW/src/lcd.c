@@ -28,12 +28,16 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
+#include <stdio.h>
+
 #include "gfx_mono/sysfont.h"
 #include "main.h"
 
 #include "lcd.h"
 
 extern float				g_temp;
+
+extern uint8_t				g_animation_on;
 
 extern uint8_t				g_u8_DEBUG11,
 							g_u8_DEBUG12,
@@ -48,6 +52,7 @@ extern float				g_f_DEBUG31;
 #define ANIMATION_TRAIN_BLANK_LEN       (1 + 15 + ANIMATION_TRAIN_WAGGON_CNT * (3 + 8) + 1)
 
 static uint8_t s_lcd_ram_read_nonvalid = 0;
+static char    s_lcd_prepare_buf[16];
 static	int    s_animation_train_origin = 0;
 static 	int8_t s_animation_dx = 0;
 static float   s_animation_time_last_temp  = 0.f;
@@ -272,7 +277,6 @@ static void s_lcd_test_lines(void)
 
 static void s_lcd_test_temp(void)
 {
-	char	buf[7];
 	float	t;
 
 	s_task();
@@ -285,15 +289,15 @@ static void s_lcd_test_temp(void)
 		t = 0.f;
 	}
 
-	buf[0] = '0' + (uint8_t)(((int)(t /  10.f)) % 10);
-	buf[1] = '0' + (uint8_t)(((int) t         ) % 10);
-	buf[2] = ',';
-	buf[3] = '0' + (uint8_t)(((int)(t *  10.f)) % 10);
-	buf[4] = '0' + (uint8_t)(((int)(t * 100.f)) % 10);
-	buf[5] = 'C';
-	buf[6] = 0;
+	s_lcd_prepare_buf[0] = '0' + (uint8_t)(((int)(t /  10.f)) % 10);
+	s_lcd_prepare_buf[1] = '0' + (uint8_t)(((int) t         ) % 10);
+	s_lcd_prepare_buf[2] = ',';
+	s_lcd_prepare_buf[3] = '0' + (uint8_t)(((int)(t *  10.f)) % 10);
+	s_lcd_prepare_buf[4] = '0' + (uint8_t)(((int)(t * 100.f)) % 10);
+	s_lcd_prepare_buf[5] = 'C';
+	s_lcd_prepare_buf[6] = 0;
 
-	gfx_mono_draw_string(buf, 120, 65, &sysfont);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 120, 65, &sysfont);
 }
 
 void lcd_animation_prepare(void)
@@ -448,8 +452,19 @@ void lcd_test(uint8_t pattern_bm)
 	if (pattern_bm & (1 << 7)) {
 		// TEST 8
 		lcd_animation_prepare();
+
+		g_animation_on = true;
 		lcd_animation_loop();
 	}
+}
+
+void lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "  .  .  ");
+	gfx_mono_draw_string(s_lcd_prepare_buf, 10, 10, &sysfont);
+
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%02d.%02d.%04d", day, month, year);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 10, 10, &sysfont);
 }
 
 const void* lcd_get_sysfont(void)

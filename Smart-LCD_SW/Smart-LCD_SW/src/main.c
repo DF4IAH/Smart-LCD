@@ -57,6 +57,8 @@ float				g_adc_temp_last						= 0.f;
 float				g_temp								= 0.f;
 uint8_t				g_lcdbl_dimmer						= 0;
 
+uint8_t				g_animation_on						= 0;
+
 uint8_t				g_u8_DEBUG11						= 0,
 					g_u8_DEBUG12						= 0,
 					g_u8_DEBUG13						= 0;
@@ -88,6 +90,8 @@ static void s_reset_global_vars(void)
 
 	g_temp				= 25.f;
 	g_lcdbl_dimmer		= 64;
+
+	g_animation_on		= false;
 
 	cpu_irq_restore(flags);
 }
@@ -386,8 +390,18 @@ void s_task(void)
 		s_task_temp(l_adc_temp);
 	}
 
-	/* animated picture */
-	lcd_animation_loop();
+	/* animated demo */
+	if (g_animation_on) {
+		lcd_animation_loop();
+
+	} else {
+		static int8_t s_last_animation = true;
+
+		if (s_last_animation) {
+			s_last_animation = false;
+			lcd_cls();							// clear screen
+		}
+	}
 }
 
 static void s_enter_sleep(uint8_t sleep_mode)

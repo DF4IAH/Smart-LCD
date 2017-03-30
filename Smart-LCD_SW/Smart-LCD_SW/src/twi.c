@@ -32,20 +32,24 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
+
+#include "lcd.h"
 #include "main.h"
 
 #include "twi.h"
 
 
-static uint8_t s_tx_next_len = 0;
-static uint8_t s_tx_next_d[8];
-static uint8_t s_tx_lock = 0;
-static uint8_t s_tx_len = 0;
-static uint8_t s_tx_d[8];
+extern uint8_t				g_animation_on;
 
-static uint8_t s_rx_lock = 0;
-static uint8_t s_rx_d[8];
-static uint8_t s_rx_len = 0;
+static uint8_t				s_tx_next_len = 0;
+static uint8_t				s_tx_next_d[8];
+static uint8_t				s_tx_lock = 0;
+static uint8_t				s_tx_len = 0;
+static uint8_t				s_tx_d[8];
+
+static uint8_t				s_rx_lock = 0;
+static uint8_t				s_rx_d[8];
+static uint8_t				s_rx_len = 0;
 
 
 static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
@@ -124,10 +128,16 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 
 		nop();
 		switch (cmd) {
-			case TWI_SMART_LCD_CMD_GETVER:		// return version
+			case TWI_SMART_LCD_CMD_GETVER:
 			buf[0] = VERSION;
 			s_twi_rx_prepare(1, buf);
+			g_animation_on = false;				// stop animation demo
 			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
+			lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
+			break;
+
 
 			case 0b1000000:						// LCD reset
 			// TODO: LCD communication
