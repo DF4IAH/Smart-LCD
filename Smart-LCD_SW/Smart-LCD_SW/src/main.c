@@ -331,12 +331,13 @@ static void s_task_backlight(float adc_photo)
 	char buf[16];
 
 	/* calculate the 8-bit backlight PWM value based on the ADC LDR voltage */
-	const uint16_t  BL_ADC_MAXVAL		=  1023;
-	const uint16_t	BL_OFF_INTENSITY	=   950;
-	uint16_t lum = (uint16_t) (BL_ADC_MAXVAL - adc_photo);
+	const uint16_t	BL_ADC_OFF			=   950;
+	const uint16_t	BL_MIN_INTENSITY	=    10;
+	uint16_t lum = (uint16_t) adc_photo;
 
-	if (lum < BL_OFF_INTENSITY) {
-		OCR2A	= (uint8_t) (255.0f * (((float) lum) / (BL_OFF_INTENSITY - 1)));	// no interrupt lock needed
+	if (lum < BL_ADC_OFF) {
+		OCR2A	= (uint8_t) (BL_MIN_INTENSITY + (255.0f - BL_MIN_INTENSITY) \
+				  * (((float) lum - BL_MIN_INTENSITY) / BL_ADC_OFF));			// no interrupt lock needed
 		TCCR2A |= (0b10  << COM2A0);
 
 	} else {
