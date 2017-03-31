@@ -134,6 +134,10 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			g_animation_on = false;				// stop animation demo
 			break;
 
+			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
+			lcd_10mhz_ref_osc_show_clk_state(data[2]);
+			break;
+
 			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 			lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
 			break;

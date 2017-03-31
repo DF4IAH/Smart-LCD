@@ -458,13 +458,19 @@ void lcd_test(uint8_t pattern_bm)
 	}
 }
 
+void lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "x%1x", clk_state);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 16, 8, &sysfont);
+}
+
 void lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
 {
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "  .  .  ");
-	gfx_mono_draw_string(s_lcd_prepare_buf, 10, 10, &sysfont);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 16, 16, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%02d.%02d.%04d", day, month, year);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 10, 10, &sysfont);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 16, 16, &sysfont);
 }
 
 const void* lcd_get_sysfont(void)
