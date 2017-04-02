@@ -73,6 +73,7 @@ float				g_f_DEBUG31							= 0.f,
 /* MAIN STATIC section */
 
 static uint8_t		runmode								= 0;			// static runmode of main.c
+static char			prepareBuf[16];
 
 
 
@@ -328,8 +329,6 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 
 static void s_task_backlight(float adc_photo)
 {
-	char buf[16];
-
 	/* calculate the 8-bit backlight PWM value based on the ADC photo diode current */
 	const uint16_t	BL_ADC_OFF			=   950;
 	const uint16_t	BL_MIN_INTENSITY	=    10;
@@ -346,8 +345,12 @@ static void s_task_backlight(float adc_photo)
 		TCCR2A &= ~(0b11  << COM2A0);
 	}
 
-	sprintf(buf, "LUM=%4d", lum);
-	gfx_mono_draw_string(buf, 120, 81, lcd_get_sysfont());
+	if (g_animation_on) {
+		sprintf(prepareBuf, "LUM=    ");
+		gfx_mono_draw_string(prepareBuf, 200, 0, lcd_get_sysfont());
+		sprintf(prepareBuf, "LUM=%04d", lum);
+		gfx_mono_draw_string(prepareBuf, 200, 0, lcd_get_sysfont());
+	}
 }
 
 static void s_task_temp(float adc_temp)
@@ -401,6 +404,9 @@ void s_task(void)
 		if (s_last_animation) {
 			s_last_animation = false;
 			lcd_cls();							// clear screen
+
+			const char buf[] = "=== 10 MHz.-Ref.-Osc.  Smart-LCD ===";
+			gfx_mono_draw_string(buf, 8, 0, lcd_get_sysfont());
 		}
 	}
 }

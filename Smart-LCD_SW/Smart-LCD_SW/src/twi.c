@@ -52,6 +52,7 @@ static uint8_t				s_rx_d[8];
 static uint8_t				s_rx_len = 0;
 
 
+#if 0
 static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
 {
 	if (msgCnt && msg) {
@@ -71,6 +72,7 @@ static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
 		} // else ... the message is lost
 	}
 }
+#endif
 
 static void s_twi_tx_done(void)
 {
@@ -111,7 +113,6 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 	uint8_t cmd		=  data[1];
 
 	if (isGCA) {
-		nop();
 		switch (cmd) {
 			case 0b0100000:						// IDENTIFY
 			// TODO: prepare ADR+R data
@@ -124,13 +125,12 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		}
 
 	} else {
-		uint8_t buf[4];
+		uint8_t prepareBuf[4];
 
-		nop();
 		switch (cmd) {
 			case TWI_SMART_LCD_CMD_GETVER:
-			buf[0] = VERSION;
-			s_twi_rx_prepare(1, buf);
+			prepareBuf[0] = VERSION;
+			s_twi_rx_prepare(1, prepareBuf);
 			g_animation_on = false;				// stop animation demo
 			break;
 
@@ -140,6 +140,46 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 
 			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 			lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
+			lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_PPM_INT16_FRAC16:
+			lcd_10mhz_ref_osc_show_ppm(data[2] | (data[3] << 8), data[4] | (data[5] << 8));
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
+			lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
+			lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_SATS:
+			lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_DOP:
+			lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
+			lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
+			lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4] | (data[5] << 8));
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_POS_LON:
+			lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3] | (data[4] << 8), data[5] | (data[6] << 8));
+			break;
+
+			case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
+			lcd_10mhz_ref_osc_show_pos_height(data[2] | (data[3] << 8));
 			break;
 
 
