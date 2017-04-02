@@ -146,8 +146,8 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
 			break;
 
-			case TWI_SMART_LCD_CMD_SHOW_PPM_INT16_FRAC16:
-			lcd_10mhz_ref_osc_show_ppm(data[2] | (data[3] << 8), data[4] | (data[5] << 8));
+			case TWI_SMART_LCD_CMD_SHOW_PPM:
+			lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
@@ -171,11 +171,11 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
-			lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4] | (data[5] << 8));
+			lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LON:
-			lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3] | (data[4] << 8), data[5] | (data[6] << 8));
+			lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
