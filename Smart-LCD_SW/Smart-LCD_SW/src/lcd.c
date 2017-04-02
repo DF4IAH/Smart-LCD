@@ -517,13 +517,13 @@ void lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2)
 
 void lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t lat_min_int, uint16_t lat_min_frac10000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c  %02d'%02d.%04d", lat_sgn, lat_deg, lat_min_int, lat_min_frac10000);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c  %02d^%02d.%04d'", lat_sgn, lat_deg, lat_min_int, lat_min_frac10000);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  88, &sysfont);
 }
 
 void lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lon_min_int, uint16_t lon_min_frac10000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c %03d'%02d.%04d", lon_sgn, lon_deg, lon_min_int, lon_min_frac10000);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c %03d^%02d.%04d'", lon_sgn, lon_deg, lon_min_int, lon_min_frac10000);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  96, &sysfont);
 }
 
