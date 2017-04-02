@@ -41,7 +41,7 @@
 
 
 #define ADC_TEMP_DELTA	0.005f
-#define ADC_LDR_DELTA   2.5f
+#define ADC_PD_DELTA	0.5f
 
 
 /* GLOBAL section */
@@ -73,6 +73,7 @@ float				g_f_DEBUG31							= 0.f,
 /* MAIN STATIC section */
 
 static uint8_t		runmode								= 0;			// static runmode of main.c
+static char			prepareBuf[16];
 
 
 
@@ -328,15 +329,14 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 
 static void s_task_backlight(float adc_photo)
 {
-	char buf[16];
+	/* calculate the 8-bit backlight PWM value based on the ADC photo diode current */
+	const uint16_t	BL_ADC_OFF			=   950;
+	const uint16_t	BL_MIN_INTENSITY	=    10;
+	uint16_t lum = (uint16_t) adc_photo;
 
-	/* calculate the 8-bit backlight PWM value based on the ADC LDR voltage */
-	const uint16_t  BL_ADC_MAXVAL		=  1023;
-	const uint16_t	BL_OFF_INTENSITY	=   950;
-	uint16_t lum = (uint16_t) (BL_ADC_MAXVAL - adc_photo);
-
-	if (lum < BL_OFF_INTENSITY) {
-		OCR2A	= (uint8_t) (255.0f * (((float) lum) / (BL_OFF_INTENSITY - 1)));	// no interrupt lock needed
+	if (lum < BL_ADC_OFF) {
+		OCR2A	= (uint8_t) (BL_MIN_INTENSITY + (255.0f - BL_MIN_INTENSITY) \
+				  * (((float) lum - BL_MIN_INTENSITY) / BL_ADC_OFF));			// no interrupt lock needed
 		TCCR2A |= (0b10  << COM2A0);
 
 	} else {
@@ -345,8 +345,12 @@ static void s_task_backlight(float adc_photo)
 		TCCR2A &= ~(0b11  << COM2A0);
 	}
 
-	sprintf(buf, "LUM=%4d", lum);
-	gfx_mono_draw_string(buf, 120, 81, lcd_get_sysfont());
+	if (g_animation_on) {
+		sprintf(prepareBuf, "LUM=    ");
+		gfx_mono_draw_string(prepareBuf, 200, 0, lcd_get_sysfont());
+		sprintf(prepareBuf, "LUM=%04d", lum);
+		gfx_mono_draw_string(prepareBuf, 200, 0, lcd_get_sysfont());
+	}
 }
 
 static void s_task_temp(float adc_temp)
@@ -376,7 +380,7 @@ void s_task(void)
 
 	/* calculate new backlight PWM value and set that */
 	float ldr_diff = l_adc_ldr - l_adc_ldr_last;
-	if (ldr_diff <= -ADC_LDR_DELTA || ADC_LDR_DELTA <= ldr_diff) {
+	if (ldr_diff <= -ADC_PD_DELTA || ADC_PD_DELTA <= ldr_diff) {
 		s_task_backlight(l_adc_ldr);
 
 		flags = cpu_irq_save();
@@ -400,6 +404,9 @@ void s_task(void)
 		if (s_last_animation) {
 			s_last_animation = false;
 			lcd_cls();							// clear screen
+
+			const char buf[] = "=== 10 MHz.-Ref.-Osc.  Smart-LCD ===";
+			gfx_mono_draw_string(buf, 8, 0, lcd_get_sysfont());
 		}
 	}
 }

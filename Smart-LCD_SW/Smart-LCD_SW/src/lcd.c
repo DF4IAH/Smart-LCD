@@ -52,7 +52,7 @@ extern float				g_f_DEBUG31;
 #define ANIMATION_TRAIN_BLANK_LEN       (1 + 15 + ANIMATION_TRAIN_WAGGON_CNT * (3 + 8) + 1)
 
 static uint8_t s_lcd_ram_read_nonvalid = 0;
-static char    s_lcd_prepare_buf[16];
+static char    s_lcd_prepare_buf[48];
 static	int    s_animation_train_origin = 0;
 static 	int8_t s_animation_dx = 0;
 static float   s_animation_time_last_temp  = 0.f;
@@ -297,7 +297,10 @@ static void s_lcd_test_temp(void)
 	s_lcd_prepare_buf[5] = 'C';
 	s_lcd_prepare_buf[6] = 0;
 
-	gfx_mono_draw_string(s_lcd_prepare_buf, 120, 65, &sysfont);
+	if (!g_animation_on) {
+		return;
+	}
+	gfx_mono_draw_string(s_lcd_prepare_buf, 200, 8, &sysfont);
 }
 
 void lcd_animation_prepare(void)
@@ -458,14 +461,78 @@ void lcd_test(uint8_t pattern_bm)
 	}
 }
 
+void lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "ClkState: 0x%1X", clk_state);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  16, &sysfont);
+}
+
 void lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "  .  .  ");
-	gfx_mono_draw_string(s_lcd_prepare_buf, 10, 10, &sysfont);
-
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%02d.%02d.%04d", day, month, year);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 10, 10, &sysfont);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Date    : %02d.%02d.%04d", day, month, year);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  24, &sysfont);
 }
+
+void lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "UTC     : %02d:%02d.%02d", hour, minute, second);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  32, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_ppm(uint16_t ppm_int, uint16_t ppm_frac)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Precis. : %3d.%03d ppm", ppm_int, ppm_frac);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  40, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d / 256 %%", pwm_int, pwm_frac);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  48, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PullVolt: %2d.%03d V", pv_int, pv_frac);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  56, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatUse  : W=%02d E=%02d U=%02d sats", sat_west, sat_east, sat_used);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  64, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %3.3f", sat_dop100 / 100.0f);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  72, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatState: FI=%1d M2=%1d", state_fi, state_m2);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  80, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_int, uint16_t lat_frac)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c %02d.%04d deg", lat_sgn, lat_int, lat_frac);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  88, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint16_t lon_int, uint16_t lon_frac)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c%03d.%04d deg", lon_sgn, lon_int, lon_frac);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8,  96, &sysfont);
+}
+
+void lcd_10mhz_ref_osc_show_pos_height(uint16_t height)
+{
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %5d m", height);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 8, 104, &sysfont);
+}
+
 
 const void* lcd_get_sysfont(void)
 {
