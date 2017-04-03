@@ -57,7 +57,7 @@ void lcd_animation_prepare(void);
 void lcd_animation_loop(void);
 void lcd_test(uint8_t pattern_bm);
 
-void lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state);
+void lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100);
 void lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
 void lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);
 void lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000);

@@ -257,7 +257,7 @@ static void s_adc_disable(void)
 	sysclk_disable_module(POWER_RED_REG0, PRADC_bm);	// disable ADC sub-module
 }
 
-static void s_twi_init(void)
+static void s_twi_init(uint8_t twi_addr, uint8_t twi_addr_bm)
 {
 	sysclk_enable_module(POWER_RED_REG0, PRTWI_bm);
 
@@ -266,8 +266,8 @@ static void s_twi_init(void)
 	TWSR = (0b00 << TWPS0);						// Prescaler value = 1
 	TWBR = 2;									// TWI bit-rate = 400 kBit/sec @ 8 MHz when master mode active
 
-	TWAR  = (TWI_SLAVE_ADDR    << 1) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
-	TWAMR = (TWI_SLAVE_ADDR_BM << 1);
+	TWAR  = (twi_addr    << 1) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
+	TWAMR = (twi_addr_bm << 1);
 
 	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable, no START or STOP bit
 	//TWCR = _BV(TWSTA) | _BV(TWEN) | _BV(TWIE);	// TEST: Enable START, ENable TWI port, Interrupt Enable
@@ -346,10 +346,8 @@ static void s_task_backlight(float adc_photo)
 	}
 
 	if (g_animation_on) {
-		sprintf(prepareBuf, "LUM=    ");
-		gfx_mono_draw_string(prepareBuf, 200, 0, lcd_get_sysfont());
-		sprintf(prepareBuf, "LUM=%04d", lum);
-		gfx_mono_draw_string(prepareBuf, 200, 0, lcd_get_sysfont());
+		snprintf(prepareBuf, sizeof(prepareBuf), " L=%4d AD ", lum);
+		gfx_mono_draw_string(prepareBuf, 180, 60, lcd_get_sysfont());
 	}
 }
 
@@ -405,8 +403,8 @@ void s_task(void)
 			s_last_animation = false;
 			lcd_cls();							// clear screen
 
-			const char buf[] = "=== 10 MHz.-Ref.-Osc.  Smart-LCD ===";
-			gfx_mono_draw_string(buf, 8, 0, lcd_get_sysfont());
+			const char buf[] = "<==== 10 MHz.-Ref.-Osc.  Smart-LCD ====>";
+			gfx_mono_draw_string(buf, 0, 0, lcd_get_sysfont());
 		}
 	}
 }
@@ -458,8 +456,8 @@ int main (void)
 		asm_break();
 	}
 
-	/* I2C interface */
-	s_twi_init();
+	/* I2C interface - 10 MHz-Ref-Osc. second display */
+	s_twi_init(TWI_SLAVE_ADDR_10MHZREFOSC, TWI_SLAVE_ADDR_BM);
 
 	/* All interrupt sources prepared here - IRQ activation */
 	cpu_irq_enable();
