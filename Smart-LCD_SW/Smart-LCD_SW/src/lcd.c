@@ -38,7 +38,7 @@
 
 extern float				g_temp;
 
-extern uint8_t				g_animation_on;
+extern status_t				g_status;
 
 extern uint8_t				g_u8_DEBUG11,
 							g_u8_DEBUG12,
@@ -80,15 +80,12 @@ uint8_t lcd_bus_read_status(void)
 	data = PIND;													// Access needs 50ns: therefore take 2 cycles with 33ns each
 
 	cpu_irq_restore(flags);
-
 	return data;
 }
 
 void lcd_bus_write_cmd(uint8_t cmd)
 {
-	irqflags_t flags;
-
-	flags = cpu_irq_save();
+	irqflags_t flags = cpu_irq_save();
 
 	PORTD = cmd;													// Data to be written
 	DDRD  = 0xff;													// Enable bus-drivers
@@ -102,9 +99,7 @@ void lcd_bus_write_cmd(uint8_t cmd)
 
 void lcd_bus_write_ram(uint8_t data)
 {
-	irqflags_t flags;
-
-	flags = cpu_irq_save();
+	irqflags_t flags = cpu_irq_save();
 
 	PORTD = data;													// Data to be written
 	DDRD  = 0xff;													// Enable bus-drivers
@@ -118,10 +113,8 @@ void lcd_bus_write_ram(uint8_t data)
 
 uint8_t lcd_bus_read_ram(void)
 {
-	irqflags_t flags;
 	uint8_t data;
-
-	flags = cpu_irq_save();
+	irqflags_t flags = cpu_irq_save();
 
 	PORTD = 0xff;													// Enable pull-ups (when bus-drivers are disabled)
 	DDRD  = 0x00;													// Disable bus-drivers
@@ -138,8 +131,8 @@ uint8_t lcd_bus_read_ram(void)
 	data = PIND;													// Access needs 50ns: therefore take 2 cycles with 33ns each
 
 	s_lcd_ram_read_nonvalid = false;								// since here read returns valid data
-	cpu_irq_restore(flags);
 
+	cpu_irq_restore(flags);
 	return data;
 }
 
@@ -283,7 +276,7 @@ static void s_lcd_test_temp(void)
 
 	s_task();
 
-	if (!g_animation_on) {
+	if (!g_status.doAnimation) {
 		return;
 	}
 
@@ -366,7 +359,7 @@ void lcd_animation_loop(void)
 
 			if (s_animation_train_origin <= (-10 - ANIMATION_TRAIN_BLANK_LEN)) {
 				s_animation_dx = 1;
-				} else if (s_animation_train_origin >= (GFX_MONO_LCD_WIDTH + 10)) {
+			} else if (s_animation_train_origin >= (GFX_MONO_LCD_WIDTH + 10)) {
 				s_animation_dx = -1;
 			}
 
@@ -374,7 +367,7 @@ void lcd_animation_loop(void)
 				// Draw train left
 				if (s_animation_train_origin >= 0 && s_animation_train_origin < GFX_MONO_LCD_WIDTH) {
 					gfx_mono_lcd_uc1608_put_page(s_animation_train_left, GFX_MONO_LCD_PAGES - 1, s_animation_train_origin, ANIMATION_TRAIN_BLANK_LEN);				// full width
-					} else if (-ANIMATION_TRAIN_BLANK_LEN < s_animation_train_origin && s_animation_train_origin < 0) {
+				} else if (-ANIMATION_TRAIN_BLANK_LEN < s_animation_train_origin && s_animation_train_origin < 0) {
 					gfx_mono_lcd_uc1608_put_page(s_animation_train_left - s_animation_train_origin, GFX_MONO_LCD_PAGES - 1, 0, ANIMATION_TRAIN_BLANK_LEN + s_animation_train_origin);	// left: reduced width
 				}
 
@@ -382,7 +375,7 @@ void lcd_animation_loop(void)
 				// Draw train right
 				if (s_animation_train_origin >= 0 && s_animation_train_origin < GFX_MONO_LCD_WIDTH) {
 					gfx_mono_lcd_uc1608_put_page(s_animation_train_right, GFX_MONO_LCD_PAGES - 1, s_animation_train_origin, ANIMATION_TRAIN_BLANK_LEN);				// full width
-					} else if (-ANIMATION_TRAIN_BLANK_LEN < s_animation_train_origin && s_animation_train_origin < 0) {
+				} else if (-ANIMATION_TRAIN_BLANK_LEN < s_animation_train_origin && s_animation_train_origin < 0) {
 					gfx_mono_lcd_uc1608_put_page(s_animation_train_right - s_animation_train_origin, GFX_MONO_LCD_PAGES - 1, 0, ANIMATION_TRAIN_BLANK_LEN + s_animation_train_origin);	// left: reduced width
 				}
 			}
@@ -457,7 +450,7 @@ void lcd_test(uint8_t pattern_bm)
 		// TEST 8
 		lcd_animation_prepare();
 
-		g_animation_on = true;
+		g_status.doAnimation = true;
 		lcd_animation_loop();
 	}
 }
@@ -519,7 +512,7 @@ void lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second)
 
 void lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Precis. : %-3i.%04d ppm", ppm_int, ppm_frac1000);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Precis. : %05d.%03d ppm", ppm_int, ppm_frac1000);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  40, &sysfont);
 }
 
@@ -537,13 +530,13 @@ void lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000)
 
 void lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatUse  : W=%02d E=%02d U=%02d sats", sat_west, sat_east, sat_used);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatUse  : West=%02d East=%02d Used=%02d sats", sat_west, sat_east, sat_used);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  64, &sysfont);
 }
 
 void lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %2.3f", sat_dop100 / 100.0f);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %03d.%02d", (int) (sat_dop100 / 100.0f), sat_dop100 % 100);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  72, &sysfont);
 }
 
@@ -567,7 +560,7 @@ void lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lo
 
 void lcd_10mhz_ref_osc_show_pos_height(uint16_t height)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %5d m", height);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %04d m", height);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 0, 104, &sysfont);
 }
 

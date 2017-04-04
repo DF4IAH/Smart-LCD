@@ -57,7 +57,7 @@ float				g_adc_temp_last						= 0.f;
 float				g_temp								= 0.f;
 uint8_t				g_lcdbl_dimmer						= 0;
 
-uint8_t				g_animation_on						= 0;
+status_t			g_status							= { 0 };
 
 uint8_t				g_u8_DEBUG11						= 0,
 					g_u8_DEBUG12						= 0,
@@ -92,7 +92,8 @@ static void s_reset_global_vars(void)
 	g_temp				= 25.f;
 	g_lcdbl_dimmer		= 64;
 
-	g_animation_on		= false;
+	g_status.doAnimation = false;
+	g_status.isAnimationStopped = false;
 
 	cpu_irq_restore(flags);
 }
@@ -345,7 +346,7 @@ static void s_task_backlight(float adc_photo)
 		TCCR2A &= ~(0b11  << COM2A0);
 	}
 
-	if (g_animation_on) {
+	if (g_status.doAnimation) {
 		snprintf(prepareBuf, sizeof(prepareBuf), " L=%4d AD ", lum);
 		gfx_mono_draw_string(prepareBuf, 180, 60, lcd_get_sysfont());
 	}
@@ -393,7 +394,7 @@ void s_task(void)
 	}
 
 	/* animated demo */
-	if (g_animation_on) {
+	if (g_status.doAnimation) {
 		lcd_animation_loop();
 
 	} else {
@@ -401,8 +402,9 @@ void s_task(void)
 
 		if (s_last_animation) {
 			s_last_animation = false;
-			lcd_cls();							// clear screen
+			g_status.isAnimationStopped = true;
 
+			lcd_cls();							// clear screen
 			const char buf[] = "<==== 10 MHz.-Ref.-Osc.  Smart-LCD ====>";
 			gfx_mono_draw_string(buf, 0, 0, lcd_get_sysfont());
 		}
