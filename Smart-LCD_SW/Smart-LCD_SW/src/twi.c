@@ -39,7 +39,7 @@
 #include "twi.h"
 
 
-extern uint8_t				g_animation_on;
+extern status_t				g_status;
 
 static uint8_t				s_tx_next_len = 0;
 static uint8_t				s_tx_next_d[8];
@@ -109,6 +109,7 @@ static uint8_t s_twi_rcvd_command_open_form(uint8_t data[], uint8_t pos)
 
 static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 {
+	uint8_t prepareBuf[4];
 	uint8_t isGCA	= !data[0];
 	uint8_t cmd		=  data[1];
 
@@ -125,64 +126,93 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		}
 
 	} else if (data[0] == TWI_SLAVE_ADDR_10MHZREFOSC) {
-		uint8_t prepareBuf[4];
-
 		switch (cmd) {
 			case TWI_SMART_LCD_CMD_GETVER:
 			prepareBuf[0] = VERSION;
 			s_twi_rx_prepare(1, prepareBuf);
-			g_animation_on = false;				// stop animation demo
+			g_status.doAnimation = false;				// stop animation demo
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
-			lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
-			lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
-			lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_PPM:
-			lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
-			lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
-			lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_SATS:
-			lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_DOP:
-			lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
-			lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
-			lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LON:
-			lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
+			}
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
-			lcd_10mhz_ref_osc_show_pos_height(data[2] | (data[3] << 8));
+			if (g_status.isAnimationStopped) {
+				lcd_10mhz_ref_osc_show_pos_height(data[2] | (data[3] << 8));
+			}
 			break;
 
+			default:
+			{
+				// do nothing
+			}
+		}
 
+	} else if (data[0] == TWI_SLAVE_ADDR_SMARTLCD) {
+		switch (cmd) {
 			case 0b1000000:						// LCD reset
 			// TODO: LCD communication
 			break;
@@ -204,8 +234,6 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 				// do nothing
 			}
 		}
-	} else if (data[0] == TWI_SLAVE_ADDR_SMARTLCD) {
-
 	}
 }
 
@@ -264,6 +292,22 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		twcr_new |= _BV(TWSTA);					// Send START (again)
 		break;
 
+	case TWI_TWSR_M_SLAR_ADDR_ACK:
+		nop();
+		break;
+
+	case TWI_TWSR_M_SLAR_ADDR_NACK:
+		nop();
+		break;
+
+	case TWI_TWSR_M_SLAR_DATA_ACK:
+		nop();
+		break;
+
+	case TWI_TWSR_M_SLAR_DATA_NACK:
+		nop();
+		break;
+
 
 	/* Slave Receiver Mode */
 
@@ -273,7 +317,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	case TWI_TWSR_S_SLAW_MYADDR_ARBIT_LOST:
 		s_rx_lock = 1;
 		mem_set(s_rx_d, 8, 0x00);
-		s_rx_d[0] = twd >> 1;						// Target address (== MYADDR)
+		s_rx_d[0] = twd >> 1;					// [0]=Target address (== MYADDR)
 		pos_i = 1;								// Starting of reception
 		twcr_new |= _BV(TWEA);					// Send ACK
 		break;
@@ -292,14 +336,14 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		nop();
 		// fall-through.
 	case TWI_TWSR_S_SLAW_OMNIADDR_DATA_ACK:
-		if (cnt_i != 0b111) {					// Closed parameter form
-			if (pos_i <= 0b110) {
-				s_rx_d[pos_i] = twd;
+		if (cnt_i != 0b1111) {					// Closed parameter form
+			if (pos_i <= 0b1110) {
+				s_rx_d[pos_i] = twd;			// [1]=cmd, [2..]=parameters
 			}
 			if (pos_i == 1) {
 				/* Load receive counter */
 				if (s_rx_d[0] == TWI_SLAVE_ADDR_SMARTLCD) {
-					cnt_i = ((twd >> 5) & 0b111) + 1;
+					cnt_i = ((s_rx_d[1] >> 5) & 0b111) + 1;	// encoded parameter count
 
 				} else if (s_rx_d[0] == TWI_SLAVE_ADDR_10MHZREFOSC) {
 					switch (s_rx_d[1]) {
@@ -341,11 +385,11 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 				}
 			}
 
-			if (pos_i < 0b110) {
+			if (pos_i < 0b1110) {
 				if (++pos_i <= cnt_i) {
-					twcr_new |= _BV(TWEA);			// Send ACK
+					twcr_new |= _BV(TWEA);		// Send ACK
 				} else {
-					twcr_new &= ~_BV(TWEA);			// Send NACK
+					twcr_new &= ~_BV(TWEA);		// Send NACK
 				}
 			} else {
 				twcr_new &= ~_BV(TWEA);			// Send NACK
@@ -367,7 +411,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		// fall-through.
 	case TWI_TWSR_S_SLAW_OMNIADDR_DATA_NACK:
 		s_rx_lock = 0;
-		if (cnt_i != 0b111) {
+		if (cnt_i != 0b1111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
 			s_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
@@ -381,7 +425,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 	case TWI_TWSR_S_SLAW_STOP_REPEATEDSTART_RECEIVED:	// STOP or RESTART received while still addressed as slave
 		s_rx_lock = 0;
-		if (cnt_i != 0b111) {
+		if (cnt_i != 0b1111) {
 			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
 			s_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
@@ -420,8 +464,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 	case TWI_TWSR_S_SLAR_OMNIADDR_DATA_NACK:	// Data sent and NACK has been returned
 		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
-		pos_o = 0;
-		cnt_o = 0;
 		s_rx_lock = 0;
 		break;
 
@@ -430,9 +472,23 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		s_rx_lock = 0;
 		/* message transmitted successfully in slave mode */
 		break;
-		
+
+	case TWI_TWSR_BUS_ERROR_STARTSTOP:
+		nop();
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		s_rx_lock = 0;
+		break;
+
+	case TWI_TWSR_BUS_ERROR_UNKNOWN:
+		nop();
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		s_rx_lock = 0;
+		break;
+
 	default:
 		nop();
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		s_rx_lock = 0;
 	}
 
 	return twcr_new;

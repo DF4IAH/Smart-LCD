@@ -48,6 +48,10 @@
 #define TWI_TWSR_S_SLAR_OMNIADDR_DATA_NACK					0xC0
 #define TWI_TWSR_S_SLAR_MYADDR_LASTDATA_ACK					0xC8
 
+#define TWI_TWSR_BUS_ERROR_STARTSTOP						0x00
+#define TWI_TWSR_BUS_ERROR_UNKNOWN							0xF8
+
+
 
 /* Commands used by the 10MHz-Ref-Osc */
 #define TWI_SMART_LCD_CMD_NOOP								0x00
