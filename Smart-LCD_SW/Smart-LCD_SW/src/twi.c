@@ -126,88 +126,65 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		}
 
 	} else if (data[0] == TWI_SLAVE_ADDR_10MHZREFOSC) {
+		g_status.doAnimation = false;			// stop animation demo
+
 		switch (cmd) {
 			case TWI_SMART_LCD_CMD_GETVER:
 			prepareBuf[0] = VERSION;
 			s_twi_rx_prepare(1, prepareBuf);
-			g_status.doAnimation = false;				// stop animation demo
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
-			}
+			lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
-			}
+			lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
-			}
+			lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_PPM:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
-			}
+			lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
-			}
+			lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
-			}
+			lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_SATS:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
-			}
+			lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_DOP:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
-			}
+			lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
-			}
+			lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
-			}
+			lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LON:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
-			}
+			lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
-			if (g_status.isAnimationStopped) {
-				lcd_10mhz_ref_osc_show_pos_height(data[2] | (data[3] << 8));
-			}
+			lcd_10mhz_ref_osc_show_pos_height((int16_t) (data[2] | (data[3] << 8)));
 			break;
 
 			default:
 			{
-				// do nothing
+				// do nothing for unsupported commands
 			}
 		}
 
@@ -244,7 +221,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	static uint8_t pos_o	= 0;
 	static uint8_t cnt_i	= 0;
 	static uint8_t cnt_o	= 0;
-	uint8_t twcr_new = twcr_cur;
+	uint8_t twcr_new = twcr_cur & 0b01000101;
 
 	switch(tws) {
 
@@ -346,13 +323,17 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 					cnt_i = ((s_rx_d[1] >> 5) & 0b111) + 1;	// encoded parameter count
 
 				} else if (s_rx_d[0] == TWI_SLAVE_ADDR_10MHZREFOSC) {
+					cnt_i = 0;
+					cnt_o = 0;
+
 					switch (s_rx_d[1]) {
 						case TWI_SMART_LCD_CMD_NOOP:
 							cnt_i = 1;
 							break;
 
 						case TWI_SMART_LCD_CMD_GETVER:
-							cnt_i = 2;
+							cnt_i = 1;
+							cnt_o = 1;
 							break;
 
 						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
@@ -378,9 +359,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 						case TWI_SMART_LCD_CMD_SHOW_POS_LON:
 							cnt_i = 6;
 							break;
-
-						default:
-							cnt_i = 14;
 					}
 				}
 			}
@@ -443,7 +421,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	case TWI_TWSR_S_SLAR_MYADDR_ARBIT_LOST:
 		s_rx_lock = 1;
 		pos_o = 0;
-		cnt_o = s_rx_len;
 		TWDR = cnt_o > pos_o ?  s_rx_d[pos_o++] : 0;
 
 		if (cnt_o > pos_o) {
@@ -457,7 +434,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		TWDR = cnt_o > pos_o ?  s_rx_d[pos_o++] : 0;
 		if (cnt_o > pos_o) {
 			twcr_new |= _BV(TWEA);				// More data to send ACK
-			} else {
+		} else {
 			twcr_new &= ~_BV(TWEA);				// No more data to send NACK
 		}
 		break;
@@ -475,19 +452,22 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 	case TWI_TWSR_BUS_ERROR_STARTSTOP:
 		nop();
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
+		s_tx_lock = 0;
 		s_rx_lock = 0;
 		break;
 
 	case TWI_TWSR_BUS_ERROR_UNKNOWN:
 		nop();
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
+		s_tx_lock = 0;
 		s_rx_lock = 0;
 		break;
 
 	default:
 		nop();
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
+		s_tx_lock = 0;
 		s_rx_lock = 0;
 	}
 
