@@ -373,7 +373,9 @@ void s_task(void)
 		cpu_irq_restore(flags);
 
 		/* Show received data from I2C bus */
-		more = lcd_show_new_data();
+		if (g_status.isAnimationStopped) {
+			more = lcd_show_new_data();
+		}
 
 		/* Calculate new backlight PWM value and set that */
 		s_task_backlight(l_adc_ldr);

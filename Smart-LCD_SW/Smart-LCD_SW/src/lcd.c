@@ -653,9 +653,12 @@ void lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newClkState = true;
-	g_showData.clkState_clk_state = clk_state;
-	g_showData.clkState_phase100 = phase100;
+	if (g_showData.clkState_clk_state != clk_state ||
+			g_showData.clkState_phase100 != phase100) {
+		g_showData.newClkState = true;
+		g_showData.clkState_clk_state = clk_state;
+		g_showData.clkState_phase100 = phase100;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -663,10 +666,14 @@ void lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newDate = true;
-	g_showData.date_year = year;
-	g_showData.date_month = month;
-	g_showData.date_day = day;
+	if (g_showData.date_year != year ||
+			g_showData.date_month != month ||
+			g_showData.date_day != day) {
+		g_showData.newDate = true;
+		g_showData.date_year = year;
+		g_showData.date_month = month;
+		g_showData.date_day = day;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -674,10 +681,14 @@ void lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newTime = true;
-	g_showData.time_hour = hour;
-	g_showData.time_minute = minute;
-	g_showData.time_second = second;
+	if (g_showData.time_hour != hour ||
+			g_showData.time_minute != minute ||
+			g_showData.time_second != second) {
+		g_showData.newTime = true;
+		g_showData.time_hour = hour;
+		g_showData.time_minute = minute;
+		g_showData.time_second = second;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -685,9 +696,12 @@ void lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPpm = true;
-	g_showData.ppm_int = ppm_int;
-	g_showData.ppm_frac1000 = ppm_frac1000;
+	if (g_showData.ppm_int != ppm_int ||
+			g_showData.ppm_frac1000 != ppm_frac1000) {
+		g_showData.newPpm = true;
+		g_showData.ppm_int = ppm_int;
+		g_showData.ppm_frac1000 = ppm_frac1000;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -695,9 +709,12 @@ void lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac1000)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPwm = true;
-	g_showData.pwm_int = pwm_int;
-	g_showData.pwm_frac1000 = pwm_frac1000;
+	if (g_showData.pwm_int != pwm_int ||
+			g_showData.pwm_frac1000 != pwm_frac1000) {
+		g_showData.newPwm = true;
+		g_showData.pwm_int = pwm_int;
+		g_showData.pwm_frac1000 = pwm_frac1000;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -705,9 +722,12 @@ void lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPv = true;
-	g_showData.pv_int = pv_int;
-	g_showData.pv_frac1000 = pv_frac1000;
+	if (g_showData.pv_int != pv_int ||
+			g_showData.pv_frac1000 != pv_frac1000) {
+		g_showData.newPv = true;
+		g_showData.pv_int = pv_int;
+		g_showData.pv_frac1000 = pv_frac1000;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -715,10 +735,14 @@ void lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t 
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newSatUse = true;
-	g_showData.satUse_west = sat_west;
-	g_showData.satUse_east = sat_east;
-	g_showData.satUse_used = sat_used;
+	if (g_showData.satUse_west != sat_west ||
+			g_showData.satUse_east != sat_east ||
+			g_showData.satUse_used != sat_used) {
+		g_showData.newSatUse = true;
+		g_showData.satUse_west = sat_west;
+		g_showData.satUse_east = sat_east;
+		g_showData.satUse_used = sat_used;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -726,8 +750,10 @@ void lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newSatDop = true;
-	g_showData.satDop_dop100 = sat_dop100;
+	if (g_showData.satDop_dop100 != sat_dop100) {
+		g_showData.newSatDop = true;
+		g_showData.satDop_dop100 = sat_dop100;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -735,9 +761,12 @@ void lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPosState = true;
-	g_showData.posState_fi = state_fi;
-	g_showData.posState_m2 = state_m2;
+	if (g_showData.posState_fi != state_fi ||
+			g_showData.posState_m2 != state_m2) {
+		g_showData.newPosState = true;
+		g_showData.posState_fi = state_fi;
+		g_showData.posState_m2 = state_m2;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -745,11 +774,17 @@ void lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t la
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPosLat = true;
-	g_showData.posLat_sgn = lat_sgn;
-	g_showData.posLat_deg = lat_deg;
-	g_showData.posLat_min_int = lat_min_int;
-	g_showData.posLat_min_frac10000 = lat_min_frac10000;
+	if (g_showData.posLat_sgn != lat_sgn ||
+			g_showData.posLat_deg != lat_deg ||
+			g_showData.posLat_min_int != lat_min_int ||
+			g_showData.posLat_min_int != lat_min_int ||
+			g_showData.posLat_min_frac10000 != lat_min_frac10000) {
+		g_showData.newPosLat = true;
+		g_showData.posLat_sgn = lat_sgn;
+		g_showData.posLat_deg = lat_deg;
+		g_showData.posLat_min_int = lat_min_int;
+		g_showData.posLat_min_frac10000 = lat_min_frac10000;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -757,11 +792,17 @@ void lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lo
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPosLon = true;
-	g_showData.posLon_sgn = lon_sgn;
-	g_showData.posLon_deg = lon_deg;
-	g_showData.posLon_min_int = lon_min_int;
-	g_showData.posLon_min_frac10000 = lon_min_frac10000;
+	if (g_showData.posLon_sgn != lon_sgn ||
+			g_showData.posLon_deg != lon_deg ||
+			g_showData.posLon_deg != lon_deg ||
+			g_showData.posLon_min_int != lon_min_int ||
+			g_showData.posLon_min_frac10000 != lon_min_frac10000) {
+		g_showData.newPosLon = true;
+		g_showData.posLon_sgn = lon_sgn;
+		g_showData.posLon_deg = lon_deg;
+		g_showData.posLon_min_int = lon_min_int;
+		g_showData.posLon_min_frac10000 = lon_min_frac10000;
+	}
 	cpu_irq_restore(flags);
 }
 
@@ -769,8 +810,10 @@ void lcd_10mhz_ref_osc_show_pos_height(int16_t height)
 {
 	irqflags_t flags = cpu_irq_save();
 	cpu_irq_disable();
-	g_showData.newPosHeight = true;
-	g_showData.pos_heigth = height;
+	if (g_showData.pos_heigth != height) {
+		g_showData.newPosHeight = true;
+		g_showData.pos_heigth = height;
+	}
 	cpu_irq_restore(flags);
 }
 
