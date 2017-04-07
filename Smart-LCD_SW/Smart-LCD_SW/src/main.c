@@ -40,24 +40,20 @@
 #include "main.h"
 
 
-#define ADC_TEMP_DELTA	0.005f
-#define ADC_PD_DELTA	0.5f
-
-
 /* GLOBAL section */
 
 uint_fast32_t		g_timer_abs_msb						= 0;
 
 uint8_t				g_adc_state							= 0;
 float				g_adc_ldr							= 0.f;
-float				g_adc_ldr_last						= 0.f;
 float				g_adc_temp							= 0.f;
-float				g_adc_temp_last						= 0.f;
 
 float				g_temp								= 0.f;
 uint8_t				g_lcdbl_dimmer						= 0;
 
 status_t			g_status							= { 0 };
+
+showData_t			g_showData							= { 0 };
 
 uint8_t				g_u8_DEBUG11						= 0,
 					g_u8_DEBUG12						= 0,
@@ -82,12 +78,11 @@ static char			prepareBuf[16];
 static void s_reset_global_vars(void)
 {
 	irqflags_t flags	= cpu_irq_save();
+	cpu_irq_disable();
 
 	g_adc_state			= ADC_STATE_PRE_LDR;
 	g_adc_ldr			= 0.f;
-	g_adc_ldr_last		= 0.f;
 	g_adc_temp			= 0.f;
-	g_adc_temp_last		= 0.f;
 
 	g_temp				= 25.f;
 	g_lcdbl_dimmer		= 64;
@@ -363,52 +358,53 @@ static void s_task_temp(float adc_temp)
 
 	irqflags_t flags = cpu_irq_save();
 	g_temp = l_temp;
-	g_adc_temp_last = adc_temp;
 	cpu_irq_restore(flags);
 }
 
 void s_task(void)
 {
-	/* TASK when woken up */
-	irqflags_t flags		= cpu_irq_save();
-	float l_adc_ldr			= g_adc_ldr;
-	float l_adc_ldr_last	= g_adc_ldr_last;
-	float l_adc_temp		= g_adc_temp;
-	float l_adc_temp_last	= g_adc_temp_last;
-	cpu_irq_restore(flags);
+	uint8_t more = 0;
 
-	/* calculate new backlight PWM value and set that */
-	float ldr_diff = l_adc_ldr - l_adc_ldr_last;
-	if (ldr_diff <= -ADC_PD_DELTA || ADC_PD_DELTA <= ldr_diff) {
+	do {
+		/* TASK when woken up */
+		irqflags_t flags		= cpu_irq_save();
+		float l_adc_ldr			= g_adc_ldr;
+		float l_adc_temp		= g_adc_temp;
+		cpu_irq_restore(flags);
+
+		/* Show received data from I2C bus */
+		more = lcd_show_new_data();
+
+		/* Calculate new backlight PWM value and set that */
 		s_task_backlight(l_adc_ldr);
 
 		flags = cpu_irq_save();
-		g_adc_ldr_last = l_adc_ldr;
 		cpu_irq_restore(flags);
-	}
 
-	/* calculate new current temperature */
-	float temp_diff = l_adc_temp - l_adc_temp_last;
-	if (temp_diff <= -ADC_TEMP_DELTA || ADC_TEMP_DELTA <= temp_diff) {
-		s_task_temp(l_adc_temp);
-	}
-
-	/* animated demo */
-	if (g_status.doAnimation) {
-		lcd_animation_loop();
-
-	} else {
-		static int8_t s_last_animation = true;
-
-		if (s_last_animation) {
-			s_last_animation = false;
-			g_status.isAnimationStopped = true;
-
-			lcd_cls();							// clear screen
-			const char buf[] = "<==== 10 MHz.-Ref.-Osc.  Smart-LCD ====>";
-			gfx_mono_draw_string(buf, 0, 0, lcd_get_sysfont());
+		if (!more) {
+			/* Calculate new current temperature */
+			s_task_temp(l_adc_temp);
 		}
-	}
+
+
+		/* Animated demo */
+		if (g_status.doAnimation) {
+			lcd_animation_loop();
+
+		} else {
+			static int8_t s_last_animation = true;
+
+			if (s_last_animation) {
+				s_last_animation = false;
+
+				lcd_cls();							// clear screen
+				const char buf[] = "<==== 10 MHz.-Ref.-Osc.  Smart-LCD ====>";
+				gfx_mono_draw_string(buf, 0, 0, lcd_get_sysfont());
+
+				g_status.isAnimationStopped = true;
+			}
+		}
+	} while (more);
 }
 
 static void s_enter_sleep(uint8_t sleep_mode)

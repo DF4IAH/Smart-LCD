@@ -40,6 +40,9 @@ extern float				g_temp;
 
 extern status_t				g_status;
 
+extern showData_t			g_showData;
+
+
 extern uint8_t				g_u8_DEBUG11,
 							g_u8_DEBUG12,
 							g_u8_DEBUG13;
@@ -239,6 +242,196 @@ void lcd_cls(void)
 
 	/* Set cursor to home position */
 	lcd_home();
+}
+
+
+static void lcd_show_new_clk_state(uint8_t clk_state, int16_t phase100)
+{
+	if (phase100 > 18000) {
+		phase100 = 18000;
+		} else if (phase100 < -18000) {
+		phase100 = -18000;
+	}
+
+	int dx = (int) (90.0f * (phase100 / 18000.0f));
+
+	uint8_t ox = 150;
+	if (dx < 0) {
+		ox += dx;
+		dx = -dx;
+	}
+
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "ClkState: 0x%1X", clk_state);
+	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  0 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+	gfx_mono_draw_string("Phase   :", 0,  120, &sysfont);
+
+	gfx_mono_generic_draw_filled_rect(60, 120,  180, 7, GFX_PIXEL_CLR);
+	if (dx) {
+		switch (clk_state) {
+			case 0xf:
+			gfx_mono_generic_draw_filled_rect(ox, 120, dx, 7, GFX_PIXEL_SET);
+			break;
+
+			case 0x7:
+			gfx_mono_generic_draw_rect(ox, 120,  dx, 7, GFX_PIXEL_SET);
+			break;
+
+			case 0x3:
+			case 0x2:
+			case 0x1:
+			gfx_mono_generic_draw_filled_rect(60, 120,  180, 3, GFX_PIXEL_SET);
+			break;
+		}
+
+		} else {
+		gfx_mono_generic_draw_line(150, 121, 150, 125, GFX_PIXEL_SET);
+	}
+}
+
+uint8_t lcd_show_new_data(void)
+{
+	static uint8_t idx = 1;
+
+	/* First entries are showed first, when modified */
+
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+
+	/* Always */
+	if (g_showData.newTime) {
+		g_showData.newTime = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "UTC     : %02d:%02d.%02d",
+		g_showData.time_hour, g_showData.time_minute, g_showData.time_second);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  2 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		return 255;
+	}
+
+	/* Always */
+	if (g_showData.newDate) {
+		g_showData.newDate = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Date    : %02d.%02d.%04d",
+		g_showData.date_day, g_showData.date_month, g_showData.date_year);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  1 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		return 254;
+	}
+
+	/* Always */
+	if (g_showData.newClkState) {
+		g_showData.newClkState = false;
+		cpu_irq_restore(flags);
+		lcd_show_new_clk_state(g_showData.clkState_clk_state, g_showData.clkState_phase100);
+		return 253;
+	}
+
+
+	/* Slot 1 */
+	if (g_showData.newPpm && (idx <= 1)) {
+		g_showData.newPpm = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Precis. : %03d.%03d ppm",
+		g_showData.ppm_int, g_showData.ppm_frac1000);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  3 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 2;
+		return 1;
+	}
+
+	/* Slot 2 */
+	if (g_showData.newPwm && (idx <= 2)) {
+		g_showData.newPwm = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d / 256 %%",
+		g_showData.pwm_int, g_showData.pwm_frac1000);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 3;
+		return 2;
+	}
+
+	/* Slot 3 */
+	if (g_showData.newPv && (idx <= 3)) {
+		g_showData.newPv = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PullVolt: %1d.%03d V",
+		g_showData.pv_int, g_showData.pv_frac1000);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  5 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 4;
+		return 3;
+	}
+
+	/* Slot 4 */
+	if (g_showData.newSatUse && (idx <= 4)) {
+		g_showData.newSatUse = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatUse  : West=%02d East=%02d Used=%02d sats",
+		g_showData.satUse_west, g_showData.satUse_east, g_showData.satUse_used);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  6 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 5;
+		return 4;
+	}
+
+	/* Slot 5 */
+	if (g_showData.newSatDop && (idx <= 5)) {
+		g_showData.newSatDop = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %03d.%02d",
+		(int) (g_showData.satDop_dop100 / 100.0f), g_showData.satDop_dop100 % 100);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  7 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 6;
+		return 5;
+	}
+
+	/* Slot 6 */
+	if (g_showData.newPosState && (idx <= 6)) {
+		g_showData.newPosState = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatState: FI=%1d M2=%1d",
+		g_showData.posState_fi, g_showData.posState_m2);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  8 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 7;
+		return 6;
+	}
+
+	/* Slot 7 */
+	if (g_showData.newPosLat && (idx <= 7)) {
+		g_showData.newPosLat = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c  %02d^%02d.%04d'",
+		g_showData.posLat_sgn, g_showData.posLat_deg, g_showData.posLat_min_int, g_showData.posLat_min_frac10000);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  9 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 8;
+		return 7;
+	}
+
+	/* Slot 8 */
+	if (g_showData.newPosLon && (idx <= 8)) {
+		g_showData.newPosLon = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c %03d^%02d.%04d'",
+		g_showData.posLon_sgn, g_showData.posLon_deg, g_showData.posLon_min_int, g_showData.posLon_min_frac10000);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP + 10 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 9;
+		return 8;
+	}
+
+	/* Slot 9 */
+	if (g_showData.newPosHeight && (idx <= 9)) {
+		g_showData.newPosHeight = false;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %04d m",
+		g_showData.pos_heigth);
+		cpu_irq_restore(flags);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		idx = 10;
+		return 9;
+	}
+
+	/* Turn back to first position */
+	if (idx >= 10) {
+		idx = 1;
+	}
+
+	cpu_irq_restore(flags);
+	return 0;
 }
 
 
@@ -455,113 +648,130 @@ void lcd_test(uint8_t pattern_bm)
 	}
 }
 
+
 void lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100)
 {
-	if (phase100 > 18000) {
-		phase100 = 18000;
-	} else if (phase100 < -18000) {
-		phase100 = -18000;
-	}
-
-	int dx = (int) (90.0f * (phase100 / 18000.0f));
-
-	uint8_t ox = 150;
-	if (dx < 0) {
-		ox += dx;
-		dx = -dx;
-	}
-
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "ClkState: 0x%1X", clk_state);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  16, &sysfont);
-	gfx_mono_draw_string("Phase   :", 0,  120, &sysfont);
-
-	gfx_mono_generic_draw_filled_rect(60, 120,  180, 7, GFX_PIXEL_CLR);
-	if (dx) {
-		switch (clk_state) {
-		case 0xf:
-			gfx_mono_generic_draw_filled_rect(ox, 120, dx, 7, GFX_PIXEL_SET);
-			break;
-
-		case 0x7:
-			gfx_mono_generic_draw_rect(ox, 120,  dx, 7, GFX_PIXEL_SET);
-			break;
-
-		case 0x3:
-		case 0x2:
-		case 0x1:
-			gfx_mono_generic_draw_filled_rect(60, 120,  180, 3, GFX_PIXEL_SET);
-			break;
-		}
-
-	} else {
-		gfx_mono_generic_draw_line(150, 121, 150, 125, GFX_PIXEL_SET);
-	}
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newClkState = true;
+	g_showData.clkState_clk_state = clk_state;
+	g_showData.clkState_phase100 = phase100;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Date    : %02d.%02d.%04d", day, month, year);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  24, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newDate = true;
+	g_showData.date_year = year;
+	g_showData.date_month = month;
+	g_showData.date_day = day;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "UTC     : %02d:%02d.%02d", hour, minute, second);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  32, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newTime = true;
+	g_showData.time_hour = hour;
+	g_showData.time_minute = minute;
+	g_showData.time_second = second;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Precis. : %05d.%03d ppm", ppm_int, ppm_frac1000);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  40, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPpm = true;
+	g_showData.ppm_int = ppm_int;
+	g_showData.ppm_frac1000 = ppm_frac1000;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac1000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d / 256 %%", pwm_int, pwm_frac1000);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  48, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPwm = true;
+	g_showData.pwm_int = pwm_int;
+	g_showData.pwm_frac1000 = pwm_frac1000;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PullVolt: %1d.%03d V", pv_int, pv_frac1000);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  56, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPv = true;
+	g_showData.pv_int = pv_int;
+	g_showData.pv_frac1000 = pv_frac1000;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatUse  : West=%02d East=%02d Used=%02d sats", sat_west, sat_east, sat_used);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  64, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newSatUse = true;
+	g_showData.satUse_west = sat_west;
+	g_showData.satUse_east = sat_east;
+	g_showData.satUse_used = sat_used;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %03d.%02d", (int) (sat_dop100 / 100.0f), sat_dop100 % 100);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  72, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newSatDop = true;
+	g_showData.satDop_dop100 = sat_dop100;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatState: FI=%1d M2=%1d", state_fi, state_m2);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  80, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPosState = true;
+	g_showData.posState_fi = state_fi;
+	g_showData.posState_m2 = state_m2;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t lat_min_int, uint16_t lat_min_frac10000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c  %02d^%02d.%04d'", lat_sgn, lat_deg, lat_min_int, lat_min_frac10000);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  88, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPosLat = true;
+	g_showData.posLat_sgn = lat_sgn;
+	g_showData.posLat_deg = lat_deg;
+	g_showData.posLat_min_int = lat_min_int;
+	g_showData.posLat_min_frac10000 = lat_min_frac10000;
+	cpu_irq_restore(flags);
 }
 
 void lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lon_min_int, uint16_t lon_min_frac10000)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c %03d^%02d.%04d'", lon_sgn, lon_deg, lon_min_int, lon_min_frac10000);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0,  96, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPosLon = true;
+	g_showData.posLon_sgn = lon_sgn;
+	g_showData.posLon_deg = lon_deg;
+	g_showData.posLon_min_int = lon_min_int;
+	g_showData.posLon_min_frac10000 = lon_min_frac10000;
+	cpu_irq_restore(flags);
 }
 
-void lcd_10mhz_ref_osc_show_pos_height(uint16_t height)
+void lcd_10mhz_ref_osc_show_pos_height(int16_t height)
 {
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %04d m", height);
-	gfx_mono_draw_string(s_lcd_prepare_buf, 0, 104, &sysfont);
+	irqflags_t flags = cpu_irq_save();
+	cpu_irq_disable();
+	g_showData.newPosHeight = true;
+	g_showData.pos_heigth = height;
+	cpu_irq_restore(flags);
 }
 
 
