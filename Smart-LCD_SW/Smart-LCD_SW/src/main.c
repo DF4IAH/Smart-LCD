@@ -343,7 +343,7 @@ static void s_task_backlight(float adc_photo)
 
 	if (g_status.doAnimation) {
 		snprintf(prepareBuf, sizeof(prepareBuf), " L=%4d AD ", lum);
-		gfx_mono_draw_string(prepareBuf, 180, 60, lcd_get_sysfont());
+		gfx_mono_draw_string(prepareBuf, 160, 95, lcd_get_sysfont());
 	}
 }
 
@@ -400,9 +400,9 @@ void s_task(void)
 				s_last_animation = false;
 
 				lcd_cls();							// clear screen
-				const char buf[] = "<==== 10 MHz.-Ref.-Osc.  Smart-LCD ====>";
-				gfx_mono_draw_string(buf, 0, 0, lcd_get_sysfont());
-
+				gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
+				const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
+				gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
 				g_status.isAnimationStopped = true;
 			}
 		}
