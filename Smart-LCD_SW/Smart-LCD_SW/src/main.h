@@ -24,7 +24,7 @@ typedef struct showData {
 	uint16_t	newClkState											: 1;
 	uint16_t	newDate												: 1;
 	uint16_t	newTime												: 1;
-	uint16_t	newPpm												: 1;
+	uint16_t	newPpb												: 1;
 	uint16_t	newPwm												: 1;
 	uint16_t	newPv												: 1;
 	uint16_t	newSatUse											: 1;
@@ -37,8 +37,8 @@ typedef struct showData {
 
 	int16_t		clkState_phase100;
 	uint16_t	date_year;
-	int16_t		ppm_int;
-	uint16_t	ppm_frac1000;
+	int16_t		ppb_int;
+	uint16_t	ppb_frac1000;
 	uint16_t	pv_frac1000;
 	uint16_t	satDop_dop100;
 	uint16_t	posLat_min_frac10000;

@@ -39,9 +39,9 @@
 // Status: BZ flag
 #define C_LCD_STATUS_M	_BV(7)
 
-#define LCD_SHOW_LINE_TOP			10
+#define LCD_SHOW_LINE_TOP			11
 #define LCD_SHOW_LINE_HEIGHT		9
-#define LCD_SHOW_LINE_LEFT			0
+#define LCD_SHOW_LINE_LEFT			3
 
 
 uint8_t	lcd_bus_read_status(void);
