@@ -37,6 +37,7 @@
  */
 #include <asf.h>
 
+#include "main.h"
 #include "twi.h"
 
 #include "isr.h"
@@ -44,10 +45,14 @@
 
 /* External vars */
 
+extern showData_t			g_showData;
 extern uint_fast32_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
 extern float				g_adc_ldr;
 extern float				g_adc_temp;
+extern uint8_t				g_audio_out_loudness;
+extern int16_t				g_audio_pwm_accu;
+extern uint8_t				g_audio_pwm_ramp_dwn;
 
 
 /* Forward declarations */
@@ -114,7 +119,38 @@ ISR(__vector_8, ISR_BLOCK)
 
 ISR(__vector_9, ISR_BLOCK)
 {	/* TIMER 2 OVF - Overflow */
-	s_bad_interrupt();
+	static uint8_t state_old = 0;
+	static uint8_t state_ctr = 0;
+	uint8_t cur = PORTB & 0x3f;
+
+	/* signaling the grade of deviation */
+	g_audio_out_loudness = 0;
+	if (g_showData.clkState_clk_state < 0xf) {
+		cur |= _BV(PORTB6);  // LED = red
+		if (state_old != 0x02) {
+			state_ctr = 122;  // 1 sec
+		}
+		state_old = 0x02;
+
+	} else if ((g_showData.clkState_clk_state == 0xf) && (-4 < g_showData.ppb_int) && (g_showData.ppb_int < 4)) {
+		cur |= _BV(PORTB7);  // LED = green
+		state_old = 0x00;
+
+	} else {
+		if (!state_old) {
+			state_ctr = 30;  // 1/4 sec
+		}
+		state_old = 0x01;
+	}
+
+	if (state_ctr) {
+		--state_ctr;
+		g_audio_out_loudness = 10;
+	} else {
+		g_audio_out_loudness = 0;
+	}
+
+	PORTB = cur;
 }
 
 ISR(__vector_10, ISR_BLOCK)
@@ -135,6 +171,33 @@ ISR(__vector_12, ISR_BLOCK)
 ISR(__vector_13, ISR_BLOCK)
 {	/* TIMER 1 OVF - Overflow */
 	++g_timer_abs_msb;
+
+#if 1
+	const int16_t l_audio_pwm_inc = 114;						// 1760 Hz / 15625 Hz * (2 x 512) Steps
+#else
+	int16_t l_audio_pwm_inc = 114 + (g_showData.clkState_phase100 >> 11);
+#endif
+
+	/* Generate triangle signal */
+	if (g_audio_pwm_ramp_dwn) {
+		g_audio_pwm_accu -= l_audio_pwm_inc;
+		if (g_audio_pwm_accu <= -255) {
+			g_audio_pwm_ramp_dwn = false;
+			int16_t residue = -g_audio_pwm_accu - 255;
+			g_audio_pwm_accu = -255 + residue;
+		}
+	} else {
+		g_audio_pwm_accu += l_audio_pwm_inc;
+		if (g_audio_pwm_accu >= +255) {
+			g_audio_pwm_ramp_dwn = true;
+			int16_t residue = g_audio_pwm_accu - 255;
+			g_audio_pwm_accu = 255 - residue;
+		}
+	}
+
+	int16_t audio_out = 256 + (g_audio_pwm_accu >> (10 - g_audio_out_loudness));
+	OCR1AH = (uint8_t) ((audio_out >> 8) & 0x01);			// 9 bit
+	OCR1AL = (uint8_t) ( audio_out       & 0xff);
 }
 
 ISR(__vector_14, ISR_BLOCK)
