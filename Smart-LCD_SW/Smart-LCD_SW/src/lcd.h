@@ -66,7 +66,7 @@ void    isr_lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100
 void    isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
 void    isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);
 void    isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000);
-void    isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac1000);
+void    isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac256);
 void    isr_lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000);
 void    isr_lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used);
 void    isr_lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100);
