@@ -51,6 +51,10 @@ float				g_adc_temp							= 0.f;
 float				g_temp								= 0.f;
 uint8_t				g_lcdbl_dimmer						= 0;
 
+uint8_t				g_audio_out_loudness				= 0;
+int16_t				g_audio_pwm_accu					= 0;
+uint8_t				g_audio_pwm_ramp_dwn				= 0;
+
 status_t			g_status							= { 0 };
 
 showData_t			g_showData							= { 0 };
@@ -142,8 +146,8 @@ static void s_tc_init(void)
 		barrier();
 		TCNT1L	=            0b00000000;
 
-		OCR1AH  =        0b1           ;		// Mid-range compare value for zero audio output
-		OCR1AL  =            0b00000000;
+		OCR1AH  =        0b0           ;		// Mid-range compare value for zero audio output
+		OCR1AL  =            0b10000000;
 
 		TIMSK1  = _BV(TOIE1);					// TOIE1 interrupt
 		TIFR1   = 0b00100111;					// Clear all flags (when restarting without reset)
@@ -163,7 +167,7 @@ static void s_tc_init(void)
 
 		OCR2A   = 0x00;							// LCD backlight dimmed down
 
-		TIMSK2  = 0b00000000;					// No interrupts
+		TIMSK2  = 0b00000001;					// TOIE2: overflow interrupt
 		TIFR2   = 0b00000111;					// Clear all flags
 
 		ASSR    = 0;							// No async. TOSC1 mode
