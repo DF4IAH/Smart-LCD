@@ -62,18 +62,18 @@ void    lcd_animation_prepare(void);
 void    lcd_animation_loop(void);
 void    lcd_test(uint8_t pattern_bm);
 
-void    lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100);
-void    lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
-void    lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);
-void    lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000);
-void    lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac1000);
-void    lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000);
-void    lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used);
-void    lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100);
-void    lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2);
-void    lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t lat_min_int, uint16_t lat_min_frac10000);
-void    lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lon_min_int, uint16_t lon_min_frac10000);
-void    lcd_10mhz_ref_osc_show_pos_height(int16_t height);
+void    isr_lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100);
+void    isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
+void    isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);
+void    isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000);
+void    isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac1000);
+void    isr_lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000);
+void    isr_lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used);
+void    isr_lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100);
+void    isr_lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2);
+void    isr_lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t lat_min_int, uint16_t lat_min_frac10000);
+void    isr_lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lon_min_int, uint16_t lon_min_frac10000);
+void    isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height);
 
 const void* lcd_get_sysfont(void);
 

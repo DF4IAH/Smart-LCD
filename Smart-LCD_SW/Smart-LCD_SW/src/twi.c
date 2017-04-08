@@ -100,14 +100,14 @@ static void s_twi_rx_prepare(uint8_t msgCnt, uint8_t msg[])
 	}
 }
 
-static uint8_t s_twi_rcvd_command_open_form(uint8_t data[], uint8_t pos)
+static uint8_t s_isr_twi_rcvd_command_open_form(uint8_t data[], uint8_t pos)
 {
 	uint8_t err = 1;
 	// TODO: implementation
 	return err;
 }
 
-static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
+static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 {
 	uint8_t prepareBuf[4];
 	uint8_t isGCA	= !data[0];
@@ -135,51 +135,51 @@ static void s_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
-			lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
+			isr_lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
-			lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
+			isr_lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
-			lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
+			isr_lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_PPM:
-			lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
+			isr_lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
-			lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
+			isr_lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
-			lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
+			isr_lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_SATS:
-			lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
+			isr_lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_DOP:
-			lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
+			isr_lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
-			lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
+			isr_lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
-			lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
+			isr_lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_LON:
-			lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
+			isr_lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
-			lcd_10mhz_ref_osc_show_pos_height((int16_t) (data[2] | (data[3] << 8)));
+			isr_lcd_10mhz_ref_osc_show_pos_height((int16_t) (data[2] | (data[3] << 8)));
 			break;
 
 			default:
@@ -375,7 +375,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 		} else {								// Open parameter form
 			s_rx_d[2] = twd;
-			if (!s_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
+			if (!s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
 				twcr_new |= _BV(TWEA);			// Send ACK
 			} else {
 				twcr_new &= ~_BV(TWEA);			// Send NACK
@@ -390,9 +390,9 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	case TWI_TWSR_S_SLAW_OMNIADDR_DATA_NACK:
 		s_rx_lock = 0;
 		if (cnt_i != 0b1111) {
-			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
+			s_isr_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
-			s_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
+			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
 		}
 		pos_i = 0;
 		cnt_i = 0;
@@ -404,9 +404,9 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	case TWI_TWSR_S_SLAW_STOP_REPEATEDSTART_RECEIVED:	// STOP or RESTART received while still addressed as slave
 		s_rx_lock = 0;
 		if (cnt_i != 0b1111) {
-			s_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
+			s_isr_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
 		} else {
-			s_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
+			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
 		}
 		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		pos_i = 0;
