@@ -52,7 +52,7 @@ typedef struct showData {
 	uint8_t		time_minute;
 	uint8_t		time_second;
 	uint8_t		pwm_int;
-	uint8_t		pwm_frac1000;
+	uint8_t		pwm_frac256;
 	uint8_t		pv_int;
 	uint8_t		satUse_west;
 	uint8_t		satUse_east;

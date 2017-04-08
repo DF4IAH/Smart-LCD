@@ -458,7 +458,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPwm && (idx <= 8)) {
 		g_showData.newPwm = false;
 		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d / 256 %%",
-		g_showData.pwm_int, g_showData.pwm_frac1000);
+		g_showData.pwm_int, (int) (g_showData.pwm_frac256 * (1000.0f / 256.0f)));
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 9;
@@ -748,14 +748,14 @@ void isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000)
 	}
 }
 
-void isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac1000)
+void isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac256)
 {
 	// interrupt is already disabled, here
 	if (g_showData.pwm_int != pwm_int ||
-			g_showData.pwm_frac1000 != pwm_frac1000) {
+			g_showData.pwm_frac256 != pwm_frac256) {
 		g_showData.newPwm = true;
 		g_showData.pwm_int = pwm_int;
-		g_showData.pwm_frac1000 = pwm_frac1000;
+		g_showData.pwm_frac256 = pwm_frac256;
 	}
 }
 
