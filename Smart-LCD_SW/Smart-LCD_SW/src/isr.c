@@ -121,6 +121,7 @@ ISR(__vector_9, ISR_BLOCK)
 {	/* TIMER 2 OVF - Overflow */
 	static uint8_t state_old = 0;
 	static uint8_t state_ctr = 0;
+	static uint8_t second_old = 0;
 	uint8_t cur = PORTB & 0x3f;
 
 	/* signaling the grade of deviation */
@@ -136,6 +137,12 @@ ISR(__vector_9, ISR_BLOCK)
 		cur |= _BV(PORTB7);  // LED = green
 		state_old = 0x00;
 
+		/* Acoustic phase tracker */
+		if (g_showData.time_second != second_old) {
+			second_old = g_showData.time_second;
+			state_ctr = 12;
+		}
+
 	} else {
 		if (!state_old) {
 			state_ctr = 30;  // 1/4 sec
@@ -145,7 +152,7 @@ ISR(__vector_9, ISR_BLOCK)
 
 	if (state_ctr) {
 		--state_ctr;
-		g_audio_out_loudness = 10;
+		g_audio_out_loudness = 9;  // max 9
 	} else {
 		g_audio_out_loudness = 0;
 	}
@@ -172,32 +179,32 @@ ISR(__vector_13, ISR_BLOCK)
 {	/* TIMER 1 OVF - Overflow */
 	++g_timer_abs_msb;
 
-#if 1
-	const int16_t l_audio_pwm_inc = 114;						// 1760 Hz / 15625 Hz * (2 x 512) Steps
+#if 0
+	const int16_t l_audio_pwm_inc = 3691;				// (880 Hz / 15625 Hz) * 16384 Steps * 2
 #else
-	int16_t l_audio_pwm_inc = 114 + (g_showData.clkState_phase100 >> 11);
+	int16_t l_audio_pwm_inc = 3691 - (g_showData.clkState_phase100 >> 4);
 #endif
 
 	/* Generate triangle signal */
 	if (g_audio_pwm_ramp_dwn) {
 		g_audio_pwm_accu -= l_audio_pwm_inc;
-		if (g_audio_pwm_accu <= -255) {
+		if (g_audio_pwm_accu <= -16383) {
 			g_audio_pwm_ramp_dwn = false;
-			int16_t residue = -g_audio_pwm_accu - 255;
-			g_audio_pwm_accu = -255 + residue;
+			int16_t residue = -g_audio_pwm_accu - 16383;
+			g_audio_pwm_accu = -16383 + residue;
 		}
 	} else {
 		g_audio_pwm_accu += l_audio_pwm_inc;
-		if (g_audio_pwm_accu >= +255) {
+		if (g_audio_pwm_accu >= +16383) {
 			g_audio_pwm_ramp_dwn = true;
-			int16_t residue = g_audio_pwm_accu - 255;
-			g_audio_pwm_accu = 255 - residue;
+			int16_t residue = g_audio_pwm_accu - 16383;
+			g_audio_pwm_accu = 16383 - residue;
 		}
 	}
 
-	int16_t audio_out = 256 + (g_audio_pwm_accu >> (10 - g_audio_out_loudness));
-	OCR1AH = (uint8_t) ((audio_out >> 8) & 0x01);			// 9 bit
-	OCR1AL = (uint8_t) ( audio_out       & 0xff);
+	int16_t audio_out = 256 + (g_audio_pwm_accu >> ((6 + 9) - g_audio_out_loudness));
+	OCR1AH = (uint8_t) (audio_out >> 8);					// 9 bit
+	OCR1AL = (uint8_t) (audio_out & 0xff);
 }
 
 ISR(__vector_14, ISR_BLOCK)
@@ -274,7 +281,7 @@ ISR(__vector_21, ISR_BLOCK)
 	uint16_t adc_temp_last = g_adc_temp;
 
 	/* SEI part */
-	sei();
+	cpu_irq_enable();
 
 	__vector_21__bottom(reason, adc_val, adc_ldr_last, adc_temp_last);
 }
@@ -286,13 +293,13 @@ void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_ldr_last
 	if (reason == ADC_STATE_VLD_LDR) {
 		float calc = g_adc_ldr ?  0.998f * g_adc_ldr + 0.002f * adc_val : adc_val;			// load with initial value if none is set before
 
-		cli();
+		cpu_irq_disable();
 		g_adc_ldr = calc;
 
 	} else if (reason == ADC_STATE_VLD_TEMP) {
 		float calc = g_adc_temp ?  0.9995f * g_adc_temp + 0.0005f * adc_val : adc_val;		// load with initial value if none is set before
 
-		cli();
+		cpu_irq_disable();
 		g_adc_temp = calc;
 	}
 }

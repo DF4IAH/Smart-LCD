@@ -253,16 +253,16 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		if (pos_o < cnt_o) {
 			TWDR = s_tx_d[pos_o++];				// Send new data byte
 		} else {
-			twcr_new |= _BV(TWSTO);				// Send STOP - no more data available
 			s_tx_lock = 0;
 			s_twi_tx_done();					// Message sent
+			twcr_new |= _BV(TWSTO);				// Send STOP - no more data available
 		}
 		break;
 
 	case TWI_TWSR_M_SLAW_DATA_NACK:				// Data byte sent and NACK received
-		twcr_new |= _BV(TWSTO);					// Send STOP - due to an error or slave not ready situation
 		s_tx_lock = 0;
 		s_twi_tx_done();						// Message failure
+		twcr_new |= _BV(TWSTO);					// Send STOP - due to an error or slave not ready situation
 		break;
 
 	case TWI_TWSR_M_SLAW_ARBIT_LOST:			// Arbitration lost
@@ -378,8 +378,8 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 			if (!s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
 				twcr_new |= _BV(TWEA);			// Send ACK
 			} else {
-				twcr_new &= ~_BV(TWEA);			// Send NACK
 				pos_i = 0;
+				twcr_new &= ~_BV(TWEA);			// Send NACK
 			}
 		}
 		break;
@@ -408,8 +408,8 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		} else {
 			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
 		}
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		pos_i = 0;
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		break;
 
 
@@ -422,7 +422,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		s_rx_lock = 1;
 		pos_o = 0;
 		TWDR = cnt_o > pos_o ?  s_rx_d[pos_o++] : 0;
-
 		if (cnt_o > pos_o) {
 			twcr_new |= _BV(TWEA);				// More data to send ACK
 		} else {
@@ -440,35 +439,35 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 		break;
 
 	case TWI_TWSR_S_SLAR_OMNIADDR_DATA_NACK:	// Data sent and NACK has been returned
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		s_rx_lock = 0;
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		break;
 
 	case TWI_TWSR_S_SLAR_MYADDR_LASTDATA_ACK:	// Last data sent and ACK has been returned
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
-		s_rx_lock = 0;
 		/* message transmitted successfully in slave mode */
+		s_rx_lock = 0;
+		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
 		break;
 
 	case TWI_TWSR_BUS_ERROR_STARTSTOP:
 		nop();
-		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
 		s_tx_lock = 0;
 		s_rx_lock = 0;
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
 		break;
 
 	case TWI_TWSR_BUS_ERROR_UNKNOWN:
 		nop();
-		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
 		s_tx_lock = 0;
 		s_rx_lock = 0;
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
 		break;
 
 	default:
 		nop();
-		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
 		s_tx_lock = 0;
 		s_rx_lock = 0;
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
 	}
 
 	return twcr_new;

@@ -258,7 +258,7 @@ static void lcd_show_new_clk_state(uint8_t clk_state, int16_t phase100)
 	}
 
 
-	int diff = (int) ((float)maxdiff * (phase100 / 18000.0f));
+	int diff = (int) ((float)maxdiff * (phase100 / -18000.0f));
 	int ldiff = diff < 0 ?  diff : 0;
 	int rdiff = diff > 0 ?  diff : 0;
 

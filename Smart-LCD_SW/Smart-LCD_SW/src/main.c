@@ -132,7 +132,7 @@ static void s_tc_init(void)
 	{
 	}
 
-	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 10-bit resolution - overflows with 15625 Hz */
+	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 9-bit resolution - overflows with 15625 Hz */
 	{
 		sysclk_enable_module(POWER_RED_REG0, PRTIM1_bm);
 
