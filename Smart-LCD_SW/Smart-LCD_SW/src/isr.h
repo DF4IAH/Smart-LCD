@@ -29,7 +29,7 @@ void asm_break(void);
 
 
 /* ISR */
-void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_ldr_last, uint16_t adc_temp_last);
+void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_light_last, uint16_t adc_temp_last);
 
 
 #endif /* ISR_H_ */

@@ -43,7 +43,7 @@ typedef struct showData {
 	uint16_t	satDop_dop100;
 	uint16_t	posLat_min_frac10000;
 	uint16_t	posLon_min_frac10000;
-	int16_t		pos_heigth;
+	int16_t		pos_height_int;
 
 	uint8_t		clkState_clk_state;
 	uint8_t		date_month;
@@ -65,6 +65,7 @@ typedef struct showData {
 	uint8_t		posLon_sgn;
 	uint8_t		posLon_deg;
 	uint8_t		posLon_min_int;
+	uint8_t		pos_height_frac100;
 
 } showData_t;
 
