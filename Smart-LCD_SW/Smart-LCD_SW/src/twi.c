@@ -109,7 +109,7 @@ static uint8_t s_isr_twi_rcvd_command_open_form(uint8_t data[], uint8_t pos)
 
 static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 {
-	uint8_t prepareBuf[4];
+	uint8_t prepareBuf[4] = { 0 };
 	uint8_t isGCA	= !data[0];
 	uint8_t cmd		=  data[1];
 
@@ -179,7 +179,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
-			isr_lcd_10mhz_ref_osc_show_pos_height((int16_t) (data[2] | (data[3] << 8)));
+			isr_lcd_10mhz_ref_osc_show_pos_height((data[2] | (data[3] << 8)), data[4]);
 			break;
 
 			default:

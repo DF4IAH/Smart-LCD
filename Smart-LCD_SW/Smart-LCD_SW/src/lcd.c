@@ -37,11 +37,9 @@
 #include "lcd.h"
 
 extern float				g_temp;
-
+extern float				g_adc_light;
 extern status_t				g_status;
-
 extern showData_t			g_showData;
-
 
 extern uint8_t				g_u8_DEBUG11,
 							g_u8_DEBUG12,
@@ -435,8 +433,8 @@ uint8_t lcd_show_new_data(void)
 	/* Slot 6 */
 	if (g_showData.newPosHeight && (idx <= 6)) {
 		g_showData.newPosHeight = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %04d m",
-		g_showData.pos_heigth);
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %04d.%01d m",
+		g_showData.pos_height_int, g_showData.pos_height_frac100 / 10);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 7;
@@ -491,7 +489,7 @@ static void s_lcd_test_lines(void)
 	const int w = GFX_MONO_LCD_WIDTH;
 
 	static int loop = 0;
-	static uint8_t sw = 0;
+	static uint8_t sw = 2;
 
 	if (loop++ < h) {
 		uint8_t y11 = oy + loop;
@@ -514,13 +512,7 @@ static void s_lcd_test_lines(void)
 static void s_lcd_test_temp(void)
 {
 	static float t_last = 0.0f;
-	float	t;
-
-	s_task();
-
-	if (!g_status.doAnimation) {
-		return;
-	}
+	float t;
 
 	irqflags_t flags = cpu_irq_save();
 	t = g_temp;
@@ -530,13 +522,31 @@ static void s_lcd_test_temp(void)
 		t = 0.f;
 	}
 
-	if (fabs(t - t_last) < 0.01f) {
+	if (fabsf(t - t_last) < 0.01f) {
 		return;
 	}
 	t_last = t;
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), " T=%2d.%02d^C ", (int) t, ((int) (t * 100.0f)) % 100);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), " T=  %2d.%02d^C ", (int) t, ((int) (t * 100.0f)) % 100);
 	gfx_mono_draw_string(s_lcd_prepare_buf, 160, 105, &sysfont);
+}
+
+static void s_lcd_test_light(void)
+{
+	static float l_last = 0.0f;
+	float l;
+
+	irqflags_t flags = cpu_irq_save();
+	l = g_adc_light;
+	cpu_irq_restore(flags);
+
+	if (fabsf(l - l_last) < 0.1f) {
+		return;
+	}
+	l_last = l;
+
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), " L=%4d.%1d AD", (int) l, ((int) (l * 10.0f)) % 10);
+	gfx_mono_draw_string(s_lcd_prepare_buf, 160, 95, &sysfont);
 }
 
 void lcd_animation_prepare(void)
@@ -625,11 +635,13 @@ void lcd_animation_loop(void)
 
 		if ((now - s_animation_time_last_temp) >= 0.50f) {  // 2x per sec
 			s_animation_time_last_temp = now;
+			s_task();
 			s_lcd_test_temp();
+			s_lcd_test_light();
 		}
 
 		s_lcd_test_lines();  // Every cycle
-	}	
+	}
 }
 
 void lcd_test(uint8_t pattern_bm)
@@ -835,12 +847,13 @@ void isr_lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_
 	}
 }
 
-void isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height)
+void isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height_int, uint8_t height_frac100)
 {
 	// interrupt is already disabled, here
-	if (g_showData.pos_heigth != height) {
+	if (g_showData.pos_height_int != height_int || g_showData.pos_height_frac100 != height_frac100) {
 		g_showData.newPosHeight = true;
-		g_showData.pos_heigth = height;
+		g_showData.pos_height_int = height_int;
+		g_showData.pos_height_frac100 = height_frac100;
 	}
 }
 

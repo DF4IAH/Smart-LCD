@@ -43,20 +43,15 @@
 /* GLOBAL section */
 
 uint_fast32_t		g_timer_abs_msb						= 0;
-
 uint8_t				g_adc_state							= 0;
-float				g_adc_ldr							= 0.f;
+float				g_adc_light							= 0.f;
 float				g_adc_temp							= 0.f;
-
 float				g_temp								= 0.f;
 uint8_t				g_lcdbl_dimmer						= 0;
-
 uint8_t				g_audio_out_loudness				= 0;
 int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
-
 status_t			g_status							= { 0 };
-
 showData_t			g_showData							= { 0 };
 
 uint8_t				g_u8_DEBUG11						= 0,
@@ -73,7 +68,6 @@ float				g_f_DEBUG31							= 0.f,
 /* MAIN STATIC section */
 
 static uint8_t		runmode								= 0;			// static runmode of main.c
-static char			prepareBuf[16];
 
 
 
@@ -85,7 +79,7 @@ static void s_reset_global_vars(void)
 	cpu_irq_disable();
 
 	g_adc_state			= ADC_STATE_PRE_LDR;
-	g_adc_ldr			= 0.f;
+	g_adc_light			= 0.f;
 	g_adc_temp			= 0.f;
 
 	g_temp				= 25.f;
@@ -270,7 +264,6 @@ static void s_twi_init(uint8_t twi_addr, uint8_t twi_addr_bm)
 	TWAMR = (twi_addr_bm << 1);
 
 	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable, no START or STOP bit
-	//TWCR = _BV(TWSTA) | _BV(TWEN) | _BV(TWIE);	// TEST: Enable START, ENable TWI port, Interrupt Enable
 
 	cpu_irq_restore(flags);
 }
@@ -344,11 +337,6 @@ static void s_task_backlight(float adc_photo)
 		OCR2A   = 0;
 		TCCR2A &= ~(0b11  << COM2A0);
 	}
-
-	if (g_status.doAnimation) {
-		snprintf(prepareBuf, sizeof(prepareBuf), " L=%4d AD ", lum);
-		gfx_mono_draw_string(prepareBuf, 160, 95, lcd_get_sysfont());
-	}
 }
 
 static void s_task_temp(float adc_temp)
@@ -367,34 +355,36 @@ static void s_task_temp(float adc_temp)
 
 void s_task(void)
 {
-	uint8_t more = 0;
+	/* TASK when woken up */
+	float l_adc_temp, l_adc_light;
+	irqflags_t flags;
+	uint8_t l_doAnimation, l_isAnimationStopped;
+	uint8_t more;
 
+	flags = cpu_irq_save();
+	l_adc_temp = g_adc_temp;
+	l_adc_light = g_adc_light;
+	l_doAnimation = g_status.doAnimation;
+	l_isAnimationStopped = g_status.isAnimationStopped;
+	cpu_irq_restore(flags);
+
+	/* Calculate new current temperature */
+	s_task_temp(l_adc_temp);
+
+	/* Calculate new backlight PWM value and set that */
+	s_task_backlight(l_adc_light);
+
+	/* Runs as long as changed data is not presented yet */
 	do {
-		/* TASK when woken up */
-		irqflags_t flags		= cpu_irq_save();
-		float l_adc_ldr			= g_adc_ldr;
-		float l_adc_temp		= g_adc_temp;
-		cpu_irq_restore(flags);
-
 		/* Show received data from I2C bus */
-		if (g_status.isAnimationStopped) {
+		if (l_isAnimationStopped) {
 			more = lcd_show_new_data();
+		} else {
+			more = 0;
 		}
-
-		/* Calculate new backlight PWM value and set that */
-		s_task_backlight(l_adc_ldr);
-
-		flags = cpu_irq_save();
-		cpu_irq_restore(flags);
-
-		if (!more) {
-			/* Calculate new current temperature */
-			s_task_temp(l_adc_temp);
-		}
-
 
 		/* Animated demo */
-		if (g_status.doAnimation) {
+		if (l_doAnimation) {
 			lcd_animation_loop();
 
 		} else {
@@ -403,11 +393,15 @@ void s_task(void)
 			if (s_last_animation) {
 				s_last_animation = false;
 
-				lcd_cls();							// clear screen
+				/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
+				lcd_cls();
 				gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
 				const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
 				gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
+
+				flags = cpu_irq_save();
 				g_status.isAnimationStopped = true;
+				cpu_irq_restore(flags);
 			}
 		}
 	} while (more);

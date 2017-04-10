@@ -45,10 +45,11 @@
 
 /* External vars */
 
+extern status_t				g_status;
 extern showData_t			g_showData;
 extern uint_fast32_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
-extern float				g_adc_ldr;
+extern float				g_adc_light;
 extern float				g_adc_temp;
 extern uint8_t				g_audio_out_loudness;
 extern int16_t				g_audio_pwm_accu;
@@ -119,45 +120,47 @@ ISR(__vector_8, ISR_BLOCK)
 
 ISR(__vector_9, ISR_BLOCK)
 {	/* TIMER 2 OVF - Overflow */
-	static uint8_t state_old = 0;
-	static uint8_t state_ctr = 0;
-	static uint8_t second_old = 0;
-	uint8_t cur = PORTB & 0x3f;
+	if (g_status.isAnimationStopped) {
+		static uint8_t state_old = 0;
+		static uint8_t state_ctr = 0;
+		static uint8_t second_old = 0;
+		uint8_t cur = PORTB & 0x3f;
 
-	/* signaling the grade of deviation */
-	g_audio_out_loudness = 0;
-	if (g_showData.clkState_clk_state < 0xf) {
-		cur |= _BV(PORTB6);  // LED = red
-		if (state_old != 0x02) {
-			state_ctr = 122;  // 1 sec
-		}
-		state_old = 0x02;
-
-	} else if ((g_showData.clkState_clk_state == 0xf) && (-4 < g_showData.ppb_int) && (g_showData.ppb_int < 4)) {
-		cur |= _BV(PORTB7);  // LED = green
-		state_old = 0x00;
-
-		/* Acoustic phase tracker */
-		if (g_showData.time_second != second_old) {
-			second_old = g_showData.time_second;
-			state_ctr = 12;
-		}
-
-	} else {
-		if (!state_old) {
-			state_ctr = 30;  // 1/4 sec
-		}
-		state_old = 0x01;
-	}
-
-	if (state_ctr) {
-		--state_ctr;
-		g_audio_out_loudness = 9;  // max 9
-	} else {
+		/* signaling the grade of deviation */
 		g_audio_out_loudness = 0;
-	}
+		if (g_showData.clkState_clk_state < 0xf) {
+			cur |= _BV(PORTB6);  // LED = red
+			if (state_old != 0x02) {
+				state_ctr = 122;  // 1 sec
+			}
+			state_old = 0x02;
 
-	PORTB = cur;
+		} else if ((g_showData.clkState_clk_state == 0xf) && (-4 < g_showData.ppb_int) && (g_showData.ppb_int < 4)) {
+			cur |= _BV(PORTB7);  // LED = green
+			state_old = 0x00;
+
+			/* Acoustic phase tracker */
+			if (g_showData.time_second != second_old) {
+				second_old = g_showData.time_second;
+				state_ctr = 6;
+			}
+
+		} else {
+			if (!state_old) {
+				state_ctr = 30;  // 1/4 sec
+			}
+			state_old = 0x01;
+		}
+
+		if (state_ctr) {
+			--state_ctr;
+			g_audio_out_loudness = 9;  // max 9
+		} else {
+			g_audio_out_loudness = 0;
+		}
+
+		PORTB = cur;
+	}
 }
 
 ISR(__vector_10, ISR_BLOCK)
@@ -179,32 +182,30 @@ ISR(__vector_13, ISR_BLOCK)
 {	/* TIMER 1 OVF - Overflow */
 	++g_timer_abs_msb;
 
-#if 0
-	const int16_t l_audio_pwm_inc = 3691;				// (880 Hz / 15625 Hz) * 16384 Steps * 2
-#else
-	int16_t l_audio_pwm_inc = 3691 - (g_showData.clkState_phase100 >> 4);
-#endif
+	if (g_status.isAnimationStopped && g_audio_out_loudness) {
+		int16_t l_audio_pwm_inc = 3691 - (g_showData.clkState_phase100 >> 4);  // (880 Hz / 15625 Hz) * 16384 Steps * 2
 
-	/* Generate triangle signal */
-	if (g_audio_pwm_ramp_dwn) {
-		g_audio_pwm_accu -= l_audio_pwm_inc;
-		if (g_audio_pwm_accu <= -16383) {
-			g_audio_pwm_ramp_dwn = false;
-			int16_t residue = -g_audio_pwm_accu - 16383;
-			g_audio_pwm_accu = -16383 + residue;
+		/* Generate triangle signal */
+		if (g_audio_pwm_ramp_dwn) {
+			g_audio_pwm_accu -= l_audio_pwm_inc;
+			if (g_audio_pwm_accu <= -16383) {
+				g_audio_pwm_ramp_dwn = false;
+				int16_t residue = -g_audio_pwm_accu - 16383;
+				g_audio_pwm_accu = -16383 + residue;
+			}
+		} else {
+			g_audio_pwm_accu += l_audio_pwm_inc;
+			if (g_audio_pwm_accu >= +16383) {
+				g_audio_pwm_ramp_dwn = true;
+				int16_t residue = g_audio_pwm_accu - 16383;
+				g_audio_pwm_accu = 16383 - residue;
+			}
 		}
-	} else {
-		g_audio_pwm_accu += l_audio_pwm_inc;
-		if (g_audio_pwm_accu >= +16383) {
-			g_audio_pwm_ramp_dwn = true;
-			int16_t residue = g_audio_pwm_accu - 16383;
-			g_audio_pwm_accu = 16383 - residue;
-		}
+
+		int16_t audio_out = 256 + (g_audio_pwm_accu >> (15 - g_audio_out_loudness));  // 6 + 9
+		OCR1AH = (uint8_t) (audio_out >> 8);					// 9 bit
+		OCR1AL = (uint8_t) (audio_out & 0xff);
 	}
-
-	int16_t audio_out = 256 + (g_audio_pwm_accu >> ((6 + 9) - g_audio_out_loudness));
-	OCR1AH = (uint8_t) (audio_out >> 8);					// 9 bit
-	OCR1AL = (uint8_t) (audio_out & 0xff);
 }
 
 ISR(__vector_14, ISR_BLOCK)
@@ -277,24 +278,24 @@ ISR(__vector_21, ISR_BLOCK)
 		g_adc_state = ADC_STATE_PRE_LDR;
 	}
 
-	uint16_t adc_ldr_last  = g_adc_ldr;
+	uint16_t adc_light_last  = g_adc_light;
 	uint16_t adc_temp_last = g_adc_temp;
 
 	/* SEI part */
 	cpu_irq_enable();
 
-	__vector_21__bottom(reason, adc_val, adc_ldr_last, adc_temp_last);
+	__vector_21__bottom(reason, adc_val, adc_light_last, adc_temp_last);
 }
 
 /* do not static this function to avoid code inlining that would inherit many push operations in the critical section */
-void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_ldr_last, uint16_t adc_temp_last)
+void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_light_last, uint16_t adc_temp_last)
 {
 	/* Low pass filtering and enhancing the data depth */
 	if (reason == ADC_STATE_VLD_LDR) {
-		float calc = g_adc_ldr ?  0.998f * g_adc_ldr + 0.002f * adc_val : adc_val;			// load with initial value if none is set before
+		float calc = g_adc_light ?  0.998f * g_adc_light + 0.002f * adc_val : adc_val;			// load with initial value if none is set before
 
 		cpu_irq_disable();
-		g_adc_ldr = calc;
+		g_adc_light = calc;
 
 	} else if (reason == ADC_STATE_VLD_TEMP) {
 		float calc = g_adc_temp ?  0.9995f * g_adc_temp + 0.0005f * adc_val : adc_val;		// load with initial value if none is set before
