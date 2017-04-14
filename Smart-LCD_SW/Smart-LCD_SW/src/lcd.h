@@ -42,6 +42,7 @@
 #define LCD_SHOW_LINE_TOP			11
 #define LCD_SHOW_LINE_HEIGHT		9
 #define LCD_SHOW_LINE_LEFT			3
+#define LCD_SHOW_CLMN_WIDTH         6
 
 
 uint8_t	lcd_bus_read_status(void);
@@ -57,12 +58,13 @@ void    lcd_col_set(uint8_t col);
 void    lcd_cr(void);
 void    lcd_home(void);
 void    lcd_cls(void);
+void    lcd_show_template(void);
 uint8_t lcd_show_new_data(void);
 void    lcd_animation_prepare(void);
 void    lcd_animation_loop(void);
 void    lcd_test(uint8_t pattern_bm);
 
-void    isr_lcd_10mhz_ref_osc_show_clk_state(uint8_t clk_state, int16_t phase100);
+void    isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100);
 void    isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
 void    isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);
 void    isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000);

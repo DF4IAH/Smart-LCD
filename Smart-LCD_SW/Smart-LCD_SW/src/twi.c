@@ -135,7 +135,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
-			isr_lcd_10mhz_ref_osc_show_clk_state(data[2], (int16_t) (data[3] | (data[4] << 8)));
+			isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(data[2], (uint16_t) (data[3] | (data[4] << 8)), (int16_t) (data[5] | (data[6] << 8)));
 			break;
 
 			case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
@@ -343,7 +343,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 							cnt_i = 3;
 							break;
 
-						case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
 						case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
 						case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
 						case TWI_SMART_LCD_CMD_SHOW_SATS:
@@ -355,6 +354,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 							cnt_i = 5;
 							break;
 
+						case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
 						case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
 						case TWI_SMART_LCD_CMD_SHOW_POS_LON:
 							cnt_i = 6;

@@ -35,7 +35,8 @@ typedef struct showData {
 	uint16_t	newPosHeight										: 1;
 	uint16_t	newRsvrd											: 4;
 
-	int16_t		clkState_phase100;
+	uint16_t	clkState_phaseVolt1000;
+	int16_t		clkState_phaseDeg100;
 	uint16_t	date_year;
 	int16_t		ppb_int;
 	uint16_t	ppb_frac1000;
