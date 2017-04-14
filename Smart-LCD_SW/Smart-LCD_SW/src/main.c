@@ -398,6 +398,7 @@ void s_task(void)
 				gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
 				const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
 				gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
+				lcd_show_template();
 
 				flags = cpu_irq_save();
 				g_status.isAnimationStopped = true;
