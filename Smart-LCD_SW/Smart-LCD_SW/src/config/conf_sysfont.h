@@ -1062,7 +1062,7 @@
 /** First character defined. */
 #  define SYSFONT_FIRSTCHAR       ((uint8_t)' ')
 /** Last character defined. */
-#  define SYSFONT_LASTCHAR        ((uint8_t)'}')
+#  define SYSFONT_LASTCHAR        ((uint8_t)0x7e)
 
 /** Define variable containing the font */
 #  define SYSFONT_DEFINE_GLYPHS \
@@ -1162,6 +1162,7 @@
 		0x10, 0x20, 0x20, 0x40, 0x20, 0x20, 0x10,          /* "{" */ \
 		0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,          /* "|" */ \
 		0x40, 0x20, 0x20, 0x10, 0x20, 0x20, 0x40,          /* "}" */ \
+		0x20, 0x50, 0x20, 0x00, 0x00, 0x00, 0x00,          /* "°" = 167d mapped @ 0x7e */ \
 	};
 #endif
 

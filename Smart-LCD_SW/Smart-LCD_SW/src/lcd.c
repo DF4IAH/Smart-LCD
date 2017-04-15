@@ -251,13 +251,13 @@ void lcd_show_template(void)
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Date    :");
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  1 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "UTC     :");
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Time    : 00:00.00 UTC");
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  2 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Deviat. : %04d.%03d ppb", 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Deviat'n: %04d.%03d ppb", 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  3 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 %%", 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 = %3d.%03d%%", 0, 0, 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PullVolt: %1d.%03d V", 0, 0);
@@ -275,17 +275,17 @@ void lcd_show_template(void)
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatState: FI=%1d M2=%1d", 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  8 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c  %02d^%02d.%04d'", ' ', 0, 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lat : %c  %02d%c%02d.%04d'", ' ', 0, 0x7e, 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  9 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c %03d^%02d.%04d'", ' ', 0, 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Lon : %c %03d%c%02d.%04d'", ' ', 0, 0x7e, 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP + 10 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat Hgt : %04d.%01d m", 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Phase: %+04d ^", 0);
-	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 25 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Phase: %+04d%c", 0, 0x7e);
+	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 26 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	gfx_mono_draw_string("PhaseOfs:", LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 }
@@ -303,7 +303,7 @@ static void lcd_show_new_clk_state(uint8_t clk_state, uint16_t phaseVolt1000, in
 	}
 
 
-	int diff = (int) ((float)maxdiff * (phaseDeg100 / -18000.0f));
+	int diff = (int) ((float)maxdiff * (phaseDeg100 / 18000.0f));
 	int ldiff = diff < 0 ?  diff : 0;
 	int rdiff = diff > 0 ?  diff : 0;
 
@@ -321,7 +321,7 @@ static void lcd_show_new_clk_state(uint8_t clk_state, uint16_t phaseVolt1000, in
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 31 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  5 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%+04d", phaseDeg100 / 100);
-	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 32 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 33 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	if ((clk_state_old != clk_state) || !dx) {
 		gfx_mono_generic_draw_filled_rect(mid_x - maxdiff -4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,  (maxdiff << 1) +8, 5, GFX_PIXEL_CLR);
@@ -463,8 +463,8 @@ uint8_t lcd_show_new_data(void)
 	/* Slot 4 */
 	if (g_showData.newPosLat && (idx <= 4)) {
 		g_showData.newPosLat = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%c  %02d^%02d.%04d'",
-		g_showData.posLat_sgn, g_showData.posLat_deg, g_showData.posLat_min_int, g_showData.posLat_min_frac10000);
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%c  %02d%c%02d.%04d",
+		g_showData.posLat_sgn, g_showData.posLat_deg, 0x7e, g_showData.posLat_min_int, g_showData.posLat_min_frac10000);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  9 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 5;
@@ -474,8 +474,8 @@ uint8_t lcd_show_new_data(void)
 	/* Slot 5 */
 	if (g_showData.newPosLon && (idx <= 5)) {
 		g_showData.newPosLon = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%c %03d^%02d.%04d'",
-		g_showData.posLon_sgn, g_showData.posLon_deg, g_showData.posLon_min_int, g_showData.posLon_min_frac10000);
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%c %03d%c%02d.%04d",
+		g_showData.posLon_sgn, g_showData.posLon_deg, 0x7e, g_showData.posLon_min_int, g_showData.posLon_min_frac10000);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 10 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 6;
@@ -485,7 +485,7 @@ uint8_t lcd_show_new_data(void)
 	/* Slot 6 */
 	if (g_showData.newPosHeight && (idx <= 6)) {
 		g_showData.newPosHeight = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%04d.%01d m",
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%04d.%01d",
 		g_showData.pos_height_int, g_showData.pos_height_frac100 / 10);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
@@ -506,11 +506,22 @@ uint8_t lcd_show_new_data(void)
 
 	/* Slot 8 */
 	if (g_showData.newPwm && (idx <= 8)) {
+		const float exp_256_to_1000 = 1000.0f / 256.0f;
+		uint8_t pwm_int = g_showData.pwm_int;
+		uint8_t pwm_frac256 = g_showData.pwm_frac256;
 		g_showData.newPwm = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
-		g_showData.pwm_int, (int) (g_showData.pwm_frac256 * (1000.0f / 256.0f)));
 		cpu_irq_restore(flags);
+
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
+		pwm_int, (int) (pwm_frac256 * exp_256_to_1000));
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+
+		float f_pwm = pwm_int;
+		f_pwm += pwm_frac256 / 256.0f;
+		f_pwm *= 100.0f / 256.0f;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
+		(int) f_pwm, (int) ((f_pwm - floorf(f_pwm)) * 1000.0f));
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 24 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 9;
 		return 8;
 	}
