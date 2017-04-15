@@ -254,10 +254,10 @@ void lcd_show_template(void)
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Time    : 00:00.00 UTC");
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  2 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Deviat. : %04d.%03d ppb", 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Deviat'n: %04d.%03d ppb", 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  3 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 %%", 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 = %3d.%03d%%", 0, 0, 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PullVolt: %1d.%03d V", 0, 0);
@@ -506,11 +506,22 @@ uint8_t lcd_show_new_data(void)
 
 	/* Slot 8 */
 	if (g_showData.newPwm && (idx <= 8)) {
+		const float exp_256_to_1000 = 1000.0f / 256.0f;
+		uint8_t pwm_int = g_showData.pwm_int;
+		uint8_t pwm_frac256 = g_showData.pwm_frac256;
 		g_showData.newPwm = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
-		g_showData.pwm_int, (int) (g_showData.pwm_frac256 * (1000.0f / 256.0f)));
 		cpu_irq_restore(flags);
+
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
+		pwm_int, (int) (pwm_frac256 * exp_256_to_1000));
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+
+		float f_pwm = pwm_int;
+		f_pwm += pwm_frac256 / 256.0f;
+		f_pwm *= 100.0f / 256.0f;
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
+		(int) f_pwm, (int) ((f_pwm - floorf(f_pwm)) * 1000.0f));
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 24 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 9;
 		return 8;
 	}
