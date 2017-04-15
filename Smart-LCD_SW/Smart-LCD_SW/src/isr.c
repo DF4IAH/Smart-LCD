@@ -183,7 +183,7 @@ ISR(__vector_13, ISR_BLOCK)
 	++g_timer_abs_msb;
 
 	if (g_status.isAnimationStopped && g_audio_out_loudness) {
-		int16_t l_audio_pwm_inc = 3691 - (g_showData.clkState_phaseDeg100 >> 4);  // (880 Hz / 15625 Hz) * 16384 Steps * 2
+		int16_t l_audio_pwm_inc = 3691 + (g_showData.clkState_phaseDeg100 >> 4);  // (880 Hz / 15625 Hz) * 16384 Steps * 2
 
 		/* Generate triangle signal */
 		if (g_audio_pwm_ramp_dwn) {
