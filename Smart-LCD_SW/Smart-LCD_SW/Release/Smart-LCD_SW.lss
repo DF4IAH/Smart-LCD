@@ -7945,7 +7945,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
     3020:	8d 38       	cpi	r24, 0x8D	; 141
     3022:	98 f0       	brcs	.+38     	; 0x304a <__vector_24__bottom+0x220>
     3024:	8d 38       	cpi	r24, 0x8D	; 141
-    3026:	29 f0       	breq	.+10     	; 0x3032 <__vector_24__bottom+0x208>
+    3026:	49 f0       	breq	.+18     	; 0x303a <__vector_24__bottom+0x210>
     3028:	16 c0       	rjmp	.+44     	; 0x3056 <__vector_24__bottom+0x22c>
 						case TWI_SMART_LCD_CMD_NOOP:
 							cnt_i = 1;
@@ -7953,11 +7953,11 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
     302c:	80 93 0c 04 	sts	0x040C, r24	; 0x80040c <cnt_i.2657>
 							break;
     3030:	12 c0       	rjmp	.+36     	; 0x3056 <__vector_24__bottom+0x22c>
+							break;
 
-						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
 						case TWI_SMART_LCD_CMD_SHOW_DOP:
 						case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
-						case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
+						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
 							cnt_i = 3;
     3032:	83 e0       	ldi	r24, 0x03	; 3
     3034:	80 93 0c 04 	sts	0x040C, r24	; 0x80040c <cnt_i.2657>
@@ -7965,16 +7965,17 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
     3038:	0e c0       	rjmp	.+28     	; 0x3056 <__vector_24__bottom+0x22c>
 
 						case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
-						case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
+						case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
 						case TWI_SMART_LCD_CMD_SHOW_SATS:
+						case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
 							cnt_i = 4;
     303a:	84 e0       	ldi	r24, 0x04	; 4
     303c:	80 93 0c 04 	sts	0x040C, r24	; 0x80040c <cnt_i.2657>
 							break;
     3040:	0a c0       	rjmp	.+20     	; 0x3056 <__vector_24__bottom+0x22c>
 
-						case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 						case TWI_SMART_LCD_CMD_SHOW_PPM:
+						case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 							cnt_i = 5;
     3042:	85 e0       	ldi	r24, 0x05	; 5
     3044:	80 93 0c 04 	sts	0x040C, r24	; 0x80040c <cnt_i.2657>
