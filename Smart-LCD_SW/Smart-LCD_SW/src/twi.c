@@ -336,21 +336,21 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 							cnt_o = 1;
 							break;
 
-						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
 						case TWI_SMART_LCD_CMD_SHOW_DOP:
 						case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
-						case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
+						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
 							cnt_i = 3;
 							break;
 
 						case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
-						case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
+						case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
 						case TWI_SMART_LCD_CMD_SHOW_SATS:
+						case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
 							cnt_i = 4;
 							break;
 
-						case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 						case TWI_SMART_LCD_CMD_SHOW_PPM:
+						case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 							cnt_i = 5;
 							break;
 
