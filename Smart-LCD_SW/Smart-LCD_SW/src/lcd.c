@@ -269,7 +269,7 @@ void lcd_show_template(void)
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatUse  : West=%02d East=%02d Used=%02d sats", 0, 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  6 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %03d.%02d", 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Sat DOP : %02d.%02d", 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  7 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "SatState: FI=%1d M2=%1d", 0, 0);
@@ -441,7 +441,7 @@ uint8_t lcd_show_new_data(void)
 	/* Slot 2 */
 	if (g_showData.newSatDop && (idx <= 2)) {
 		g_showData.newSatDop = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%03d.%02d",
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%02d.%02d",
 		(int) (g_showData.satDop_dop100 / 100.0f), g_showData.satDop_dop100 % 100);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  7 * LCD_SHOW_LINE_HEIGHT, &sysfont);
@@ -485,8 +485,8 @@ uint8_t lcd_show_new_data(void)
 	/* Slot 6 */
 	if (g_showData.newPosHeight && (idx <= 6)) {
 		g_showData.newPosHeight = false;
-		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%04d.%01d",
-		g_showData.pos_height_int, g_showData.pos_height_frac100 / 10);
+		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%04d.%1d",
+		g_showData.pos_height_int, g_showData.pos_height_frac10);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 7;
@@ -912,13 +912,13 @@ void isr_lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_
 	}
 }
 
-void isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height_int, uint8_t height_frac100)
+void isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height_int, uint8_t height_frac10)
 {
 	// interrupt is already disabled, here
-	if (g_showData.pos_height_int != height_int || g_showData.pos_height_frac100 != height_frac100) {
+	if ((g_showData.pos_height_int != height_int) || (g_showData.pos_height_frac10 != height_frac10)) {
 		g_showData.newPosHeight = true;
 		g_showData.pos_height_int = height_int;
-		g_showData.pos_height_frac100 = height_frac100;
+		g_showData.pos_height_frac10 = height_frac10;
 	}
 }
 

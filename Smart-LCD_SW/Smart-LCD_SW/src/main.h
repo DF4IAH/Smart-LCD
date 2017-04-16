@@ -66,7 +66,7 @@ typedef struct showData {
 	uint8_t		posLon_sgn;
 	uint8_t		posLon_deg;
 	uint8_t		posLon_min_int;
-	uint8_t		pos_height_frac100;
+	uint8_t		pos_height_frac10;
 
 } showData_t;
 
