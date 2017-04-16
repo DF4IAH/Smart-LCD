@@ -257,7 +257,7 @@ void lcd_show_template(void)
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "Deviat'n: %04d.%03d ppb", 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  3 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 = %3d.%03d%%", 0, 0, 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 =%3d.%03d%%", 0, 0, 0, 0);
 	gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PullVolt: %1d.%03d V", 0, 0);
@@ -521,7 +521,7 @@ uint8_t lcd_show_new_data(void)
 		f_pwm *= 100.0f / 256.0f;
 		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
 		(int) f_pwm, (int) ((f_pwm - floorf(f_pwm)) * 1000.0f));
-		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 24 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 23 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
 		idx = 9;
 		return 8;
 	}

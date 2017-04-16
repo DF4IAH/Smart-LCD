@@ -1120,12 +1120,13 @@ END GROUP
                 0x00800103        0x7 src/gfx_mono/sysfont.o
                 0x00800103                sysfont
  .rodata.str1.1
-                0x0080010a      0x218 src/lcd.o
-                                0x22d (size before relaxing)
+                0x0080010a      0x217 src/lcd.o
+                                0x22c (size before relaxing)
  .rodata.str1.1
-                0x00800322       0x28 src/main.o
+                0x00800321       0x28 src/main.o
  *(.gnu.linkonce.d*)
                 0x0080034a                . = ALIGN (0x2)
+ *fill*         0x00800349        0x1 
                 0x0080034a                _edata = .
                 0x0080034a                PROVIDE (__data_end, .)
 

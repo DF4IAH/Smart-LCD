@@ -4399,7 +4399,7 @@ void lcd_show_template(void)
     19b2:	ce 01       	movw	r24, r28
     19b4:	ef d9       	rcall	.-3106   	; 0xd94 <gfx_mono_draw_string>
 
-	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 = %3d.%03d%%", 0, 0, 0, 0);
+	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "PWM     : %3d.%03d/256 =%3d.%03d%%", 0, 0, 0, 0);
     19b6:	1f 92       	push	r1
     19b8:	1f 92       	push	r1
     19ba:	1f 92       	push	r1
@@ -4430,7 +4430,7 @@ void lcd_show_template(void)
     19e8:	1f 92       	push	r1
     19ea:	1f 92       	push	r1
     19ec:	1f 92       	push	r1
-    19ee:	84 e7       	ldi	r24, 0x74	; 116
+    19ee:	83 e7       	ldi	r24, 0x73	; 115
     19f0:	91 e0       	ldi	r25, 0x01	; 1
     19f2:	9f 93       	push	r25
     19f4:	8f 93       	push	r24
@@ -4460,7 +4460,7 @@ void lcd_show_template(void)
     1a20:	1f 92       	push	r1
     1a22:	1f 92       	push	r1
     1a24:	1f 92       	push	r1
-    1a26:	89 e8       	ldi	r24, 0x89	; 137
+    1a26:	88 e8       	ldi	r24, 0x88	; 136
     1a28:	91 e0       	ldi	r25, 0x01	; 1
     1a2a:	9f 93       	push	r25
     1a2c:	8f 93       	push	r24
@@ -4484,7 +4484,7 @@ void lcd_show_template(void)
     1a4c:	1f 92       	push	r1
     1a4e:	1f 92       	push	r1
     1a50:	1f 92       	push	r1
-    1a52:	8f e9       	ldi	r24, 0x9F	; 159
+    1a52:	8e e9       	ldi	r24, 0x9E	; 158
     1a54:	91 e0       	ldi	r25, 0x01	; 1
     1a56:	9f 93       	push	r25
     1a58:	8f 93       	push	r24
@@ -4506,7 +4506,7 @@ void lcd_show_template(void)
     1a74:	1f 92       	push	r1
     1a76:	1f 92       	push	r1
     1a78:	1f 92       	push	r1
-    1a7a:	8c ec       	ldi	r24, 0xCC	; 204
+    1a7a:	8b ec       	ldi	r24, 0xCB	; 203
     1a7c:	91 e0       	ldi	r25, 0x01	; 1
     1a7e:	9f 93       	push	r25
     1a80:	8f 93       	push	r24
@@ -4536,7 +4536,7 @@ void lcd_show_template(void)
     1aac:	1f 92       	push	r1
     1aae:	1f 92       	push	r1
     1ab0:	1f 92       	push	r1
-    1ab2:	80 ee       	ldi	r24, 0xE0	; 224
+    1ab2:	8f ed       	ldi	r24, 0xDF	; 223
     1ab4:	91 e0       	ldi	r25, 0x01	; 1
     1ab6:	9f 93       	push	r25
     1ab8:	8f 93       	push	r24
@@ -4567,7 +4567,7 @@ void lcd_show_template(void)
     1ae6:	80 e2       	ldi	r24, 0x20	; 32
     1ae8:	f8 2e       	mov	r15, r24
     1aea:	ff 92       	push	r15
-    1aec:	88 ef       	ldi	r24, 0xF8	; 248
+    1aec:	87 ef       	ldi	r24, 0xF7	; 247
     1aee:	91 e0       	ldi	r25, 0x01	; 1
     1af0:	9f 93       	push	r25
     1af2:	8f 93       	push	r24
@@ -4595,7 +4595,7 @@ void lcd_show_template(void)
     1b1a:	1f 92       	push	r1
     1b1c:	1f 92       	push	r1
     1b1e:	ff 92       	push	r15
-    1b20:	87 e1       	ldi	r24, 0x17	; 23
+    1b20:	86 e1       	ldi	r24, 0x16	; 22
     1b22:	92 e0       	ldi	r25, 0x02	; 2
     1b24:	9f 93       	push	r25
     1b26:	8f 93       	push	r24
@@ -4625,7 +4625,7 @@ void lcd_show_template(void)
     1b52:	1f 92       	push	r1
     1b54:	1f 92       	push	r1
     1b56:	1f 92       	push	r1
-    1b58:	85 e3       	ldi	r24, 0x35	; 53
+    1b58:	84 e3       	ldi	r24, 0x34	; 52
     1b5a:	92 e0       	ldi	r25, 0x02	; 2
     1b5c:	9f 93       	push	r25
     1b5e:	8f 93       	push	r24
@@ -4647,7 +4647,7 @@ void lcd_show_template(void)
     1b7a:	0f 93       	push	r16
     1b7c:	1f 92       	push	r1
     1b7e:	1f 92       	push	r1
-    1b80:	8b e4       	ldi	r24, 0x4B	; 75
+    1b80:	8a e4       	ldi	r24, 0x4A	; 74
     1b82:	92 e0       	ldi	r25, 0x02	; 2
     1b84:	9f 93       	push	r25
     1b86:	8f 93       	push	r24
@@ -4677,7 +4677,7 @@ void lcd_show_template(void)
     1bb2:	31 e0       	ldi	r19, 0x01	; 1
     1bb4:	47 e7       	ldi	r20, 0x77	; 119
     1bb6:	63 e0       	ldi	r22, 0x03	; 3
-    1bb8:	8a e5       	ldi	r24, 0x5A	; 90
+    1bb8:	89 e5       	ldi	r24, 0x59	; 89
     1bba:	92 e0       	ldi	r25, 0x02	; 2
 }
     1bbc:	df 91       	pop	r29
@@ -4745,7 +4745,7 @@ uint8_t lcd_show_new_data(void)
     1c0e:	80 91 45 04 	lds	r24, 0x0445	; 0x800445 <g_showData+0x19>
     1c12:	1f 92       	push	r1
     1c14:	8f 93       	push	r24
-    1c16:	84 e6       	ldi	r24, 0x64	; 100
+    1c16:	83 e6       	ldi	r24, 0x63	; 99
     1c18:	92 e0       	ldi	r25, 0x02	; 2
     1c1a:	9f 93       	push	r25
     1c1c:	8f 93       	push	r24
@@ -4799,7 +4799,7 @@ uint8_t lcd_show_new_data(void)
     1c72:	80 91 44 04 	lds	r24, 0x0444	; 0x800444 <g_showData+0x18>
     1c76:	1f 92       	push	r1
     1c78:	8f 93       	push	r24
-    1c7a:	83 e7       	ldi	r24, 0x73	; 115
+    1c7a:	82 e7       	ldi	r24, 0x72	; 114
     1c7c:	92 e0       	ldi	r25, 0x02	; 2
     1c7e:	9f 93       	push	r25
     1c80:	8f 93       	push	r24
@@ -4931,7 +4931,7 @@ uint8_t lcd_show_new_data(void)
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%1X", clk_state);
     1d3e:	1f 92       	push	r1
     1d40:	9f 92       	push	r9
-    1d42:	82 e8       	ldi	r24, 0x82	; 130
+    1d42:	81 e8       	ldi	r24, 0x81	; 129
     1d44:	92 e0       	ldi	r25, 0x02	; 2
     1d46:	9f 93       	push	r25
     1d48:	8f 93       	push	r24
@@ -4961,7 +4961,7 @@ uint8_t lcd_show_new_data(void)
     1d76:	8f 93       	push	r24
     1d78:	7f 93       	push	r23
     1d7a:	6f 93       	push	r22
-    1d7c:	86 e8       	ldi	r24, 0x86	; 134
+    1d7c:	85 e8       	ldi	r24, 0x85	; 133
     1d7e:	92 e0       	ldi	r25, 0x02	; 2
     1d80:	9f 93       	push	r25
     1d82:	8f 93       	push	r24
@@ -4985,7 +4985,7 @@ uint8_t lcd_show_new_data(void)
     1da4:	0e 94 75 1d 	call	0x3aea	; 0x3aea <__divmodhi4>
     1da8:	7f 93       	push	r23
     1daa:	6f 93       	push	r22
-    1dac:	8f e8       	ldi	r24, 0x8F	; 143
+    1dac:	8e e8       	ldi	r24, 0x8E	; 142
     1dae:	92 e0       	ldi	r25, 0x02	; 2
     1db0:	9f 93       	push	r25
     1db2:	8f 93       	push	r24
@@ -5289,7 +5289,7 @@ uint8_t lcd_show_new_data(void)
     1f68:	80 91 4b 04 	lds	r24, 0x044B	; 0x80044b <g_showData+0x1f>
     1f6c:	1f 92       	push	r1
     1f6e:	8f 93       	push	r24
-    1f70:	85 e9       	ldi	r24, 0x95	; 149
+    1f70:	84 e9       	ldi	r24, 0x94	; 148
     1f72:	92 e0       	ldi	r25, 0x02	; 2
     1f74:	9f 93       	push	r25
     1f76:	8f 93       	push	r24
@@ -5375,7 +5375,7 @@ uint8_t lcd_show_new_data(void)
     1ffa:	0e 94 b8 1b 	call	0x3770	; 0x3770 <__fixsfsi>
     1ffe:	7f 93       	push	r23
     2000:	6f 93       	push	r22
-    2002:	86 ed       	ldi	r24, 0xD6	; 214
+    2002:	85 ed       	ldi	r24, 0xD5	; 213
     2004:	91 e0       	ldi	r25, 0x01	; 1
     2006:	9f 93       	push	r25
     2008:	8f 93       	push	r24
@@ -5432,7 +5432,7 @@ uint8_t lcd_show_new_data(void)
     2066:	80 91 4e 04 	lds	r24, 0x044E	; 0x80044e <g_showData+0x22>
     206a:	1f 92       	push	r1
     206c:	8f 93       	push	r24
-    206e:	8d ee       	ldi	r24, 0xED	; 237
+    206e:	8c ee       	ldi	r24, 0xEC	; 236
     2070:	91 e0       	ldi	r25, 0x01	; 1
     2072:	9f 93       	push	r25
     2074:	8f 93       	push	r24
@@ -5499,7 +5499,7 @@ uint8_t lcd_show_new_data(void)
     20ec:	80 91 50 04 	lds	r24, 0x0450	; 0x800450 <g_showData+0x24>
     20f0:	1f 92       	push	r1
     20f2:	8f 93       	push	r24
-    20f4:	8e ea       	ldi	r24, 0xAE	; 174
+    20f4:	8d ea       	ldi	r24, 0xAD	; 173
     20f6:	92 e0       	ldi	r25, 0x02	; 2
     20f8:	9f 93       	push	r25
     20fa:	8f 93       	push	r24
@@ -5566,7 +5566,7 @@ uint8_t lcd_show_new_data(void)
     2172:	80 91 53 04 	lds	r24, 0x0453	; 0x800453 <g_showData+0x27>
     2176:	1f 92       	push	r1
     2178:	8f 93       	push	r24
-    217a:	82 ec       	ldi	r24, 0xC2	; 194
+    217a:	81 ec       	ldi	r24, 0xC1	; 193
     217c:	92 e0       	ldi	r25, 0x02	; 2
     217e:	9f 93       	push	r25
     2180:	8f 93       	push	r24
@@ -5626,7 +5626,7 @@ uint8_t lcd_show_new_data(void)
     21e8:	8f 93       	push	r24
     21ea:	80 91 40 04 	lds	r24, 0x0440	; 0x800440 <g_showData+0x14>
     21ee:	8f 93       	push	r24
-    21f0:	85 ed       	ldi	r24, 0xD5	; 213
+    21f0:	84 ed       	ldi	r24, 0xD4	; 212
     21f2:	92 e0       	ldi	r25, 0x02	; 2
     21f4:	9f 93       	push	r25
     21f6:	8f 93       	push	r24
@@ -5685,7 +5685,7 @@ uint8_t lcd_show_new_data(void)
     225c:	8f 93       	push	r24
     225e:	80 91 34 04 	lds	r24, 0x0434	; 0x800434 <g_showData+0x8>
     2262:	8f 93       	push	r24
-    2264:	8f ed       	ldi	r24, 0xDF	; 223
+    2264:	8e ed       	ldi	r24, 0xDE	; 222
     2266:	92 e0       	ldi	r25, 0x02	; 2
     2268:	9f 93       	push	r25
     226a:	8f 93       	push	r24
@@ -5768,7 +5768,7 @@ uint8_t lcd_show_new_data(void)
     22ec:	6f 93       	push	r22
     22ee:	1f 92       	push	r1
     22f0:	ff 92       	push	r15
-    22f2:	09 ee       	ldi	r16, 0xE9	; 233
+    22f2:	08 ee       	ldi	r16, 0xE8	; 232
     22f4:	12 e0       	ldi	r17, 0x02	; 2
     22f6:	1f 93       	push	r17
     22f8:	0f 93       	push	r16
@@ -5854,11 +5854,11 @@ uint8_t lcd_show_new_data(void)
     2392:	cf 93       	push	r28
     2394:	0e 94 8f 1d 	call	0x3b1e	; 0x3b1e <snprintf>
 		(int) f_pwm, (int) ((f_pwm - floorf(f_pwm)) * 1000.0f));
-		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 24 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 23 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
     2398:	23 e0       	ldi	r18, 0x03	; 3
     239a:	31 e0       	ldi	r19, 0x01	; 1
     239c:	4f e2       	ldi	r20, 0x2F	; 47
-    239e:	63 e9       	ldi	r22, 0x93	; 147
+    239e:	6d e8       	ldi	r22, 0x8D	; 141
     23a0:	ce 01       	movw	r24, r28
     23a2:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 9;
@@ -5896,7 +5896,7 @@ uint8_t lcd_show_new_data(void)
     23e2:	80 91 4a 04 	lds	r24, 0x044A	; 0x80044a <g_showData+0x1e>
     23e6:	1f 92       	push	r1
     23e8:	8f 93       	push	r24
-    23ea:	86 e8       	ldi	r24, 0x86	; 134
+    23ea:	85 e8       	ldi	r24, 0x85	; 133
     23ec:	92 e0       	ldi	r25, 0x02	; 2
     23ee:	9f 93       	push	r25
     23f0:	8f 93       	push	r24
@@ -6413,7 +6413,7 @@ static void s_lcd_test_temp(void)
     270e:	0e 94 b8 1b 	call	0x3770	; 0x3770 <__fixsfsi>
     2712:	7f 93       	push	r23
     2714:	6f 93       	push	r22
-    2716:	82 ef       	ldi	r24, 0xF2	; 242
+    2716:	81 ef       	ldi	r24, 0xF1	; 241
     2718:	92 e0       	ldi	r25, 0x02	; 2
     271a:	9f 93       	push	r25
     271c:	8f 93       	push	r24
@@ -6500,7 +6500,7 @@ static void s_lcd_test_light(void)
     27be:	d8 d7       	rcall	.+4016   	; 0x3770 <__fixsfsi>
     27c0:	7f 93       	push	r23
     27c2:	6f 93       	push	r22
-    27c4:	83 e0       	ldi	r24, 0x03	; 3
+    27c4:	82 e0       	ldi	r24, 0x02	; 2
     27c6:	93 e0       	ldi	r25, 0x03	; 3
     27c8:	9f 93       	push	r25
     27ca:	8f 93       	push	r24
@@ -6825,7 +6825,7 @@ void lcd_test(uint8_t pattern_bm)
     298c:	31 e0       	ldi	r19, 0x01	; 1
     298e:	40 e2       	ldi	r20, 0x20	; 32
     2990:	66 e4       	ldi	r22, 0x46	; 70
-    2992:	81 e1       	ldi	r24, 0x11	; 17
+    2992:	80 e1       	ldi	r24, 0x10	; 16
     2994:	93 e0       	ldi	r25, 0x03	; 3
     2996:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 	}
@@ -8381,7 +8381,7 @@ void halt(void)
     32fc:	60 e0       	ldi	r22, 0x00	; 0
     32fe:	80 e0       	ldi	r24, 0x00	; 0
     3300:	0e 94 53 04 	call	0x8a6	; 0x8a6 <gfx_mono_generic_draw_rect>
-    3304:	e2 e2       	ldi	r30, 0x22	; 34
+    3304:	e1 e2       	ldi	r30, 0x21	; 33
     3306:	f3 e0       	ldi	r31, 0x03	; 3
     3308:	de 01       	movw	r26, r28
     330a:	11 96       	adiw	r26, 0x01	; 1
