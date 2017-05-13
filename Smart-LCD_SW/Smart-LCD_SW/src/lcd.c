@@ -294,16 +294,17 @@ static void lcd_show_new_clk_state(uint8_t clk_state, uint16_t phaseVolt1000, in
 {
 	const int maxdiff = 76;
 	const uint8_t mid_x = 150;
+	const int maxPhaseToShow = 4500;
 	static uint8_t clk_state_old = 0;
 
-	if (phaseDeg100 > 18000) {
-		phaseDeg100 = 18000;
-		} else if (phaseDeg100 < -18000) {
-		phaseDeg100 = -18000;
+	if (phaseDeg100 > maxPhaseToShow) {
+		phaseDeg100 = maxPhaseToShow;
+		} else if (phaseDeg100 < -maxPhaseToShow) {
+		phaseDeg100 = -maxPhaseToShow;
 	}
 
 
-	int diff = (int) ((float)maxdiff * (phaseDeg100 / 18000.0f));
+	int diff = (int) ((float)maxdiff * (phaseDeg100 / (float)maxPhaseToShow));
 	int ldiff = diff < 0 ?  diff : 0;
 	int rdiff = diff > 0 ?  diff : 0;
 
