@@ -15,19 +15,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   5 .debug_aranges 000003e8  00000000  00000000  0000443c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00007286  00000000  00000000  00004824  2**0
+  6 .debug_info   00007297  00000000  00000000  00004824  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00001cd4  00000000  00000000  0000baaa  2**0
+  7 .debug_abbrev 00001cd4  00000000  00000000  0000babb  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000033b4  00000000  00000000  0000d77e  2**0
+  8 .debug_line   000033b4  00000000  00000000  0000d78f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000015e0  00000000  00000000  00010b34  2**2
+  9 .debug_frame  000015e0  00000000  00000000  00010b44  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00001cc8  00000000  00000000  00012114  2**0
+ 10 .debug_str    00001cd7  00000000  00000000  00012124  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00006032  00000000  00000000  00013ddc  2**0
+ 11 .debug_loc    00006032  00000000  00000000  00013dfb  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000003d8  00000000  00000000  00019e0e  2**0
+ 12 .debug_ranges 000003d8  00000000  00000000  00019e2d  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -4852,24 +4852,24 @@ uint8_t lcd_show_new_data(void)
     1cd0:	90 90 40 04 	lds	r9, 0x0440	; 0x800440 <g_showData+0x16>
     1cd4:	c0 91 2e 04 	lds	r28, 0x042E	; 0x80042e <g_showData+0x4>
     1cd8:	d0 91 2f 04 	lds	r29, 0x042F	; 0x80042f <g_showData+0x5>
-    1cdc:	c0 3b       	cpi	r28, 0xB0	; 176
-    1cde:	99 eb       	ldi	r25, 0xB9	; 185
+    1cdc:	cc 36       	cpi	r28, 0x6C	; 108
+    1cde:	9e ee       	ldi	r25, 0xEE	; 238
     1ce0:	d9 07       	cpc	r29, r25
     1ce2:	14 f4       	brge	.+4      	; 0x1ce8 <lcd_show_new_data+0x120>
-    1ce4:	c0 eb       	ldi	r28, 0xB0	; 176
-    1ce6:	d9 eb       	ldi	r29, 0xB9	; 185
-    1ce8:	c1 35       	cpi	r28, 0x51	; 81
-    1cea:	86 e4       	ldi	r24, 0x46	; 70
+    1ce4:	cc e6       	ldi	r28, 0x6C	; 108
+    1ce6:	de ee       	ldi	r29, 0xEE	; 238
+    1ce8:	c5 39       	cpi	r28, 0x95	; 149
+    1cea:	81 e1       	ldi	r24, 0x11	; 17
     1cec:	d8 07       	cpc	r29, r24
     1cee:	14 f0       	brlt	.+4      	; 0x1cf4 <lcd_show_new_data+0x12c>
-    1cf0:	c0 e5       	ldi	r28, 0x50	; 80
-    1cf2:	d6 e4       	ldi	r29, 0x46	; 70
-		} else if (phaseDeg100 < -18000) {
-		phaseDeg100 = -18000;
+    1cf0:	c4 e9       	ldi	r28, 0x94	; 148
+    1cf2:	d1 e1       	ldi	r29, 0x11	; 17
+		} else if (phaseDeg100 < -maxPhaseToShow) {
+		phaseDeg100 = -maxPhaseToShow;
 	}
 
 
-	int diff = (int) ((float)maxdiff * (phaseDeg100 / 18000.0f));
+	int diff = (int) ((float)maxdiff * (phaseDeg100 / (float)maxPhaseToShow));
     1cf4:	be 01       	movw	r22, r28
     1cf6:	0d 2e       	mov	r0, r29
     1cf8:	00 0c       	add	r0, r0
@@ -4879,7 +4879,7 @@ uint8_t lcd_show_new_data(void)
     1d02:	20 e0       	ldi	r18, 0x00	; 0
     1d04:	30 ea       	ldi	r19, 0xA0	; 160
     1d06:	4c e8       	ldi	r20, 0x8C	; 140
-    1d08:	56 e4       	ldi	r21, 0x46	; 70
+    1d08:	55 e4       	ldi	r21, 0x45	; 69
     1d0a:	0e 94 4d 1b 	call	0x369a	; 0x369a <__divsf3>
     1d0e:	20 e0       	ldi	r18, 0x00	; 0
     1d10:	30 e0       	ldi	r19, 0x00	; 0
@@ -4916,7 +4916,7 @@ uint8_t lcd_show_new_data(void)
 	if (dx < 0) {
     1d38:	6b 01       	movw	r12, r22
 
-	int diff = (int) ((float)maxdiff * (phaseDeg100 / 18000.0f));
+	int diff = (int) ((float)maxdiff * (phaseDeg100 / (float)maxPhaseToShow));
 	int ldiff = diff < 0 ?  diff : 0;
 	int rdiff = diff > 0 ?  diff : 0;
 
@@ -5011,17 +5011,17 @@ uint8_t lcd_show_new_data(void)
     1dd8:	9e bf       	out	0x3e, r25	; 62
     1dda:	0f be       	out	0x3f, r0	; 63
     1ddc:	8d bf       	out	0x3d, r24	; 61
-    1dde:	80 91 55 03 	lds	r24, 0x0355	; 0x800355 <clk_state_old.3121>
+    1dde:	80 91 55 03 	lds	r24, 0x0355	; 0x800355 <clk_state_old.3122>
     1de2:	89 11       	cpse	r24, r9
     1de4:	22 c0       	rjmp	.+68     	; 0x1e2a <lcd_show_new_data+0x262>
     1de6:	c1 14       	cp	r12, r1
     1de8:	d1 04       	cpc	r13, r1
     1dea:	f9 f0       	breq	.+62     	; 0x1e2a <lcd_show_new_data+0x262>
-		phaseDeg100 = -18000;
+		phaseDeg100 = -maxPhaseToShow;
 	}
 
 
-	int diff = (int) ((float)maxdiff * (phaseDeg100 / 18000.0f));
+	int diff = (int) ((float)maxdiff * (phaseDeg100 / (float)maxPhaseToShow));
 	int ldiff = diff < 0 ?  diff : 0;
     1dec:	44 2d       	mov	r20, r4
     1dee:	1e 14       	cp	r1, r14
@@ -5257,7 +5257,7 @@ uint8_t lcd_show_new_data(void)
 	}
 
 	clk_state_old = clk_state;
-    1f3e:	90 92 55 03 	sts	0x0355, r9	; 0x800355 <clk_state_old.3121>
+    1f3e:	90 92 55 03 	sts	0x0355, r9	; 0x800355 <clk_state_old.3122>
 	/* Always */
 	if (g_showData.newClkState) {
 		g_showData.newClkState = false;
@@ -5273,7 +5273,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newSatUse && (idx <= 1)) {
     1f46:	96 ff       	sbrs	r25, 6
     1f48:	36 c0       	rjmp	.+108    	; 0x1fb6 <lcd_show_new_data+0x3ee>
-    1f4a:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3136>
+    1f4a:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3137>
     1f4e:	22 30       	cpi	r18, 0x02	; 2
     1f50:	90 f5       	brcc	.+100    	; 0x1fb6 <lcd_show_new_data+0x3ee>
 		g_showData.newSatUse = false;
@@ -5314,7 +5314,7 @@ uint8_t lcd_show_new_data(void)
     1f98:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 2;
     1f9c:	82 e0       	ldi	r24, 0x02	; 2
-    1f9e:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    1f9e:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 1;
     1fa2:	8d b7       	in	r24, 0x3d	; 61
     1fa4:	9e b7       	in	r25, 0x3e	; 62
@@ -5332,7 +5332,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newSatDop && (idx <= 2)) {
     1fb6:	97 ff       	sbrs	r25, 7
     1fb8:	47 c0       	rjmp	.+142    	; 0x2048 <lcd_show_new_data+0x480>
-    1fba:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3136>
+    1fba:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3137>
     1fbe:	23 30       	cpi	r18, 0x03	; 3
     1fc0:	08 f0       	brcs	.+2      	; 0x1fc4 <lcd_show_new_data+0x3fc>
     1fc2:	42 c0       	rjmp	.+132    	; 0x2048 <lcd_show_new_data+0x480>
@@ -5400,7 +5400,7 @@ uint8_t lcd_show_new_data(void)
     202a:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 3;
     202e:	83 e0       	ldi	r24, 0x03	; 3
-    2030:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    2030:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 2;
     2034:	8d b7       	in	r24, 0x3d	; 61
     2036:	9e b7       	in	r25, 0x3e	; 62
@@ -5419,7 +5419,7 @@ uint8_t lcd_show_new_data(void)
     2048:	20 91 2b 04 	lds	r18, 0x042B	; 0x80042b <g_showData+0x1>
     204c:	20 ff       	sbrs	r18, 0
     204e:	32 c0       	rjmp	.+100    	; 0x20b4 <lcd_show_new_data+0x4ec>
-    2050:	30 91 01 01 	lds	r19, 0x0101	; 0x800101 <idx.3136>
+    2050:	30 91 01 01 	lds	r19, 0x0101	; 0x800101 <idx.3137>
     2054:	34 30       	cpi	r19, 0x04	; 4
     2056:	70 f5       	brcc	.+92     	; 0x20b4 <lcd_show_new_data+0x4ec>
 		g_showData.newPosState = false;
@@ -5457,7 +5457,7 @@ uint8_t lcd_show_new_data(void)
     2096:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 4;
     209a:	84 e0       	ldi	r24, 0x04	; 4
-    209c:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    209c:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 3;
     20a0:	8d b7       	in	r24, 0x3d	; 61
     20a2:	9e b7       	in	r25, 0x3e	; 62
@@ -5475,7 +5475,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPosLat && (idx <= 4)) {
     20b4:	21 ff       	sbrs	r18, 1
     20b6:	41 c0       	rjmp	.+130    	; 0x213a <lcd_show_new_data+0x572>
-    20b8:	30 91 01 01 	lds	r19, 0x0101	; 0x800101 <idx.3136>
+    20b8:	30 91 01 01 	lds	r19, 0x0101	; 0x800101 <idx.3137>
     20bc:	35 30       	cpi	r19, 0x05	; 5
     20be:	e8 f5       	brcc	.+122    	; 0x213a <lcd_show_new_data+0x572>
 		g_showData.newPosLat = false;
@@ -5524,7 +5524,7 @@ uint8_t lcd_show_new_data(void)
     211c:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 5;
     2120:	85 e0       	ldi	r24, 0x05	; 5
-    2122:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    2122:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 4;
     2126:	8d b7       	in	r24, 0x3d	; 61
     2128:	9e b7       	in	r25, 0x3e	; 62
@@ -5542,7 +5542,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPosLon && (idx <= 5)) {
     213a:	22 ff       	sbrs	r18, 2
     213c:	41 c0       	rjmp	.+130    	; 0x21c0 <lcd_show_new_data+0x5f8>
-    213e:	30 91 01 01 	lds	r19, 0x0101	; 0x800101 <idx.3136>
+    213e:	30 91 01 01 	lds	r19, 0x0101	; 0x800101 <idx.3137>
     2142:	36 30       	cpi	r19, 0x06	; 6
     2144:	e8 f5       	brcc	.+122    	; 0x21c0 <lcd_show_new_data+0x5f8>
 		g_showData.newPosLon = false;
@@ -5591,7 +5591,7 @@ uint8_t lcd_show_new_data(void)
     21a2:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 6;
     21a6:	86 e0       	ldi	r24, 0x06	; 6
-    21a8:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    21a8:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 5;
     21ac:	8d b7       	in	r24, 0x3d	; 61
     21ae:	9e b7       	in	r25, 0x3e	; 62
@@ -5609,7 +5609,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPosHeight && (idx <= 6)) {
     21c0:	23 ff       	sbrs	r18, 3
     21c2:	36 c0       	rjmp	.+108    	; 0x2230 <lcd_show_new_data+0x668>
-    21c4:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3136>
+    21c4:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3137>
     21c8:	27 30       	cpi	r18, 0x07	; 7
     21ca:	90 f5       	brcc	.+100    	; 0x2230 <lcd_show_new_data+0x668>
 		g_showData.newPosHeight = false;
@@ -5649,7 +5649,7 @@ uint8_t lcd_show_new_data(void)
     2212:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 7;
     2216:	87 e0       	ldi	r24, 0x07	; 7
-    2218:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    2218:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 6;
     221c:	8d b7       	in	r24, 0x3d	; 61
     221e:	9e b7       	in	r25, 0x3e	; 62
@@ -5667,7 +5667,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPpb && (idx <= 7)) {
     2230:	93 ff       	sbrs	r25, 3
     2232:	38 c0       	rjmp	.+112    	; 0x22a4 <lcd_show_new_data+0x6dc>
-    2234:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3136>
+    2234:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3137>
     2238:	28 30       	cpi	r18, 0x08	; 8
     223a:	a0 f5       	brcc	.+104    	; 0x22a4 <lcd_show_new_data+0x6dc>
 		g_showData.newPpb = false;
@@ -5708,7 +5708,7 @@ uint8_t lcd_show_new_data(void)
     2286:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 8;
     228a:	88 e0       	ldi	r24, 0x08	; 8
-    228c:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    228c:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 7;
     2290:	8d b7       	in	r24, 0x3d	; 61
     2292:	9e b7       	in	r25, 0x3e	; 62
@@ -5726,7 +5726,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPwm && (idx <= 8)) {
     22a4:	94 ff       	sbrs	r25, 4
     22a6:	89 c0       	rjmp	.+274    	; 0x23ba <lcd_show_new_data+0x7f2>
-    22a8:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3136>
+    22a8:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <idx.3137>
     22ac:	29 30       	cpi	r18, 0x09	; 9
     22ae:	08 f0       	brcs	.+2      	; 0x22b2 <lcd_show_new_data+0x6ea>
     22b0:	84 c0       	rjmp	.+264    	; 0x23ba <lcd_show_new_data+0x7f2>
@@ -5861,7 +5861,7 @@ uint8_t lcd_show_new_data(void)
     239c:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 9;
     23a0:	89 e0       	ldi	r24, 0x09	; 9
-    23a2:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    23a2:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 8;
     23a6:	8d b7       	in	r24, 0x3d	; 61
     23a8:	9e b7       	in	r25, 0x3e	; 62
@@ -5879,7 +5879,7 @@ uint8_t lcd_show_new_data(void)
 	if (g_showData.newPv && (idx <= 9)) {
     23ba:	95 ff       	sbrs	r25, 5
     23bc:	36 c0       	rjmp	.+108    	; 0x242a <lcd_show_new_data+0x862>
-    23be:	90 91 01 01 	lds	r25, 0x0101	; 0x800101 <idx.3136>
+    23be:	90 91 01 01 	lds	r25, 0x0101	; 0x800101 <idx.3137>
     23c2:	9a 30       	cpi	r25, 0x0A	; 10
     23c4:	90 f5       	brcc	.+100    	; 0x242a <lcd_show_new_data+0x862>
 		g_showData.newPv = false;
@@ -5919,7 +5919,7 @@ uint8_t lcd_show_new_data(void)
     240c:	0e 94 ca 06 	call	0xd94	; 0xd94 <gfx_mono_draw_string>
 		idx = 10;
     2410:	8a e0       	ldi	r24, 0x0A	; 10
-    2412:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3136>
+    2412:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <idx.3137>
 		return 9;
     2416:	8d b7       	in	r24, 0x3d	; 61
     2418:	9e b7       	in	r25, 0x3e	; 62
@@ -5936,7 +5936,7 @@ uint8_t lcd_show_new_data(void)
 	/* When no updates are due, turn back to first position */
 	idx = 1;
     242a:	91 e0       	ldi	r25, 0x01	; 1
-    242c:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <idx.3136>
+    242c:	90 93 01 01 	sts	0x0101, r25	; 0x800101 <idx.3137>
     2430:	cf bf       	out	0x3f, r28	; 63
 
 	cpu_irq_restore(flags);
@@ -6368,10 +6368,10 @@ static void s_lcd_test_temp(void)
 	}
 
 	if (fabsf(t - t_last) < 0.01f) {
-    26ac:	20 91 51 03 	lds	r18, 0x0351	; 0x800351 <t_last.3157>
-    26b0:	30 91 52 03 	lds	r19, 0x0352	; 0x800352 <t_last.3157+0x1>
-    26b4:	40 91 53 03 	lds	r20, 0x0353	; 0x800353 <t_last.3157+0x2>
-    26b8:	50 91 54 03 	lds	r21, 0x0354	; 0x800354 <t_last.3157+0x3>
+    26ac:	20 91 51 03 	lds	r18, 0x0351	; 0x800351 <t_last.3158>
+    26b0:	30 91 52 03 	lds	r19, 0x0352	; 0x800352 <t_last.3158+0x1>
+    26b4:	40 91 53 03 	lds	r20, 0x0353	; 0x800353 <t_last.3158+0x2>
+    26b8:	50 91 54 03 	lds	r21, 0x0354	; 0x800354 <t_last.3158+0x3>
     26bc:	c7 01       	movw	r24, r14
     26be:	b6 01       	movw	r22, r12
     26c0:	83 d7       	rcall	.+3846   	; 0x35c8 <__subsf3>
@@ -6386,10 +6386,10 @@ static void s_lcd_test_temp(void)
 		return;
 	}
 	t_last = t;
-    26d2:	c0 92 51 03 	sts	0x0351, r12	; 0x800351 <t_last.3157>
-    26d6:	d0 92 52 03 	sts	0x0352, r13	; 0x800352 <t_last.3157+0x1>
-    26da:	e0 92 53 03 	sts	0x0353, r14	; 0x800353 <t_last.3157+0x2>
-    26de:	f0 92 54 03 	sts	0x0354, r15	; 0x800354 <t_last.3157+0x3>
+    26d2:	c0 92 51 03 	sts	0x0351, r12	; 0x800351 <t_last.3158>
+    26d6:	d0 92 52 03 	sts	0x0352, r13	; 0x800352 <t_last.3158+0x1>
+    26da:	e0 92 53 03 	sts	0x0353, r14	; 0x800353 <t_last.3158+0x2>
+    26de:	f0 92 54 03 	sts	0x0354, r15	; 0x800354 <t_last.3158+0x3>
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), " T=  %2d.%02d^C ", (int) t, ((int) (t * 100.0f)) % 100);
     26e2:	20 e0       	ldi	r18, 0x00	; 0
@@ -6455,10 +6455,10 @@ static void s_lcd_test_light(void)
 	cpu_irq_restore(flags);
 
 	if (fabsf(l - l_last) < 0.1f) {
-    275e:	20 91 4d 03 	lds	r18, 0x034D	; 0x80034d <l_last.3163>
-    2762:	30 91 4e 03 	lds	r19, 0x034E	; 0x80034e <l_last.3163+0x1>
-    2766:	40 91 4f 03 	lds	r20, 0x034F	; 0x80034f <l_last.3163+0x2>
-    276a:	50 91 50 03 	lds	r21, 0x0350	; 0x800350 <l_last.3163+0x3>
+    275e:	20 91 4d 03 	lds	r18, 0x034D	; 0x80034d <l_last.3164>
+    2762:	30 91 4e 03 	lds	r19, 0x034E	; 0x80034e <l_last.3164+0x1>
+    2766:	40 91 4f 03 	lds	r20, 0x034F	; 0x80034f <l_last.3164+0x2>
+    276a:	50 91 50 03 	lds	r21, 0x0350	; 0x800350 <l_last.3164+0x3>
     276e:	c7 01       	movw	r24, r14
     2770:	b6 01       	movw	r22, r12
     2772:	2a d7       	rcall	.+3668   	; 0x35c8 <__subsf3>
@@ -6473,10 +6473,10 @@ static void s_lcd_test_light(void)
 		return;
 	}
 	l_last = l;
-    2784:	c0 92 4d 03 	sts	0x034D, r12	; 0x80034d <l_last.3163>
-    2788:	d0 92 4e 03 	sts	0x034E, r13	; 0x80034e <l_last.3163+0x1>
-    278c:	e0 92 4f 03 	sts	0x034F, r14	; 0x80034f <l_last.3163+0x2>
-    2790:	f0 92 50 03 	sts	0x0350, r15	; 0x800350 <l_last.3163+0x3>
+    2784:	c0 92 4d 03 	sts	0x034D, r12	; 0x80034d <l_last.3164>
+    2788:	d0 92 4e 03 	sts	0x034E, r13	; 0x80034e <l_last.3164+0x1>
+    278c:	e0 92 4f 03 	sts	0x034F, r14	; 0x80034f <l_last.3164+0x2>
+    2790:	f0 92 50 03 	sts	0x0350, r15	; 0x800350 <l_last.3164+0x3>
 
 	snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), " L=%4d.%1d AD", (int) l, ((int) (l * 10.0f)) % 10);
     2794:	20 e0       	ldi	r18, 0x00	; 0
@@ -6532,12 +6532,12 @@ static void s_lcd_test_light(void)
 	static uint8_t sw = 2;
 
 	if (loop++ < h) {
-    27f8:	20 91 4b 03 	lds	r18, 0x034B	; 0x80034b <loop.3148>
-    27fc:	30 91 4c 03 	lds	r19, 0x034C	; 0x80034c <loop.3148+0x1>
+    27f8:	20 91 4b 03 	lds	r18, 0x034B	; 0x80034b <loop.3149>
+    27fc:	30 91 4c 03 	lds	r19, 0x034C	; 0x80034c <loop.3149+0x1>
     2800:	f9 01       	movw	r30, r18
     2802:	31 96       	adiw	r30, 0x01	; 1
-    2804:	f0 93 4c 03 	sts	0x034C, r31	; 0x80034c <loop.3148+0x1>
-    2808:	e0 93 4b 03 	sts	0x034B, r30	; 0x80034b <loop.3148>
+    2804:	f0 93 4c 03 	sts	0x034C, r31	; 0x80034c <loop.3149+0x1>
+    2808:	e0 93 4b 03 	sts	0x034B, r30	; 0x80034b <loop.3149>
     280c:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__data_start>
     2810:	22 31       	cpi	r18, 0x12	; 18
     2812:	31 05       	cpc	r19, r1
@@ -6600,8 +6600,8 @@ static void s_lcd_test_light(void)
 
 	} else {
 		loop = 0;
-    2852:	10 92 4c 03 	sts	0x034C, r1	; 0x80034c <loop.3148+0x1>
-    2856:	10 92 4b 03 	sts	0x034B, r1	; 0x80034b <loop.3148>
+    2852:	10 92 4c 03 	sts	0x034C, r1	; 0x80034c <loop.3149+0x1>
+    2856:	10 92 4b 03 	sts	0x034B, r1	; 0x80034b <loop.3149>
 		if (++sw >= 3) {
     285a:	8f 5f       	subi	r24, 0xFF	; 255
     285c:	83 30       	cpi	r24, 0x03	; 3

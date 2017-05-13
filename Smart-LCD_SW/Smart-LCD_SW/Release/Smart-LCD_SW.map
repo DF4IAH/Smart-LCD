@@ -1109,8 +1109,8 @@ END GROUP
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
- .data.sw.3149  0x00800100        0x1 src/lcd.o
- .data.idx.3136
+ .data.sw.3150  0x00800100        0x1 src/lcd.o
+ .data.idx.3137
                 0x00800101        0x1 src/lcd.o
  .data.s_last_animation.3056
                 0x00800102        0x1 src/main.o
@@ -1139,13 +1139,13 @@ END GROUP
                 0x00800349        0x1 src/isr.o
  .bss.state_old.2584
                 0x0080034a        0x1 src/isr.o
- .bss.loop.3148
+ .bss.loop.3149
                 0x0080034b        0x2 src/lcd.o
- .bss.l_last.3163
+ .bss.l_last.3164
                 0x0080034d        0x4 src/lcd.o
- .bss.t_last.3157
+ .bss.t_last.3158
                 0x00800351        0x4 src/lcd.o
- .bss.clk_state_old.3121
+ .bss.clk_state_old.3122
                 0x00800355        0x1 src/lcd.o
  .bss.s_animation_train_right
                 0x00800356       0x3d src/lcd.o
@@ -1329,7 +1329,7 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x7286
+.debug_info     0x00000000     0x7297
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x5f4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_info    0x000005f4      0x299 src/ASF/common/services/clock/mega/sysclk.o
@@ -1338,10 +1338,10 @@ END GROUP
  .debug_info    0x00001a99      0x6cc src/gfx_mono/gfx_mono_text.o
  .debug_info    0x00002165      0x139 src/gfx_mono/sysfont.o
  .debug_info    0x0000229e      0xcd3 src/isr.o
- .debug_info    0x00002f71     0x23b6 src/lcd.o
- .debug_info    0x00005327      0x651 src/twi.o
- .debug_info    0x00005978       0xff src/ASF/common/boards/user_board/init.o
- .debug_info    0x00005a77     0x180f src/main.o
+ .debug_info    0x00002f71     0x23c7 src/lcd.o
+ .debug_info    0x00005338      0x651 src/twi.o
+ .debug_info    0x00005989       0xff src/ASF/common/boards/user_board/init.o
+ .debug_info    0x00005a88     0x180f src/main.o
 
 .debug_abbrev   0x00000000     0x1cd4
  *(.debug_abbrev)
@@ -1383,7 +1383,7 @@ END GROUP
  .debug_frame   0x000014b0       0x24 src/ASF/common/boards/user_board/init.o
  .debug_frame   0x000014d4      0x10c src/main.o
 
-.debug_str      0x00000000     0x1cc8
+.debug_str      0x00000000     0x1cd7
  *(.debug_str)
  .debug_str     0x00000000      0x208 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.1.130/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_str     0x00000208      0x211 src/ASF/common/services/clock/mega/sysclk.o
@@ -1398,13 +1398,13 @@ END GROUP
                                 0x207 (size before relaxing)
  .debug_str     0x000009c8      0x6a1 src/isr.o
                                 0x861 (size before relaxing)
- .debug_str     0x00001069      0x5c5 src/lcd.o
-                                0xccd (size before relaxing)
- .debug_str     0x0000162e       0xf6 src/twi.o
+ .debug_str     0x00001069      0x5d4 src/lcd.o
+                                0xcdc (size before relaxing)
+ .debug_str     0x0000163d       0xf6 src/twi.o
                                 0x4e0 (size before relaxing)
- .debug_str     0x00001724       0x36 src/ASF/common/boards/user_board/init.o
+ .debug_str     0x00001733       0x36 src/ASF/common/boards/user_board/init.o
                                 0x1e5 (size before relaxing)
- .debug_str     0x0000175a      0x56e src/main.o
+ .debug_str     0x00001769      0x56e src/main.o
                                 0xf01 (size before relaxing)
 
 .debug_loc      0x00000000     0x6032
