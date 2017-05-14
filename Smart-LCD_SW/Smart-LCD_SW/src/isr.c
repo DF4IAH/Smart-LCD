@@ -256,30 +256,29 @@ ISR(__vector_21, ISR_BLOCK)
 
 	switch (g_adc_state) {
 		case ADC_STATE_PRE_LDR:
-		// drop one ADC value after switching MUX
-		g_adc_state = ADC_STATE_VLD_LDR;
+			// drop one ADC value after switching MUX
+			g_adc_state = ADC_STATE_VLD_LDR;
 		break;
 
 		case ADC_STATE_VLD_LDR:
-		adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-		g_adc_state = ADC_STATE_PRE_TEMP;
+			adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+			g_adc_state = ADC_STATE_PRE_TEMP;
 		break;
 
 		case ADC_STATE_PRE_TEMP:
-		// drop one ADC value after switching MUX
-		g_adc_state = ADC_STATE_VLD_TEMP;
+			// drop one ADC value after switching MUX
+			g_adc_state = ADC_STATE_VLD_TEMP;
 		break;
 
 		case ADC_STATE_VLD_TEMP:
-		// fall-through
-
+			// fall-through.
 		default:
-		adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
-		g_adc_state = ADC_STATE_PRE_LDR;
+			adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+			g_adc_state = ADC_STATE_PRE_LDR;
 	}
 
-	uint16_t adc_light_last  = g_adc_light;
-	uint16_t adc_temp_last = g_adc_temp;
+	uint16_t adc_light_last = g_adc_light;
+	uint16_t adc_temp_last  = g_adc_temp;
 
 	/* SEI part */
 	cpu_irq_enable();
