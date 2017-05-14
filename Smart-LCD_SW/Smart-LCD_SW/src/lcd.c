@@ -292,19 +292,26 @@ void lcd_show_template(void)
 
 static void lcd_show_new_clk_state(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100)
 {
-	const int maxdiff = 76;
+	const uint8_t maxdiff = 76;
 	const uint8_t mid_x = 150;
-	const int maxPhaseToShow = 4500;
+	const int16_t maxPhasePossible = 18000;
+	const int16_t maxPhaseToShow   =  4500;
 	static uint8_t clk_state_old = 0;
 
-	if (phaseDeg100 > maxPhaseToShow) {
-		phaseDeg100 = maxPhaseToShow;
-		} else if (phaseDeg100 < -maxPhaseToShow) {
-		phaseDeg100 = -maxPhaseToShow;
+	if (phaseDeg100 > maxPhasePossible) {
+		phaseDeg100 = maxPhasePossible;
+	} else if (phaseDeg100 < -maxPhasePossible) {
+		phaseDeg100 = -maxPhasePossible;
 	}
 
+	int16_t phaseDegGraph100 = phaseDeg100;
+	if (phaseDegGraph100 > maxPhaseToShow) {
+		phaseDegGraph100 = maxPhasePossible;
+	} else if (phaseDegGraph100 < -maxPhaseToShow) {
+		phaseDegGraph100 = -maxPhaseToShow;
+	}
 
-	int diff = (int) ((float)maxdiff * (phaseDeg100 / (float)maxPhaseToShow));
+	int diff = (int) ((float)maxdiff * (phaseDegGraph100 / (float)maxPhaseToShow));
 	int ldiff = diff < 0 ?  diff : 0;
 	int rdiff = diff > 0 ?  diff : 0;
 
@@ -331,53 +338,53 @@ static void lcd_show_new_clk_state(uint8_t clk_state, uint16_t phaseVolt1000, in
 	if (dx) {
 		switch (clk_state) {
 			case 0xf:
-			gfx_mono_generic_draw_filled_rect(mid_x - maxdiff -4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,  maxdiff + ldiff +4, 5, GFX_PIXEL_CLR);
-			if (diff < 0) {
-				gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,
-										   GFX_PIXEL_SET);
-				gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 5,
-										   GFX_PIXEL_SET);
-			}
-			gfx_mono_generic_draw_filled_rect(ox, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1, dx, 5, GFX_PIXEL_SET);
-			gfx_mono_generic_draw_filled_rect(mid_x + rdiff, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,  maxdiff - rdiff +4, 5, GFX_PIXEL_CLR);
-			if (diff > 0) {
-				gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,
-										   GFX_PIXEL_SET);
-				gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 5,
-										   GFX_PIXEL_SET);
-			}
+				gfx_mono_generic_draw_filled_rect(mid_x - maxdiff -4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,  maxdiff + ldiff +4, 5, GFX_PIXEL_CLR);
+				if (diff < 0) {
+					gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,
+											   GFX_PIXEL_SET);
+					gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 5,
+											   GFX_PIXEL_SET);
+				}
+				gfx_mono_generic_draw_filled_rect(ox, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1, dx, 5, GFX_PIXEL_SET);
+				gfx_mono_generic_draw_filled_rect(mid_x + rdiff, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,  maxdiff - rdiff +4, 5, GFX_PIXEL_CLR);
+				if (diff > 0) {
+					gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 1,
+											   GFX_PIXEL_SET);
+					gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 5,
+											   GFX_PIXEL_SET);
+				}
 			break;
 
 			case 0x7:
-			gfx_mono_generic_draw_filled_rect(mid_x - maxdiff -4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,  maxdiff + ldiff +4, 3, GFX_PIXEL_CLR);
-			if (diff < 0) {
-				gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,
-										   GFX_PIXEL_SET);
-				gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 4,
-										   GFX_PIXEL_SET);
-			}
-			gfx_mono_generic_draw_filled_rect(ox, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,  dx, 3, GFX_PIXEL_SET);
-			gfx_mono_generic_draw_filled_rect(mid_x + rdiff, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,  maxdiff - rdiff +4, 3, GFX_PIXEL_CLR);
-			if (diff > 0) {
-				gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,
-										   GFX_PIXEL_SET);
-				gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
-										   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 4,
-										   GFX_PIXEL_SET);
-			}
+				gfx_mono_generic_draw_filled_rect(mid_x - maxdiff -4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,  maxdiff + ldiff +4, 3, GFX_PIXEL_CLR);
+				if (diff < 0) {
+					gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,
+											   GFX_PIXEL_SET);
+					gfx_mono_generic_draw_line(ox - 4, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   ox,     LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 4,
+											   GFX_PIXEL_SET);
+				}
+				gfx_mono_generic_draw_filled_rect(ox, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,  dx, 3, GFX_PIXEL_SET);
+				gfx_mono_generic_draw_filled_rect(mid_x + rdiff, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,  maxdiff - rdiff +4, 3, GFX_PIXEL_CLR);
+				if (diff > 0) {
+					gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 2,
+											   GFX_PIXEL_SET);
+					gfx_mono_generic_draw_line(mid_x + rdiff + 3, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,
+											   mid_x + rdiff - 1, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 4,
+											   GFX_PIXEL_SET);
+				}
 			break;
 
 			case 0x3:
 			case 0x2:
 			case 0x1:
-			gfx_mono_generic_draw_filled_rect(mid_x - maxdiff, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,  maxdiff << 1, 1, GFX_PIXEL_SET);
+				gfx_mono_generic_draw_filled_rect(mid_x - maxdiff, LCD_SHOW_LINE_TOP + 12 * LCD_SHOW_LINE_HEIGHT + 3,  maxdiff << 1, 1, GFX_PIXEL_SET);
 			break;
 		}
 
