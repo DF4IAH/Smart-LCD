@@ -6896,122 +6896,6 @@ Source: AVX .. aphvc.pdf</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="df4iah_dig-pot">
-<description>&lt;b&gt;DF4IAH Library - Template: to be defined&lt;/b&gt;&lt;p&gt;</description>
-<packages>
-<package name="SOT65P210X110-6N">
-<smd name="1" x="-0.889" y="0.6604" dx="1.1684" dy="0.3556" layer="1"/>
-<smd name="2" x="-0.889" y="0" dx="1.1684" dy="0.3556" layer="1"/>
-<smd name="3" x="-0.889" y="-0.6604" dx="1.1684" dy="0.3556" layer="1"/>
-<smd name="4" x="0.889" y="-0.6604" dx="1.1684" dy="0.3556" layer="1"/>
-<smd name="5" x="0.889" y="0" dx="1.1684" dy="0.3556" layer="1"/>
-<smd name="6" x="0.889" y="0.6604" dx="1.1684" dy="0.3556" layer="1"/>
-<wire x1="0.3048" y1="0.9906" x2="0.254" y2="0.8128" width="0" layer="21" curve="-34"/>
-<text x="-1.7272" y="0.8636" size="1.27" layer="21" ratio="6" rot="SR0">*</text>
-<wire x1="-0.635" y1="-0.9906" x2="0.635" y2="-0.9906" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="-0.9906" x2="0.635" y2="-0.7874" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="-0.7874" x2="0.635" y2="-0.508" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="-0.508" x2="0.635" y2="-0.1524" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="-0.1524" x2="0.635" y2="0.1524" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="0.1524" x2="0.635" y2="0.508" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="0.9906" x2="0.3048" y2="0.9906" width="0.1524" layer="51"/>
-<wire x1="0.3048" y1="0.9906" x2="-0.3048" y2="0.9906" width="0.1524" layer="51"/>
-<wire x1="-0.3048" y1="0.9906" x2="-0.635" y2="0.9906" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="0.9906" x2="-0.635" y2="0.7874" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="0.7874" x2="-0.635" y2="0.508" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="0.508" x2="-0.635" y2="0.1524" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="0.1524" x2="-0.635" y2="-0.1524" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="-0.1524" x2="-0.635" y2="-0.508" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="0.7874" x2="-1.0414" y2="0.7874" width="0.1524" layer="51"/>
-<wire x1="-1.0414" y1="0.7874" x2="-1.0414" y2="0.508" width="0.1524" layer="51"/>
-<wire x1="-1.0414" y1="0.508" x2="-0.635" y2="0.508" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="0.1524" x2="-1.0414" y2="0.1524" width="0.1524" layer="51"/>
-<wire x1="-1.0414" y1="0.1524" x2="-1.0414" y2="-0.1524" width="0.1524" layer="51"/>
-<wire x1="-1.0414" y1="-0.1524" x2="-0.635" y2="-0.1524" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="-0.9906" x2="-0.635" y2="-0.7874" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="-0.7874" x2="-0.635" y2="-0.508" width="0.1524" layer="51"/>
-<wire x1="-0.635" y1="-0.508" x2="-1.0414" y2="-0.508" width="0.1524" layer="51"/>
-<wire x1="-1.0414" y1="-0.508" x2="-1.0414" y2="-0.7874" width="0.1524" layer="51"/>
-<wire x1="-1.0414" y1="-0.7874" x2="-0.635" y2="-0.7874" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="-0.7874" x2="1.0414" y2="-0.7874" width="0.1524" layer="51"/>
-<wire x1="1.0414" y1="-0.7874" x2="1.0414" y2="-0.508" width="0.1524" layer="51"/>
-<wire x1="1.0414" y1="-0.508" x2="0.635" y2="-0.508" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="-0.1524" x2="1.0414" y2="-0.1524" width="0.1524" layer="51"/>
-<wire x1="1.0414" y1="-0.1524" x2="1.0414" y2="0.1524" width="0.1524" layer="51"/>
-<wire x1="1.0414" y1="0.1524" x2="0.635" y2="0.1524" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="0.9906" x2="0.635" y2="0.7874" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="0.7874" x2="0.635" y2="0.508" width="0.1524" layer="51"/>
-<wire x1="0.635" y1="0.508" x2="1.0414" y2="0.508" width="0.1524" layer="51"/>
-<wire x1="1.0414" y1="0.508" x2="1.0414" y2="0.7874" width="0.1524" layer="51"/>
-<wire x1="1.0414" y1="0.7874" x2="0.635" y2="0.7874" width="0.1524" layer="51"/>
-<wire x1="0.3048" y1="0.9906" x2="-0.3048" y2="0.9906" width="0" layer="51" curve="-180"/>
-<text x="-1.7272" y="0.8636" size="1.27" layer="51" ratio="6" rot="SR0">*</text>
-<text x="-4.1656" y="-3.4798" size="2.0828" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
-<text x="-5.3848" y="1.524" size="2.0828" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
-</package>
-</packages>
-<symbols>
-<symbol name="MCP4018T-104E/LT">
-<pin name="VDD" x="-17.78" y="2.54" length="middle" direction="pwr"/>
-<pin name="SCL" x="-17.78" y="-2.54" length="middle"/>
-<pin name="SDA" x="-17.78" y="-5.08" length="middle"/>
-<pin name="VSS" x="-17.78" y="-10.16" length="middle" direction="pwr"/>
-<pin name="W" x="17.78" y="2.54" length="middle" rot="R180"/>
-<pin name="A" x="17.78" y="0" length="middle" rot="R180"/>
-<wire x1="-13.208" y1="-2.54" x2="-14.2748" y2="-2.032" width="0.4064" layer="94"/>
-<wire x1="-13.208" y1="-2.54" x2="-14.2748" y2="-3.048" width="0.4064" layer="94"/>
-<wire x1="-14.7828" y1="-2.032" x2="-15.8242" y2="-2.54" width="0.4064" layer="94"/>
-<wire x1="-14.7828" y1="-3.048" x2="-15.8242" y2="-2.54" width="0.4064" layer="94"/>
-<wire x1="-13.208" y1="-5.08" x2="-14.2748" y2="-4.572" width="0.4064" layer="94"/>
-<wire x1="-13.208" y1="-5.08" x2="-14.2748" y2="-5.588" width="0.4064" layer="94"/>
-<wire x1="-14.7828" y1="-4.572" x2="-15.8242" y2="-5.08" width="0.4064" layer="94"/>
-<wire x1="-14.7828" y1="-5.588" x2="-15.8242" y2="-5.08" width="0.4064" layer="94"/>
-<wire x1="13.208" y1="2.54" x2="14.2748" y2="3.048" width="0.4064" layer="94"/>
-<wire x1="13.208" y1="2.54" x2="14.2748" y2="2.032" width="0.4064" layer="94"/>
-<wire x1="14.7828" y1="3.048" x2="15.8242" y2="2.54" width="0.4064" layer="94"/>
-<wire x1="14.7828" y1="2.032" x2="15.8242" y2="2.54" width="0.4064" layer="94"/>
-<wire x1="13.208" y1="0" x2="14.2748" y2="0.508" width="0.4064" layer="94"/>
-<wire x1="13.208" y1="0" x2="14.2748" y2="-0.508" width="0.4064" layer="94"/>
-<wire x1="14.7828" y1="0.508" x2="15.8242" y2="0" width="0.4064" layer="94"/>
-<wire x1="14.7828" y1="-0.508" x2="15.8242" y2="0" width="0.4064" layer="94"/>
-<wire x1="-12.7" y1="7.62" x2="-12.7" y2="-15.24" width="0.4064" layer="94"/>
-<wire x1="-12.7" y1="-15.24" x2="12.7" y2="-15.24" width="0.4064" layer="94"/>
-<wire x1="12.7" y1="-15.24" x2="12.7" y2="7.62" width="0.4064" layer="94"/>
-<wire x1="12.7" y1="7.62" x2="-12.7" y2="7.62" width="0.4064" layer="94"/>
-<text x="-4.572" y="10.1092" size="2.0828" layer="95" ratio="10" rot="SR0">&gt;NAME</text>
-<text x="-5.1816" y="-19.3548" size="2.0828" layer="96" ratio="10" rot="SR0">&gt;VALUE</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="MCP4018T-104E/LT">
-<description>Digital POT</description>
-<gates>
-<gate name="A" symbol="MCP4018T-104E/LT" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="SOT65P210X110-6N">
-<connects>
-<connect gate="A" pin="A" pad="6"/>
-<connect gate="A" pin="SCL" pad="3"/>
-<connect gate="A" pin="SDA" pad="4"/>
-<connect gate="A" pin="VDD" pad="1"/>
-<connect gate="A" pin="VSS" pad="2"/>
-<connect gate="A" pin="W" pad="5"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="MPN" value="MCP4018T-104E/LT" constant="no"/>
-<attribute name="OC_FARNELL" value="1825018" constant="no"/>
-<attribute name="OC_NEWARK" value="08R1802" constant="no"/>
-<attribute name="PACKAGE" value="SOT-6" constant="no"/>
-<attribute name="SUPPLIER" value="Microchip" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 <library name="df4iah_bipoltransistor">
 <description>&lt;b&gt;DF4IAH Library - Bipolar Transistors: NPN, PNP&lt;/b&gt;</description>
 <packages>
@@ -7735,10 +7619,8 @@ General-purpose diode for high-speed switching</description>
 <part name="C202" library="rcl" deviceset="C-EU" device="C0805" value="4.7uF"/>
 <part name="C211" library="rcl" deviceset="C-EU" device="C0805" value="1uF"/>
 <part name="R211" library="rcl" deviceset="R-EU_" device="R0805" value="10MR"/>
-<part name="R222" library="rcl" deviceset="R-EU_" device="R0805" value="650kR"/>
 <part name="R221" library="rcl" deviceset="R-EU_" device="R0805" value="100kR"/>
 <part name="C221" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
-<part name="U221" library="df4iah_dig-pot" deviceset="MCP4018T-104E/LT" device=""/>
 <part name="C302" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
 <part name="C301" library="rcl" deviceset="C-EU" device="C0805" value="100nF"/>
 <part name="GND101" library="df4iah_supply" deviceset="GND" device=""/>
@@ -7754,7 +7636,6 @@ General-purpose diode for high-speed switching</description>
 <part name="+3V3_201" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="+5V0_241" library="df4iah_supply" deviceset="+5V" device=""/>
 <part name="GND121" library="df4iah_supply" deviceset="GND" device=""/>
-<part name="+3V3_221" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="X131" library="df4iah_connector" deviceset="HEADER-1X2" device="" value="LDR"/>
 <part name="+3V3_131" library="df4iah_supply" deviceset="+3V3" device=""/>
 <part name="R131" library="rcl" deviceset="R-EU_" device="R0805" value="27R"/>
@@ -8239,7 +8120,6 @@ General-purpose diode for high-speed switching</description>
 <sheet>
 <description>LCD panel</description>
 <plain>
-<text x="116.84" y="45.72" size="2.1844" layer="97" ratio="12">Dig.-Pot.</text>
 <text x="157.48" y="121.92" size="1.778" layer="97" rot="R90">BM1</text>
 <text x="154.94" y="121.92" size="1.778" layer="97" rot="R90">BM0</text>
 </plain>
@@ -8250,18 +8130,12 @@ General-purpose diode for high-speed switching</description>
 <instance part="C202" gate="G$1" x="63.5" y="124.46" rot="R90"/>
 <instance part="C211" gate="G$1" x="48.26" y="91.44"/>
 <instance part="R211" gate="G$1" x="35.56" y="91.44" rot="R90"/>
-<instance part="R222" gate="G$1" x="106.68" y="73.66" rot="R90"/>
 <instance part="R221" gate="G$1" x="96.52" y="73.66" rot="R90"/>
 <instance part="C221" gate="G$1" x="96.52" y="35.56"/>
-<instance part="U221" gate="A" x="127" y="55.88" smashed="yes" rot="MR0">
-<attribute name="NAME" x="122.428" y="66.0908" size="2.0828" layer="95" ratio="10" rot="SMR180"/>
-<attribute name="VALUE" x="114.1984" y="39.6748" size="2.0828" layer="96" ratio="10" rot="SMR180"/>
-</instance>
-<instance part="GND221" gate="1" x="147.32" y="20.32"/>
+<instance part="GND221" gate="1" x="96.52" y="20.32"/>
 <instance part="GND211" gate="1" x="58.42" y="68.58"/>
 <instance part="+3V3_201" gate="G$1" x="35.56" y="134.62"/>
 <instance part="+5V0_241" gate="G$1" x="187.96" y="134.62"/>
-<instance part="+3V3_221" gate="G$1" x="147.32" y="86.36"/>
 <instance part="X232" gate="G$1" x="203.2" y="139.7" rot="R90"/>
 <instance part="X231" gate="G$1" x="193.04" y="139.7" rot="R90"/>
 </instances>
@@ -8461,53 +8335,19 @@ General-purpose diode for high-speed switching</description>
 <junction x="101.6" y="134.62"/>
 </segment>
 </net>
-<net name="POT_A" class="0">
-<segment>
-<pinref part="R222" gate="G$1" pin="1"/>
-<wire x1="106.68" y1="68.58" x2="106.68" y2="55.88" width="0.1524" layer="91"/>
-<pinref part="U221" gate="A" pin="A"/>
-<wire x1="106.68" y1="55.88" x2="109.22" y2="55.88" width="0.1524" layer="91"/>
-<label x="106.68" y="60.96" size="1.778" layer="95" rot="R90"/>
-</segment>
-</net>
 <net name="POT_W" class="0">
 <segment>
 <pinref part="C221" gate="G$1" pin="1"/>
 <pinref part="R221" gate="G$1" pin="1"/>
-<wire x1="96.52" y1="38.1" x2="96.52" y2="58.42" width="0.1524" layer="91"/>
-<pinref part="U221" gate="A" pin="W"/>
-<wire x1="96.52" y1="58.42" x2="96.52" y2="68.58" width="0.1524" layer="91"/>
-<wire x1="96.52" y1="58.42" x2="109.22" y2="58.42" width="0.1524" layer="91"/>
-<junction x="96.52" y="58.42"/>
+<wire x1="96.52" y1="38.1" x2="96.52" y2="68.58" width="0.1524" layer="91"/>
 <label x="96.52" y="48.26" size="1.778" layer="95" rot="R90"/>
-</segment>
-</net>
-<net name="SCL" class="0">
-<segment>
-<pinref part="U221" gate="A" pin="SCL"/>
-<wire x1="144.78" y1="53.34" x2="177.8" y2="53.34" width="0.1524" layer="91"/>
-<label x="177.8" y="53.34" size="1.778" layer="95" xref="yes"/>
-</segment>
-</net>
-<net name="SDA" class="0">
-<segment>
-<pinref part="U221" gate="A" pin="SDA"/>
-<wire x1="144.78" y1="50.8" x2="177.8" y2="50.8" width="0.1524" layer="91"/>
-<label x="177.8" y="50.8" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="GND" class="0">
 <segment>
-<pinref part="U221" gate="A" pin="VSS"/>
-<wire x1="147.32" y1="45.72" x2="144.78" y2="45.72" width="0.1524" layer="91"/>
-<wire x1="147.32" y1="25.4" x2="147.32" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="GND221" gate="1" pin="GND"/>
-<wire x1="147.32" y1="22.86" x2="147.32" y2="25.4" width="0.1524" layer="91"/>
-<junction x="147.32" y="25.4"/>
 <pinref part="C221" gate="G$1" pin="2"/>
-<wire x1="96.52" y1="25.4" x2="96.52" y2="30.48" width="0.1524" layer="91"/>
-<wire x1="96.52" y1="25.4" x2="147.32" y2="25.4" width="0.1524" layer="91"/>
-<label x="114.3" y="22.86" size="1.778" layer="95"/>
+<wire x1="96.52" y1="22.86" x2="96.52" y2="30.48" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="X201" gate="G$1" pin="7"/>
@@ -8544,18 +8384,6 @@ General-purpose diode for high-speed switching</description>
 <wire x1="154.94" y1="116.84" x2="157.48" y2="116.84" width="0.1524" layer="91"/>
 <junction x="154.94" y="116.84"/>
 <junction x="119.38" y="116.84"/>
-</segment>
-<segment>
-<pinref part="U221" gate="A" pin="VDD"/>
-<wire x1="147.32" y1="81.28" x2="147.32" y2="58.42" width="0.1524" layer="91"/>
-<wire x1="147.32" y1="58.42" x2="144.78" y2="58.42" width="0.1524" layer="91"/>
-<pinref part="R222" gate="G$1" pin="2"/>
-<wire x1="106.68" y1="78.74" x2="106.68" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="106.68" y1="81.28" x2="147.32" y2="81.28" width="0.1524" layer="91"/>
-<junction x="147.32" y="81.28"/>
-<label x="114.3" y="81.28" size="1.778" layer="95"/>
-<pinref part="+3V3_221" gate="G$1" pin="+3V3"/>
-<wire x1="147.32" y1="83.82" x2="147.32" y2="81.28" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+5V" class="0">
