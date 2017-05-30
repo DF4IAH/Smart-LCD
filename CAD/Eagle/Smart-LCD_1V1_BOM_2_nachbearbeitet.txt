@@ -1,0 +1,71 @@
+Stückliste exportiert aus Smart-LCD_1V1.sch am 30.05.17 14:22											Nachbearbeitet von DF4IAH, 2017-05-30
+
+#########################################################################################################################################################################################################
+Qty Value              Device             Package             Parts                              Description                            
+.........................................................................................................................................................................................................
+1   27R                R-EU_R0805         R0805               R131                               RESISTOR, European symbol              	Fotodioden-Eingang Schutzwiderstand.
+
+2   330R               R-EU_R0805         R0805               R151, R152                         RESISTOR, European symbol              	
+
+2   1kR                R-EU_R0805         R0805               R391, R392                         RESISTOR, European symbol              	I2C-Bus open collector Sammelwiderstände.
+
+1   3.3kR              R-EU_R0805         R0805               R111                               RESISTOR, European symbol              	
+
+1   4.7kR              R-EU_R0805         R0805               R121                               RESISTOR, European symbol              	
+
+1   12kR               R-EU_R0805         R0805               R101                               RESISTOR, European symbol              	
+
+2   22kR               R-EU_R0805         R0805               R451, R454                         RESISTOR, European symbol              	
+
+1   100kR              R-EU_R0805         R0805               R221                               RESISTOR, European symbol              	
+
+1   650kR              R-EU_R0805         R0805               R222                               RESISTOR, European symbol              	
+
+1   1MR                R-EU_R0805         R0805               R132                               RESISTOR, European symbol              	Fotodioden Arbeitspunkt. Noch experimental.
+
+1   10MR               R-EU_R0805         R0805               R211                               RESISTOR, European symbol           		Ableitwiderstand für LCD-Modul bei Abschaltung.   
+
+
+2   100pF              C-EUC0805          C0805               C103, C131                         CAPACITOR, European symbol             	
+
+1   470pF              C-EUC0805          C0805               C452                               CAPACITOR, European symbol             	
+
+6   100nF              C-EUC0805          C0805               C102, C111, C221, C301, C302, C402 CAPACITOR, European symbol             	
+
+1   470nF              C-EUC0805          C0805               C455                               CAPACITOR, European symbol             	
+
+2   1uF                C-EUC0805          C0805               C211, C431                         CAPACITOR, European symbol             	
+
+2   4.7uF              C-EUC0805          C0805               C201, C202                         CAPACITOR, European symbol             	
+
+2   22uF               C-EUC0805          C0805               C101, C401                         CAPACITOR, European symbol             	
+
+2   47uF               C-EUC0805          C0805               C411, C412                         CAPACITOR, European symbol             	
+
+
+1   BZX84-C2V4         BAS70-04           SOT23               D131                               Silicon Schottky Diodes                	Schutzdioden für Fotodioden-Eingang. Noch experimental.
+
+1   MMBT2222AL         MMBT2222AL         SOT23               Q121                               MMBT2222L, MMBT2222AL, SMMBT2222AL     	NPN-Transistor für Backlight ein/aus (PWM).
+
+
+1   MEGA8-P            MEGA8-P            DIL28-3             U101                               MICROCONTROLLER                        	µC ATmega 328P. Kann zusätzlich gesockelt werden.
+
+1   TS4871ID           TS4871ID           SO08                U401                               STMICROELECTRONICS  TS4871ID           	Audioverstärker für einen Kanal.
+
+
+1   LCD_23WAY__UC1608  LCD_23WAY__UC1608  23X01_1MM27__UC1608 X201                               Gfx-LCD UC1608 socket                  	240x128 Pixel Gfx-Display wird direkt eingelötet.
+
+1   Audio              HEADER-2X2         2X02                X411                               Header 2X2 2.54mm                      	Anschluss für Lautsprecher mit Impedanz von >= 8 Ohm.
+
+1   I2C                HEADER-2X3         2X03                X301                               Header 2X3 2.54mm                      	Anschluss für I2C Stecker.
+
+1   LDR                HEADER-1X2         1X02                X131                               Header 1X2 2.54mm                      	Fotodioden-Anschluss. Noch experimental.
+
+1   LEDs               HEADER-2X2         2X02                X151                               Header 2X2 2.54mm                      	Anschluss für Duo-LEDs.
+
+1   Switches           HEADER-2X2         2X02                X141                               Header 2X2 2.54mm                      	Anschluss für Dreh-/Druckknopf mit I/Q Ausgang.
+#########################################################################################################################################################################################################
+
+
+
+<EOF>
