@@ -10,6 +10,9 @@
 #define MAIN_H_
 
 
+/* ATmega 328P - fuses ext:0xFD hi:0xB9 lo:0xC2 */
+
+
 /* Version V1.0 */
 #define VERSION														0x10
 
