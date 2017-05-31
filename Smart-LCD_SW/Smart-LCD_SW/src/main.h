@@ -17,6 +17,18 @@
 #define VERSION														0x10
 
 
+enum C_EEPROM_ADDR__ENUM {
+	C_EEPROM_ADDR_VERSION											= 0x00,
+	C_EEPROM_ADDR_LCD_PM											= 0x10,
+};
+
+enum C_EEPROM_NVM_SETTING__ENUM {
+	C_EEPROM_NVM_SETTING_LCD_CONTRAST								= 0x01,
+	C_EEPROM_NVM_SETTING_VERSION									= 0x80,
+	C_EEPROM_NVM_SETTING_ALL										= 0xFF
+};
+
+
 typedef struct status_struct {
 	uint8_t		doAnimation											: 1;
 	uint8_t		isAnimationStopped									: 1;
@@ -77,6 +89,8 @@ typedef struct showData {
 /* UTILITIES section */
 float get_abs_time(void);
 void mem_set(uint8_t* buf, uint8_t count, uint8_t val);
+void eeprom_nvm_settings_write(uint8_t flags);
+void eeprom_nvm_settings_read(uint8_t flags);
 
 
 /* TASK section */

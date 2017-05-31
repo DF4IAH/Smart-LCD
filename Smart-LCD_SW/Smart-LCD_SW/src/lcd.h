@@ -19,7 +19,8 @@
 #define C_LCD_BIASRATIO				2
 
 // Gain: 0, 1, 2, 3; PM: 32/63 = 50%
-#define C_LCD_GAIN_PM				((2 << 6) | 28)
+#define C_LCD_GAIN_BM				(2 << 6)
+#define C_LCD_PM					28
 // NOTES: Optimum=15.6V, Max=16.0V
 // BR=2&Gain=2&PM=0  --> 14.89V
 // BR=2&Gain=2&PM=28 --> 15.50V
@@ -52,6 +53,7 @@ uint8_t lcd_bus_read_ram(void);
 
 uint8_t lcd_bounds_x(int x);
 uint8_t lcd_bounds_y(int y);
+void	lcd_contrast_update(void);
 void    lcd_enable(uint8_t on);
 void    lcd_page_set(uint8_t page);
 void    lcd_col_set(uint8_t col);
