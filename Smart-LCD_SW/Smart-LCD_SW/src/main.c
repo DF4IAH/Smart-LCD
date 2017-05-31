@@ -31,6 +31,7 @@
  */
 #include <asf.h>
 #include <stdio.h>
+#include <avr/eeprom.h>
 
 #include "isr.h"
 #include "twi.h"
@@ -48,6 +49,7 @@ float				g_adc_light							= 0.f;
 float				g_adc_temp							= 0.f;
 float				g_temp								= 0.f;
 uint8_t				g_lcdbl_dimmer						= 0;
+uint8_t				g_lcd_contrast_pm					= 0;
 uint8_t				g_audio_out_loudness				= 0;
 int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
@@ -317,6 +319,44 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 	}
 }
 
+void eeprom_nvm_settings_write(uint8_t flags)
+{
+	/* VERSION */
+	if (flags & 0x80) {
+		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_VERSION,
+		VERSION);
+	}
+
+	/* LCD_PM */
+	if (flags & 0x01) {
+		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_LCD_PM,
+		g_lcd_contrast_pm & 0x3F);
+	}
+}
+
+void eeprom_nvm_settings_read(uint8_t flags)
+{
+	/* VERSION */
+	if (flags & C_EEPROM_NVM_SETTING_VERSION) {
+		uint8_t ver = eeprom_read_byte((const uint8_t *) C_EEPROM_ADDR_VERSION);
+		if (ver != VERSION) {
+			eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_VERSION);
+		}
+	}
+
+	/* LCD_PM */
+	if (flags & C_EEPROM_NVM_SETTING_LCD_CONTRAST) {
+		g_lcd_contrast_pm = C_LCD_PM;			// preset value
+
+		uint8_t val = eeprom_read_byte((const uint8_t *) C_EEPROM_ADDR_LCD_PM);
+		if (val <= 0x3F) {						// value from NVM is marked as being valid
+			g_lcd_contrast_pm = val;
+		} else {
+			eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
+		}
+	}
+}
+
 
 /* TASK section */
 
@@ -454,6 +494,9 @@ int main (void)
 		g_u32_DEBUG21 = rc;
 		asm_break();
 	}
+
+	/* Read non-volatile settings */
+	eeprom_nvm_settings_read(C_EEPROM_NVM_SETTING_ALL);			// load all entries from NVM
 
 	/* I2C interface - 10 MHz-Ref-Osc. second display */
 	s_twi_init(TWI_SLAVE_ADDR_10MHZREFOSC, TWI_SLAVE_ADDR_BM);

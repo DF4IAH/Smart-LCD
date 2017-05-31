@@ -38,6 +38,7 @@
 
 extern float				g_temp;
 extern float				g_adc_light;
+extern uint8_t				g_lcd_contrast_pm;
 extern status_t				g_status;
 extern showData_t			g_showData;
 
@@ -160,6 +161,11 @@ uint8_t lcd_bounds_y(int y)
 	}
 }
 
+void lcd_contrast_update(void)
+{
+		lcd_bus_write_cmd(0b10000001);									// Set Gain and PM (A)
+		lcd_bus_write_cmd(C_LCD_GAIN_BM | (g_lcd_contrast_pm & 0x3F));	// Set Gain and PM (B)
+}
 
 void lcd_enable(uint8_t on)
 {
@@ -170,8 +176,7 @@ void lcd_enable(uint8_t on)
 		lcd_bus_write_cmd(0b00101000 | C_LCD_PWR_CTRL);					// Set Power Control
 		lcd_bus_write_cmd(0b00100000 | C_LCD_MR_TC);					// Set MR and TC
 		lcd_bus_write_cmd(0b11101000 | C_LCD_BIASRATIO);				// Set Bias Ratio
-		lcd_bus_write_cmd(0b10000001);									// Set Gain and PM (A)
-		lcd_bus_write_cmd(C_LCD_GAIN_PM);								// Set Gain and PM (B)
+		lcd_contrast_update();
 
 		lcd_bus_write_cmd(0b11000000 | C_LCD_MAPPING);					// Set Mapping
 		lcd_bus_write_cmd(0b10001000 | C_LCD_AC);						// Set RAM Address Control

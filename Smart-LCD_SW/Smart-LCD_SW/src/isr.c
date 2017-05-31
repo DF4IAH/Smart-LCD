@@ -39,6 +39,7 @@
 
 #include "main.h"
 #include "twi.h"
+#include "lcd.h"
 
 #include "isr.h"
 
@@ -51,6 +52,7 @@ extern uint_fast32_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
 extern float				g_adc_light;
 extern float				g_adc_temp;
+extern uint8_t				g_lcd_contrast_pm;
 extern uint8_t				g_audio_out_loudness;
 extern int16_t				g_audio_pwm_accu;
 extern uint8_t				g_audio_pwm_ramp_dwn;
@@ -124,6 +126,7 @@ ISR(__vector_9, ISR_BLOCK)
 		static uint8_t state_old = 0;
 		static uint8_t state_ctr = 0;
 		static uint8_t second_old = 0;
+		static uint8_t button_ctr = 0;
 		uint8_t cur = PORTB & 0x3f;
 
 		/* signaling the grade of deviation */
@@ -160,6 +163,27 @@ ISR(__vector_9, ISR_BLOCK)
 		}
 
 		PORTB = cur;
+
+		/* sampling I/Q and push buttons */
+		if (button_ctr) {
+			--button_ctr;
+		} else {
+			button_ctr = 12;
+			uint8_t sw = (PINC & 0x06) >> 1;
+			if (!(sw & 0x01)) {									// SW-I: decrement contrast voltage
+				if (g_lcd_contrast_pm) {
+					--g_lcd_contrast_pm;
+					lcd_contrast_update();
+				}
+			} else if (!(sw & 0x02)) {							// SW-Q: increment contrast voltage
+				if (g_lcd_contrast_pm < 0x3F) {
+					++g_lcd_contrast_pm;
+					lcd_contrast_update();
+				}
+			} else if (!(PINB & _BV(PINB2))) {					// Pushbutton: store value in EEPROM
+				eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
+			}
+		}
 	}
 }
 
