@@ -20,7 +20,7 @@
 
 // Gain: 0, 1, 2, 3; PM: 32/63 = 50%
 #define C_LCD_GAIN_BM				(2 << 6)
-#define C_LCD_PM					28
+#define C_LCD_PM					22
 // NOTES: Optimum=15.6V, Max=16.0V
 // BR=2&Gain=2&PM=0  --> 14.89V
 // BR=2&Gain=2&PM=28 --> 15.50V

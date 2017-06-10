@@ -350,9 +350,9 @@ void eeprom_nvm_settings_read(uint8_t flags)
 	}
 
 	/* LCD_PM */
+	g_lcd_contrast_pm = C_LCD_PM;				// preset value
+#if 0
 	if (flags & C_EEPROM_NVM_SETTING_LCD_CONTRAST) {
-		g_lcd_contrast_pm = C_LCD_PM;			// preset value
-
 		uint8_t val = eeprom_read_byte((const uint8_t *) C_EEPROM_ADDR_LCD_PM);
 		if (val <= 0x3F) {						// value from NVM is marked as being valid
 			g_lcd_contrast_pm = val;
@@ -360,6 +360,7 @@ void eeprom_nvm_settings_read(uint8_t flags)
 			eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
 		}
 	}
+#endif
 }
 
 
