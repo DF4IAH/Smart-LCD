@@ -55,6 +55,11 @@ int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
 status_t			g_status							= { 0 };
 showData_t			g_showData							= { 0 };
+uint8_t				g_SmartLCD_mode						= 0x00;
+gfx_mono_color_t	g_lcd_pixel_type					= GFX_PIXEL_CLR;
+gfx_coord_t			g_lcd_pencil_x						= 0;
+gfx_coord_t			g_lcd_pencil_y						= 0;
+char				g_strbuf[8]							= { 0 };  // size is limited due to  TWIS_SEND_BUFFER_SIZE  of the ATxmega ASF
 
 uint8_t				g_u8_DEBUG11						= 0,
 					g_u8_DEBUG12						= 0,
@@ -265,7 +270,7 @@ static void s_twi_init(uint8_t twi_addr, uint8_t twi_addr_bm)
 	TWAR  = (twi_addr    << 1) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
 	TWAMR = (twi_addr_bm << 1);
 
-	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable, no START or STOP bit
+	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, Enable TWI port, Interrupt Enable, no START or STOP bit
 
 	cpu_irq_restore(flags);
 }
@@ -433,12 +438,20 @@ void s_task(void)
 			if (s_last_animation) {
 				s_last_animation = false;
 
-				/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
 				lcd_cls();
-				gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
-				const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
-				gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
-				lcd_show_template();
+
+				if (g_SmartLCD_mode == 0x10) {
+					/* Smart-LCD drawing box comes up */
+					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
+				
+				}
+				else if (g_SmartLCD_mode == 0x20) {
+					/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
+					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
+					const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
+					gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
+					lcd_show_template();
+				}
 
 				flags = cpu_irq_save();
 				g_status.isAnimationStopped = true;
@@ -499,7 +512,7 @@ int main (void)
 	eeprom_nvm_settings_read(C_EEPROM_NVM_SETTING_ALL);			// load all entries from NVM
 
 	/* I2C interface - 10 MHz-Ref-Osc. second display */
-	s_twi_init(TWI_SLAVE_ADDR_10MHZREFOSC, TWI_SLAVE_ADDR_BM);
+	s_twi_init(TWI_SLAVE_ADDR_SMARTLCD, TWI_SLAVE_ADDR_BM);
 
 	/* All interrupt sources prepared here - IRQ activation */
 	cpu_irq_enable();

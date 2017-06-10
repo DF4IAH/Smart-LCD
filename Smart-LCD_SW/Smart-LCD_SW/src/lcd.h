@@ -66,6 +66,8 @@ void    lcd_animation_prepare(void);
 void    lcd_animation_loop(void);
 void    lcd_test(uint8_t pattern_bm);
 
+void	isr_lcd_set_mode(int8_t mode);
+void	isr_lcd_write(const char *strbuf);
 void    isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100);
 void    isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
 void    isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);

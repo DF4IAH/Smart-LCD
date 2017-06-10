@@ -33,6 +33,7 @@
  */
 #include <asf.h>
 
+#include "gfx_mono/gfx_mono.h"
 #include "lcd.h"
 #include "main.h"
 
@@ -40,6 +41,11 @@
 
 
 extern status_t				g_status;
+extern uint8_t				g_SmartLCD_mode;
+extern gfx_mono_color_t		g_lcd_pixel_type;
+extern gfx_coord_t			g_lcd_pencil_x;
+extern gfx_coord_t			g_lcd_pencil_y;
+extern char					g_strbuf[8];
 
 static uint8_t				s_tx_next_len = 0;
 static uint8_t				s_tx_next_d[8];
@@ -125,15 +131,89 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			}
 		}
 
-	} else if (data[0] == TWI_SLAVE_ADDR_10MHZREFOSC) {
-		g_status.doAnimation = false;			// stop animation demo
-
+	} else if (data[0] == TWI_SLAVE_ADDR_SMARTLCD) {
+		/* unique command section for all modes */
 		switch (cmd) {
-			case TWI_SMART_LCD_CMD_GETVER:
+			case TWI_SMART_LCD_CMD_GET_VER:
 				prepareBuf[0] = VERSION;
 				s_twi_rx_prepare(1, prepareBuf);
 			break;
 
+			case TWI_SMART_LCD_CMD_SET_MODE:
+				isr_lcd_set_mode(data[2]);
+			break;
+
+			default:
+			{
+				// do nothing
+			}
+		}
+
+	} else if ((data[0] == TWI_SLAVE_ADDR_SMARTLCD) && (g_SmartLCD_mode == 0x10)) {
+		if (!(g_status.isAnimationStopped)) {
+			return;
+		}
+
+		switch (cmd) {
+			case TWI_SMART_LCD_CMD_CLS:					// Clear screen
+				lcd_cls();
+			break;
+
+			case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:		// Set next pixels (OFF / ON / INVERTED)
+				g_lcd_pixel_type = data[2];
+			break;
+
+			case TWI_SMART_LCD_CMD_SET_POS_X_Y:			// Set pencil position (x, y)
+				g_lcd_pencil_x = data[2];
+				g_lcd_pencil_y = data[3];
+			break;
+
+			case TWI_SMART_LCD_CMD_WRITE:				// Write text of length (length, buffer...)
+			{
+				int length = data[2];
+				if (length <= 6) {
+					int i;
+					for (i = 0; i < length; ++i) {
+						g_strbuf[i] = data[3 + i];
+					}
+					g_strbuf[length] = 0;
+					isr_lcd_write(g_strbuf);
+				}
+			}
+			break;
+
+			case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y)
+				gfx_mono_generic_draw_line(g_lcd_pencil_x, g_lcd_pencil_y, data[2], data[3], g_lcd_pixel_type);
+			break;
+
+			case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height)
+				gfx_mono_generic_draw_rect(g_lcd_pencil_x, g_lcd_pencil_y, data[2], data[3], g_lcd_pixel_type);
+			break;
+
+			case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
+				gfx_mono_generic_draw_filled_rect(g_lcd_pencil_x, g_lcd_pencil_y, data[2], data[3], g_lcd_pixel_type);
+			break;
+
+			case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
+				gfx_mono_generic_draw_circle(g_lcd_pencil_x, g_lcd_pencil_y, data[2], g_lcd_pixel_type, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			break;
+
+			case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
+				gfx_mono_generic_draw_filled_circle(g_lcd_pencil_x, g_lcd_pencil_y, data[2], g_lcd_pixel_type, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			break;
+
+			default:
+			{
+				// do nothing
+			}
+		}
+
+	} else if ((data[0] == TWI_SLAVE_ADDR_SMARTLCD) && (g_SmartLCD_mode == 0x20)) {
+		if (!(g_status.isAnimationStopped)) {
+			return;
+		}
+
+		switch (cmd) {
 			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
 				isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(data[2], (uint16_t) (data[3] | (data[4] << 8)), (int16_t) (data[5] | (data[6] << 8)));
 			break;
@@ -146,7 +226,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 				isr_lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
 			break;
 
-			case TWI_SMART_LCD_CMD_SHOW_PPM:
+			case TWI_SMART_LCD_CMD_SHOW_PPB:
 				isr_lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
 			break;
 
@@ -185,30 +265,6 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			default:
 			{
 				// do nothing for unsupported commands
-			}
-		}
-
-	} else if (data[0] == TWI_SLAVE_ADDR_SMARTLCD) {
-		switch (cmd) {
-			case 0b1000000:						// LCD reset
-				// TODO: LCD communication
-			break;
-
-			case 0b1000001:						// blank screen
-				// TODO: LCD communication
-			break;
-
-			case 0b1000010:						// invert off
-				// TODO: LCD communication
-			break;
-
-			case 0b1000011:						// invert on
-				// TODO: LCD communication
-			break;
-
-			default:
-			{
-				// do nothing
 			}
 		}
 	}
@@ -320,9 +376,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 			if (pos_i == 1) {
 				/* Load receive counter */
 				if (s_rx_d[0] == TWI_SLAVE_ADDR_SMARTLCD) {
-					cnt_i = ((s_rx_d[1] >> 5) & 0b111) + 1;	// encoded parameter count
-
-				} else if (s_rx_d[0] == TWI_SLAVE_ADDR_10MHZREFOSC) {
 					cnt_i = 0;
 					cnt_o = 0;
 
@@ -331,11 +384,23 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 							cnt_i = 1;
 						break;
 
-						case TWI_SMART_LCD_CMD_GETVER:
+						case TWI_SMART_LCD_CMD_GET_VER:
 							cnt_i = 1;
 							cnt_o = 1;
 						break;
 
+
+						case TWI_SMART_LCD_CMD_SET_MODE:
+						case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:
+						case TWI_SMART_LCD_CMD_DRAW_CIRC:
+						case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:
+							cnt_i = 2;
+						break;
+
+						case TWI_SMART_LCD_CMD_SET_POS_X_Y:
+						case TWI_SMART_LCD_CMD_DRAW_LINE:
+						case TWI_SMART_LCD_CMD_DRAW_RECT:
+						case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:
 						case TWI_SMART_LCD_CMD_SHOW_DOP:
 						case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
 						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
@@ -349,7 +414,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 							cnt_i = 4;
 						break;
 
-						case TWI_SMART_LCD_CMD_SHOW_PPM:
+						case TWI_SMART_LCD_CMD_SHOW_PPB:
 						case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
 							cnt_i = 5;
 						break;

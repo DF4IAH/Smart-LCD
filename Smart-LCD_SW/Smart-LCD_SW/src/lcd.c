@@ -41,6 +41,9 @@ extern float				g_adc_light;
 extern uint8_t				g_lcd_contrast_pm;
 extern status_t				g_status;
 extern showData_t			g_showData;
+extern uint8_t				g_SmartLCD_mode;
+extern gfx_coord_t			g_lcd_pencil_x;
+extern gfx_coord_t			g_lcd_pencil_y;
 
 extern uint8_t				g_u8_DEBUG11,
 							g_u8_DEBUG12,
@@ -199,7 +202,7 @@ void lcd_enable(uint8_t on)
 
 void lcd_page_set(uint8_t page)
 {
-	if ((0 <= page && page) < (GFX_MONO_LCD_PAGES)) {
+	if ((0 <= page) && (page < GFX_MONO_LCD_PAGES)) {
 		lcd_bus_write_cmd(0b10110000 | page);					// Set Page Address
 
 		s_lcd_ram_read_nonvalid = 1;
@@ -787,6 +790,25 @@ void lcd_test(uint8_t pattern_bm)
 
 
 /* ISR - interrupt disabled functions called within the TWI interrupt handling */
+
+void isr_lcd_set_mode(int8_t mode)
+{
+	g_SmartLCD_mode = mode;
+	if (mode) {
+		g_status.doAnimation = false;	// Stop animation demo
+
+	} else {
+		// Reset display
+		lcd_init();
+		lcd_test(0b11110001);			// Start animation again
+	}
+}
+
+void isr_lcd_write(const char *strbuf)
+{
+	gfx_mono_draw_string(strbuf, g_lcd_pencil_x, g_lcd_pencil_y, lcd_get_sysfont());
+}
+
 
 void isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100)
 {
