@@ -14,6 +14,11 @@
 
 void board_init(void)
 {
+    /* This function is meant to contain board-specific initialization code
+     * for, e.g., the I/O pins. The initialization can rely on application-
+     * specific board configuration, found in conf_board.h.
+     */
+
 #if 0
 	/* all PIN settings already done in s_io_preinit(void) in main.c */
 
