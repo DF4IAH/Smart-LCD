@@ -121,7 +121,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 
 	if (isGCA) {
 		switch (cmd) {
-			case 0b0100000:						// IDENTIFY
+			case 0b0100000:								// IDENTIFY
 				// TODO: prepare ADR+R data
 			break;
 
@@ -131,75 +131,74 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			}
 		}
 
-	} else if (data[0] == TWI_SLAVE_ADDR_SMARTLCD) {
-		/* unique command section for all modes */
-		switch (cmd) {
-			case TWI_SMART_LCD_CMD_GET_VER:
-				prepareBuf[0] = VERSION;
-				s_twi_rx_prepare(1, prepareBuf);
-			break;
-
-			case TWI_SMART_LCD_CMD_SET_MODE:
-				isr_lcd_set_mode(data[2]);
-			break;
-
-			default:
-			{
-				// do nothing
-			}
-		}
-
-	} else if ((data[0] == TWI_SLAVE_ADDR_SMARTLCD) && (g_SmartLCD_mode == 0x10)) {
-		if (!(g_status.isAnimationStopped)) {
-			return;
-		}
-
+	} else if ((data[0] == TWI_SLAVE_ADDR_SMARTLCD) && (g_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD)) {
 		switch (cmd) {
 			case TWI_SMART_LCD_CMD_CLS:					// Clear screen
-				lcd_cls();
+				isr_smartlcd_cmd(cmd);
 			break;
 
-			case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:		// Set next pixels (OFF / ON / INVERTED)
-				g_lcd_pixel_type = data[2];
+			case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:		// Set next pixels (OFF / ON / XOR)
+				isr_smartlcd_cmd_data1(cmd, data[2]);
 			break;
 
 			case TWI_SMART_LCD_CMD_SET_POS_X_Y:			// Set pencil position (x, y)
-				g_lcd_pencil_x = data[2];
-				g_lcd_pencil_y = data[3];
+				isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 			break;
 
 			case TWI_SMART_LCD_CMD_WRITE:				// Write text of length (length, buffer...)
 			{
-				int length = data[2];
-				if (length <= 6) {
-					int i;
-					for (i = 0; i < length; ++i) {
-						g_strbuf[i] = data[3 + i];
-					}
-					g_strbuf[length] = 0;
-					isr_lcd_write(g_strbuf);
+				switch (data[2]) {
+					case 1:
+						isr_smartlcd_cmd_data1(cmd, data[3]);
+					break;
+
+					case 2:
+						isr_smartlcd_cmd_data2(cmd, data[3], data[4]);
+					break;
+
+					case 3:
+						isr_smartlcd_cmd_data3(cmd, data[3], data[4], data[5]);
+					break;
+
+					case 4:
+						isr_smartlcd_cmd_data4(cmd, data[3], data[4], data[5], data[6]);
+					break;
+
+					case 5:
+						isr_smartlcd_cmd_data5(cmd, data[3], data[4], data[5], data[6], data[7]);
+					break;
+
+					case 6:
+						isr_smartlcd_cmd_data6(cmd, data[3], data[4], data[5], data[6], data[7], data[8]);
+					break;
+
+					case 0:
+					default:
+						isr_smartlcd_cmd(cmd);
+					break;
+
 				}
 			}
 			break;
 
 			case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y)
-				gfx_mono_generic_draw_line(g_lcd_pencil_x, g_lcd_pencil_y, data[2], data[3], g_lcd_pixel_type);
+				isr_smartlcd_cmd_data2(cmd, data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height)
-				gfx_mono_generic_draw_rect(g_lcd_pencil_x, g_lcd_pencil_y, data[2], data[3], g_lcd_pixel_type);
+				isr_smartlcd_cmd_data2(cmd, data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
-				gfx_mono_generic_draw_filled_rect(g_lcd_pencil_x, g_lcd_pencil_y, data[2], data[3], g_lcd_pixel_type);
+				isr_smartlcd_cmd_data2(cmd, data[3], data[4]);
 			break;
 
 			case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
-				gfx_mono_generic_draw_circle(g_lcd_pencil_x, g_lcd_pencil_y, data[2], g_lcd_pixel_type, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+				isr_smartlcd_cmd_data1(cmd, data[3]);
 			break;
 
 			case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
-				gfx_mono_generic_draw_filled_circle(g_lcd_pencil_x, g_lcd_pencil_y, data[2], g_lcd_pixel_type, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+				isr_smartlcd_cmd_data1(cmd, data[3]);
 			break;
 
 			default:
@@ -208,11 +207,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			}
 		}
 
-	} else if ((data[0] == TWI_SLAVE_ADDR_SMARTLCD) && (g_SmartLCD_mode == 0x20)) {
-		if (!(g_status.isAnimationStopped)) {
-			return;
-		}
-
+	} else if ((data[0] == TWI_SLAVE_ADDR_SMARTLCD) && (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC)) {
 		switch (cmd) {
 			case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
 				isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(data[2], (uint16_t) (data[3] | (data[4] << 8)), (int16_t) (data[5] | (data[6] << 8)));
@@ -265,6 +260,23 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			default:
 			{
 				// do nothing for unsupported commands
+			}
+		}
+	} else if (data[0] == TWI_SLAVE_ADDR_SMARTLCD) {
+		/* unique command section for all modes */
+		switch (cmd) {
+			case TWI_SMART_LCD_CMD_GET_VER:
+				prepareBuf[0] = VERSION;
+				s_twi_rx_prepare(1, prepareBuf);
+			break;
+
+			case TWI_SMART_LCD_CMD_SET_MODE:
+				isr_lcd_set_mode(data[2]);
+			break;
+
+			default:
+			{
+				// do nothing
 			}
 		}
 	}

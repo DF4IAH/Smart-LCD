@@ -55,7 +55,7 @@ int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
 status_t			g_status							= { 0 };
 showData_t			g_showData							= { 0 };
-uint8_t				g_SmartLCD_mode						= 0x00;
+uint8_t				g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
 gfx_mono_color_t	g_lcd_pixel_type					= GFX_PIXEL_CLR;
 gfx_coord_t			g_lcd_pencil_x						= 0;
 gfx_coord_t			g_lcd_pencil_y						= 0;
@@ -404,14 +404,12 @@ void s_task(void)
 	/* TASK when woken up */
 	float l_adc_temp, l_adc_light;
 	irqflags_t flags;
-	uint8_t l_doAnimation, l_isAnimationStopped;
+	uint8_t l_SmartLCD_mode, l_doAnimation, l_isAnimationStopped;
 	uint8_t more;
 
 	flags = cpu_irq_save();
 	l_adc_temp = g_adc_temp;
 	l_adc_light = g_adc_light;
-	l_doAnimation = g_status.doAnimation;
-	l_isAnimationStopped = g_status.isAnimationStopped;
 	cpu_irq_restore(flags);
 
 	/* Calculate new current temperature */
@@ -422,11 +420,22 @@ void s_task(void)
 
 	/* Runs as long as changed data is not presented yet */
 	do {
+		more = 0;
+
+		flags = cpu_irq_save();
+		l_SmartLCD_mode = g_SmartLCD_mode;
+		l_doAnimation = g_status.doAnimation;
+		l_isAnimationStopped = g_status.isAnimationStopped;
+		cpu_irq_restore(flags);
+
 		/* Show received data from I2C bus */
 		if (l_isAnimationStopped) {
-			more = lcd_show_new_data();
-		} else {
-			more = 0;
+			if (l_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
+				more = lcd_show_new_smartlcd_data();
+
+			} else if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
+				more = lcd_show_new_refosc_data();
+			}
 		}
 
 		/* Animated demo */
@@ -441,12 +450,11 @@ void s_task(void)
 
 				lcd_cls();
 
-				if (g_SmartLCD_mode == 0x10) {
+				if (l_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
 					/* Smart-LCD drawing box comes up */
-					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
-				
-				}
-				else if (g_SmartLCD_mode == 0x20) {
+					gfx_mono_generic_draw_rect(2, 2, 236, 124, GFX_PIXEL_SET);
+
+				} else if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
 					/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
 					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
 					const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";

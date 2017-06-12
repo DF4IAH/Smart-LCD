@@ -9,6 +9,8 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
+#include <gfx_mono/gfx_mono.h>
+
 
 /* ATmega 328P - fuses ext:0xFD hi:0xB9 lo:0xC2 */
 
@@ -16,6 +18,12 @@
 /* Version V1.1 */
 #define VERSION														0x11
 
+
+enum C_SMART_LCD_MODE__ENUM {
+	C_SMART_LCD_MODE_UNIQUE											= 0x00,
+	C_SMART_LCD_MODE_SMARTLCD										= 0x10,
+	C_SMART_LCD_MODE_REFOSC											= 0x20,
+};
 
 enum C_EEPROM_ADDR__ENUM {
 	C_EEPROM_ADDR_VERSION											= 0x00,
@@ -49,6 +57,13 @@ typedef struct showData {
 	uint16_t	newPosLon											: 1;
 	uint16_t	newPosHeight										: 1;
 	uint16_t	newRsvrd											: 4;
+
+	uint8_t				cmd;
+	uint8_t				data[6];
+
+	gfx_mono_color_t	pixelType;
+	gfx_coord_t			pencil_x;
+	gfx_coord_t			pencil_y;
 
 	uint16_t	clkState_phaseVolt1000;
 	int16_t		clkState_phaseDeg100;
