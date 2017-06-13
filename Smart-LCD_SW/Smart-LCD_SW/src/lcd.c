@@ -415,7 +415,6 @@ uint8_t lcd_show_new_smartlcd_data(void)
 	char buf[8];
 
 	irqflags_t flags = cpu_irq_save();
-	cpu_irq_disable();
 
 	switch (g_showData.cmd) {
 		case TWI_SMART_LCD_CMD_CLS:
@@ -524,7 +523,6 @@ uint8_t lcd_show_new_refosc_data(void)
 	/* First entries are showed first, when modified */
 
 	irqflags_t flags = cpu_irq_save();
-	cpu_irq_disable();
 
 	/* Always */
 	if (g_showData.newTime) {
@@ -833,7 +831,7 @@ void lcd_animation_loop(void)
 
 		if ((now - s_animation_time_last_temp) >= 0.50f) {  // 2x per sec
 			s_animation_time_last_temp = now;
-			s_task();
+			task();
 			s_lcd_test_temp();
 			s_lcd_test_light();
 		}

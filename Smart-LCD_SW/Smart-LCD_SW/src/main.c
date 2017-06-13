@@ -399,7 +399,7 @@ static void s_task_temp(float adc_temp)
 	cpu_irq_restore(flags);
 }
 
-void s_task(void)
+void task(void)
 {
 	/* TASK when woken up */
 	float l_adc_temp, l_adc_light;
@@ -449,7 +449,7 @@ void s_task(void)
 
 				if (l_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
 					/* Smart-LCD drawing box comes up */
-					gfx_mono_generic_draw_rect(2, 2, 236, 124, GFX_PIXEL_SET);
+					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
 
 				} else if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
 					/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
@@ -534,7 +534,7 @@ int main (void)
 	/* main loop */
 	runmode = 1;
     while (runmode) {
-	    s_task();
+	    task();
 	    s_enter_sleep(SLEEP_MODE_IDLE);
     }
 

@@ -109,7 +109,7 @@ void eeprom_nvm_settings_read(uint8_t flags);
 
 
 /* TASK section */
-void s_task(void);
+void task(void);
 void halt(void);
 
 
