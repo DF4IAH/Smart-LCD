@@ -793,7 +793,14 @@ void lcd_animation_prepare(void)
 
 void lcd_animation_loop(void)
 {
-	if (s_animation_dx) {
+	irqflags_t flags;
+	uint8_t l_doAnimation;
+
+	flags = cpu_irq_save();
+	l_doAnimation = g_status.doAnimation;  // TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+	cpu_irq_restore(flags);
+
+	while (l_doAnimation && s_animation_dx) {
 		float now = get_abs_time();
 
 		if ((now - s_animation_time_last_train) >= 0.04f) {  // 25x per sec
@@ -832,11 +839,26 @@ void lcd_animation_loop(void)
 		}
 
 		s_lcd_test_lines();  // Every cycle
+
+		flags = cpu_irq_save();
+		l_doAnimation = g_status.doAnimation;  // TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+		cpu_irq_restore(flags);
 	}
+
+	flags = cpu_irq_save();
+	g_status.doAnimation = false;
+	cpu_irq_restore(flags);
 }
 
 void lcd_test(uint8_t pattern_bm)
 {
+	irqflags_t flags;
+
+	flags = cpu_irq_save();
+	g_status.doAnimation = false;
+	g_status.isAnimationStopped = false;
+	cpu_irq_restore(flags);
+
 	if (pattern_bm & (1 << 0)) {
 		// TEST 1
 		for (int i = 0; i < GFX_MONO_LCD_WIDTH; ++i) {
@@ -895,7 +917,10 @@ void lcd_test(uint8_t pattern_bm)
 		// TEST 8
 		lcd_animation_prepare();
 
+		flags = cpu_irq_save();
 		g_status.doAnimation = true;
+		cpu_irq_restore(flags);
+
 		lcd_animation_loop();
 	}
 }

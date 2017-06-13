@@ -418,13 +418,13 @@ void s_task(void)
 	/* Calculate new backlight PWM value and set that */
 	s_task_backlight(l_adc_light);
 
-	/* Runs as long as changed data is not presented yet */
+	/* Loops as long as more data is ready to be presented */
 	do {
 		more = 0;
 
 		flags = cpu_irq_save();
 		l_SmartLCD_mode = g_SmartLCD_mode;
-		l_doAnimation = g_status.doAnimation;
+		l_doAnimation = g_status.doAnimation;  // TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
 		l_isAnimationStopped = g_status.isAnimationStopped;
 		cpu_irq_restore(flags);
 
@@ -438,11 +438,8 @@ void s_task(void)
 			}
 		}
 
-		/* Animated demo */
-		if (l_doAnimation) {
-			lcd_animation_loop();
-
-		} else {
+		/* When transferring from animated demo to stopped animation */
+		if (!l_doAnimation) {
 			static int8_t s_last_animation = true;
 
 			if (s_last_animation) {
