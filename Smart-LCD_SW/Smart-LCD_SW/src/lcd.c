@@ -418,23 +418,23 @@ uint8_t lcd_show_new_smartlcd_data(void)
 
 	switch (g_showData.cmd) {
 		case TWI_SMART_LCD_CMD_CLS:
+			lcd_cls();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
-			lcd_cls();
 			return TWI_SMART_LCD_CMD_CLS;
 		break;
 
 		case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:
-			g_showData.cmd = 0;
 			g_showData.pixelType = (gfx_mono_color_t) g_showData.data[0];
+			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_SET_PIXEL_TYPE;
 		break;
 
 		case TWI_SMART_LCD_CMD_SET_POS_X_Y:
-			g_showData.cmd = 0;
 			g_showData.pencil_x = (gfx_coord_t) g_showData.data[0];
 			g_showData.pencil_y = (gfx_coord_t) g_showData.data[1];
+			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_SET_POS_X_Y;
 		break;
@@ -445,69 +445,69 @@ uint8_t lcd_show_new_smartlcd_data(void)
 				buf[i] = g_showData.data[i+1];
 			}
 			buf[len] = 0;
-			g_showData.cmd = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
-			cpu_irq_restore(flags);
 			gfx_mono_draw_string(buf, l_pencil_x, l_pencil_y, &sysfont);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_WRITE;
 		break;
 
 		case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y)
-			g_showData.cmd = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_to_x = g_showData.data[0];
 			l_to_y = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
-			cpu_irq_restore(flags);
 			gfx_mono_generic_draw_line(l_pencil_x, l_pencil_y, l_to_x, l_to_y, l_pixelType);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_LINE;
 		break;
 
 		case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height)
-			g_showData.cmd = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_width = g_showData.data[0];
 			l_height = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
-			cpu_irq_restore(flags);
 			gfx_mono_generic_draw_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_RECT;
 		break;
 		
 		case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
-			g_showData.cmd = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_width = g_showData.data[0];
 			l_height = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
-			cpu_irq_restore(flags);
 			gfx_mono_generic_draw_filled_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_FILLED_RECT;
 		break;
 		
 		case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
-			g_showData.cmd = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_radius = g_showData.data[0];
 			l_pixelType = g_showData.pixelType;
-			cpu_irq_restore(flags);
 			gfx_mono_generic_draw_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_CIRC;
 		break;
 		
 		case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
-			g_showData.cmd = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_radius = g_showData.data[0];
 			l_pixelType = g_showData.pixelType;
-			cpu_irq_restore(flags);
 			gfx_mono_generic_draw_filled_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC;
 		break;
 	}
@@ -947,52 +947,37 @@ void isr_smartlcd_cmd(uint8_t cmd)
 
 void isr_smartlcd_cmd_data1(uint8_t cmd, uint8_t data0)
 {
-	g_showData.cmd = cmd;
+	isr_smartlcd_cmd(cmd);
 	g_showData.data[0] = data0;
 }
 
 void isr_smartlcd_cmd_data2(uint8_t cmd, uint8_t data0, uint8_t data1)
 {
-	g_showData.cmd = cmd;
-	g_showData.data[0] = data0;
+	isr_smartlcd_cmd_data1(cmd, data0);
 	g_showData.data[1] = data1;
 }
 
 void isr_smartlcd_cmd_data3(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2)
 {
-	g_showData.cmd = cmd;
-	g_showData.data[0] = data0;
-	g_showData.data[1] = data1;
+	isr_smartlcd_cmd_data2(cmd, data0, data1);
 	g_showData.data[2] = data2;
 }
 
 void isr_smartlcd_cmd_data4(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3)
 {
-	g_showData.cmd = cmd;
-	g_showData.data[0] = data0;
-	g_showData.data[1] = data1;
-	g_showData.data[2] = data2;
+	isr_smartlcd_cmd_data3(cmd, data0, data1, data2);
 	g_showData.data[3] = data3;
 }
 
 void isr_smartlcd_cmd_data5(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4)
 {
-	g_showData.cmd = cmd;
-	g_showData.data[0] = data0;
-	g_showData.data[1] = data1;
-	g_showData.data[2] = data2;
-	g_showData.data[3] = data3;
+	isr_smartlcd_cmd_data4(cmd, data0, data1, data2, data3);
 	g_showData.data[4] = data4;
 }
 
 void isr_smartlcd_cmd_data6(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
 {
-	g_showData.cmd = cmd;
-	g_showData.data[0] = data0;
-	g_showData.data[1] = data1;
-	g_showData.data[2] = data2;
-	g_showData.data[3] = data3;
-	g_showData.data[4] = data4;
+	isr_smartlcd_cmd_data5(cmd, data0, data1, data2, data3, data4);
 	g_showData.data[5] = data5;
 }
 
