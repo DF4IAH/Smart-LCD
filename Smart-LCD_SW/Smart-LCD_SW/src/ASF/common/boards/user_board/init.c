@@ -36,7 +36,7 @@ void board_init(void)
 
 	ioport_set_pin_dir(LCD_RW, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_level(LCD_RW, true);
-	
+
 	ioport_set_pin_dir(LCD_EN, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_level(LCD_EN, false);
 
@@ -45,31 +45,31 @@ void board_init(void)
 
 	ioport_set_pin_dir(LCD_RST_N, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_RST_N, IOPORT_MODE_PULLUP);
-	
+
 	ioport_set_pin_dir(LCD_D0, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D0, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D1, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D1, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D2, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D2, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D3, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D3, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D4, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D4, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D5, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D5, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D6, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D6, IOPORT_MODE_PULLDOWN);
-	
+
 	ioport_set_pin_dir(LCD_D7, IOPORT_DIR_INPUT);
 	ioport_set_pin_mode(LCD_D7, IOPORT_MODE_PULLDOWN);
-	
+
 
 	/* Status LEDs */
 	ioport_set_pin_dir(LED_RD, IOPORT_DIR_OUTPUT);

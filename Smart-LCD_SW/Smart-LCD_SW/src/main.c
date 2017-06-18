@@ -475,7 +475,7 @@ static void s_enter_sleep(uint8_t sleep_mode)
 	__asm__ __volatile__ ("sleep" ::: "memory");
 
 	SMCR &= ~(_BV(SE));							// disable sleep command
-} 
+}
 
 
 /* MAIN section */

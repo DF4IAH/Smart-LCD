@@ -65,7 +65,7 @@
 void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_coord_t page_offset, gfx_coord_t width)
 {
 	if (data &&
-		(page					<  GFX_MONO_LCD_PAGES) && 
+		(page					<  GFX_MONO_LCD_PAGES) &&
 	    (page_offset			<  GFX_MONO_LCD_WIDTH)) {
 
 		gfx_mono_color_t *data_pt = data;
@@ -139,7 +139,7 @@ void gfx_mono_lcd_uc1608_draw_pixel(gfx_coord_t x, gfx_coord_t y, gfx_mono_color
 uint8_t gfx_mono_lcd_uc1608_get_pixel(gfx_coord_t x, gfx_coord_t y)
 {
 	uint8_t isSet = GFX_PIXEL_CLR;
-	
+
 	if ((x < GFX_MONO_LCD_WIDTH) && (y < GFX_MONO_LCD_HEIGHT)) {
 		gfx_coord_t			page		= y / GFX_MONO_LCD_PIXELS_PER_BYTE;
 		gfx_mono_color_t	pixel_mask	= 1 << (y % GFX_MONO_LCD_PIXELS_PER_BYTE);

@@ -245,7 +245,7 @@ void lcd_cls(void)
 		for (uint8_t cnt = GFX_MONO_LCD_WIDTH; cnt; --cnt) {		// clear all columns of that page
 			lcd_bus_write_ram(0);
 		}
-	}	
+	}
 
 	/* Set cursor to home position */
 	lcd_home();
@@ -476,7 +476,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_RECT;
 		break;
-		
+
 		case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
@@ -488,7 +488,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_FILLED_RECT;
 		break;
-		
+
 		case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
@@ -499,7 +499,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_CIRC;
 		break;
-		
+
 		case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
@@ -746,7 +746,7 @@ void lcd_animation_prepare(void)
 	s_animation_train_origin = -ANIMATION_TRAIN_BLANK_LEN;
 	s_animation_dx = 1;
 
-	/* prepare train */	
+	/* prepare train */
 	for (idx = 0; idx < ANIMATION_TRAIN_BLANK_LEN; ++idx) {
 		if (!idx) {
 			s_animation_train_left[idx] = 0;

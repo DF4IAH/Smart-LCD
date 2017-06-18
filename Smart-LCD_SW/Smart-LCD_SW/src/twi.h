@@ -3,7 +3,7 @@
  *
  * Created: 13.02.2017 08:48:44
  *  Author: DF4IAH
- */ 
+ */
 
 
 #ifndef TWI_H_

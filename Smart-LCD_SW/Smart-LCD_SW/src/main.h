@@ -3,7 +3,7 @@
  *
  * Created: 08.02.2017 21:17:52
  *  Author: DF4IAH
- */ 
+ */
 
 
 #ifndef MAIN_H_

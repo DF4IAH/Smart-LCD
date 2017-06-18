@@ -3,7 +3,7 @@
  *
  * Created: 22.02.2017 16:54:56
  *  Author: DF4IAH
- */ 
+ */
 
 
 #ifndef LCD_H_
