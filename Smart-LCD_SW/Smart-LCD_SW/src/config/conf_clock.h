@@ -61,7 +61,7 @@
 /* #define SYSCLK_SOURCE        SYSCLK_SRC_XOC16MHZ */
 
 /* ===== System Clock Bus Division Options */
-#define CONFIG_SYSCLK_PSDIV     SYSCLK_PSDIV_1  
+#define CONFIG_SYSCLK_PSDIV     SYSCLK_PSDIV_1
 //#define CONFIG_SYSCLK_PSDIV   SYSCLK_PSDIV_8
 
 #endif /* CONF_CLOCK_H_INCLUDED */

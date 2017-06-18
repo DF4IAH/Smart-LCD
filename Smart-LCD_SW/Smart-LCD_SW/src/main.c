@@ -55,6 +55,11 @@ int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
 status_t			g_status							= { 0 };
 showData_t			g_showData							= { 0 };
+uint8_t				g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
+gfx_mono_color_t	g_lcd_pixel_type					= GFX_PIXEL_CLR;
+gfx_coord_t			g_lcd_pencil_x						= 0;
+gfx_coord_t			g_lcd_pencil_y						= 0;
+char				g_strbuf[8]							= { 0 };  // size is limited due to  TWIS_SEND_BUFFER_SIZE  of the ATxmega ASF
 
 uint8_t				g_u8_DEBUG11						= 0,
 					g_u8_DEBUG12						= 0,
@@ -265,7 +270,7 @@ static void s_twi_init(uint8_t twi_addr, uint8_t twi_addr_bm)
 	TWAR  = (twi_addr    << 1) /* | (TWI_SLAVE_ADDR_GCE << TWGCE)*/ ;
 	TWAMR = (twi_addr_bm << 1);
 
-	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, ENable TWI port, Interrupt Enable, no START or STOP bit
+	TWCR = _BV(TWEA) | _BV(TWEN) | _BV(TWIE);	// Enable Acknowledge, Enable TWI port, Interrupt Enable, no START or STOP bit
 
 	cpu_irq_restore(flags);
 }
@@ -345,9 +350,9 @@ void eeprom_nvm_settings_read(uint8_t flags)
 	}
 
 	/* LCD_PM */
+	g_lcd_contrast_pm = C_LCD_PM;				// preset value
+#if 0
 	if (flags & C_EEPROM_NVM_SETTING_LCD_CONTRAST) {
-		g_lcd_contrast_pm = C_LCD_PM;			// preset value
-
 		uint8_t val = eeprom_read_byte((const uint8_t *) C_EEPROM_ADDR_LCD_PM);
 		if (val <= 0x3F) {						// value from NVM is marked as being valid
 			g_lcd_contrast_pm = val;
@@ -355,6 +360,7 @@ void eeprom_nvm_settings_read(uint8_t flags)
 			eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
 		}
 	}
+#endif
 }
 
 
@@ -393,19 +399,17 @@ static void s_task_temp(float adc_temp)
 	cpu_irq_restore(flags);
 }
 
-void s_task(void)
+void task(void)
 {
 	/* TASK when woken up */
 	float l_adc_temp, l_adc_light;
 	irqflags_t flags;
-	uint8_t l_doAnimation, l_isAnimationStopped;
+	uint8_t l_SmartLCD_mode, l_doAnimation, l_isAnimationStopped;
 	uint8_t more;
 
 	flags = cpu_irq_save();
 	l_adc_temp = g_adc_temp;
 	l_adc_light = g_adc_light;
-	l_doAnimation = g_status.doAnimation;
-	l_isAnimationStopped = g_status.isAnimationStopped;
 	cpu_irq_restore(flags);
 
 	/* Calculate new current temperature */
@@ -414,31 +418,46 @@ void s_task(void)
 	/* Calculate new backlight PWM value and set that */
 	s_task_backlight(l_adc_light);
 
-	/* Runs as long as changed data is not presented yet */
+	/* Loops as long as more data is ready to be presented */
 	do {
+		more = 0;
+
+		flags = cpu_irq_save();
+		l_SmartLCD_mode = g_SmartLCD_mode;
+		l_doAnimation = g_status.doAnimation;  // TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+		l_isAnimationStopped = g_status.isAnimationStopped;
+		cpu_irq_restore(flags);
+
 		/* Show received data from I2C bus */
 		if (l_isAnimationStopped) {
-			more = lcd_show_new_data();
-		} else {
-			more = 0;
+			if (l_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
+				more = lcd_show_new_smartlcd_data();
+
+			} else if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
+				more = lcd_show_new_refosc_data();
+			}
 		}
 
-		/* Animated demo */
-		if (l_doAnimation) {
-			lcd_animation_loop();
-
-		} else {
+		/* When transferring from animated demo to stopped animation */
+		if (!l_doAnimation) {
 			static int8_t s_last_animation = true;
 
 			if (s_last_animation) {
 				s_last_animation = false;
 
-				/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
 				lcd_cls();
-				gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
-				const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
-				gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
-				lcd_show_template();
+
+				if (l_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
+					/* Smart-LCD drawing box comes up */
+					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
+
+				} else if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
+					/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
+					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
+					const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";
+					gfx_mono_draw_string(buf, 3, 2, lcd_get_sysfont());
+					lcd_show_template();
+				}
 
 				flags = cpu_irq_save();
 				g_status.isAnimationStopped = true;
@@ -456,7 +475,7 @@ static void s_enter_sleep(uint8_t sleep_mode)
 	__asm__ __volatile__ ("sleep" ::: "memory");
 
 	SMCR &= ~(_BV(SE));							// disable sleep command
-} 
+}
 
 
 /* MAIN section */
@@ -499,7 +518,7 @@ int main (void)
 	eeprom_nvm_settings_read(C_EEPROM_NVM_SETTING_ALL);			// load all entries from NVM
 
 	/* I2C interface - 10 MHz-Ref-Osc. second display */
-	s_twi_init(TWI_SLAVE_ADDR_10MHZREFOSC, TWI_SLAVE_ADDR_BM);
+	s_twi_init(TWI_SLAVE_ADDR_SMARTLCD, TWI_SLAVE_ADDR_BM);
 
 	/* All interrupt sources prepared here - IRQ activation */
 	cpu_irq_enable();
@@ -515,7 +534,7 @@ int main (void)
 	/* main loop */
 	runmode = 1;
     while (runmode) {
-	    s_task();
+	    task();
 	    s_enter_sleep(SLEEP_MODE_IDLE);
     }
 

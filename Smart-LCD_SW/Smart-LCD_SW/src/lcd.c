@@ -32,6 +32,7 @@
 #include <math.h>
 
 #include "gfx_mono/sysfont.h"
+#include "twi.h"
 #include "main.h"
 
 #include "lcd.h"
@@ -41,6 +42,9 @@ extern float				g_adc_light;
 extern uint8_t				g_lcd_contrast_pm;
 extern status_t				g_status;
 extern showData_t			g_showData;
+extern uint8_t				g_SmartLCD_mode;
+extern gfx_coord_t			g_lcd_pencil_x;
+extern gfx_coord_t			g_lcd_pencil_y;
 
 extern uint8_t				g_u8_DEBUG11,
 							g_u8_DEBUG12,
@@ -199,7 +203,7 @@ void lcd_enable(uint8_t on)
 
 void lcd_page_set(uint8_t page)
 {
-	if ((0 <= page && page) < (GFX_MONO_LCD_PAGES)) {
+	if ((0 <= page) && (page < GFX_MONO_LCD_PAGES)) {
 		lcd_bus_write_cmd(0b10110000 | page);					// Set Page Address
 
 		s_lcd_ram_read_nonvalid = 1;
@@ -241,7 +245,7 @@ void lcd_cls(void)
 		for (uint8_t cnt = GFX_MONO_LCD_WIDTH; cnt; --cnt) {		// clear all columns of that page
 			lcd_bus_write_ram(0);
 		}
-	}	
+	}
 
 	/* Set cursor to home position */
 	lcd_home();
@@ -402,14 +406,123 @@ static void lcd_show_new_clk_state(uint8_t clk_state, uint16_t phaseVolt1000, in
 	clk_state_old = clk_state;
 }
 
-uint8_t lcd_show_new_data(void)
+uint8_t lcd_show_new_smartlcd_data(void)
+{
+	uint8_t len;
+	gfx_coord_t l_pencil_x, l_pencil_y, l_to_x, l_to_y, l_width, l_height, l_radius;
+	gfx_mono_color_t l_pixelType;
+	uint8_t i;
+	char buf[8];
+
+	irqflags_t flags = cpu_irq_save();
+
+	switch (g_showData.cmd) {
+		case TWI_SMART_LCD_CMD_CLS:
+			lcd_cls();
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_CLS;
+		break;
+
+		case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:
+			g_showData.pixelType = (gfx_mono_color_t) g_showData.data[0];
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_SET_PIXEL_TYPE;
+		break;
+
+		case TWI_SMART_LCD_CMD_SET_POS_X_Y:
+			g_showData.pencil_x = (gfx_coord_t) g_showData.data[0];
+			g_showData.pencil_y = (gfx_coord_t) g_showData.data[1];
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_SET_POS_X_Y;
+		break;
+
+		case TWI_SMART_LCD_CMD_WRITE:
+			len = g_showData.data[0];
+			for (i = 0; i < len; ++i) {
+				buf[i] = g_showData.data[i+1];
+			}
+			buf[len] = 0;
+			l_pencil_x = g_showData.pencil_x;
+			l_pencil_y = g_showData.pencil_y;
+			gfx_mono_draw_string(buf, l_pencil_x, l_pencil_y, &sysfont);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_WRITE;
+		break;
+
+		case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y)
+			l_pencil_x = g_showData.pencil_x;
+			l_pencil_y = g_showData.pencil_y;
+			l_to_x = g_showData.data[0];
+			l_to_y = g_showData.data[1];
+			l_pixelType = g_showData.pixelType;
+			gfx_mono_generic_draw_line(l_pencil_x, l_pencil_y, l_to_x, l_to_y, l_pixelType);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_DRAW_LINE;
+		break;
+
+		case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height)
+			l_pencil_x = g_showData.pencil_x;
+			l_pencil_y = g_showData.pencil_y;
+			l_width = g_showData.data[0];
+			l_height = g_showData.data[1];
+			l_pixelType = g_showData.pixelType;
+			gfx_mono_generic_draw_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_DRAW_RECT;
+		break;
+
+		case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
+			l_pencil_x = g_showData.pencil_x;
+			l_pencil_y = g_showData.pencil_y;
+			l_width = g_showData.data[0];
+			l_height = g_showData.data[1];
+			l_pixelType = g_showData.pixelType;
+			gfx_mono_generic_draw_filled_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_DRAW_FILLED_RECT;
+		break;
+
+		case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
+			l_pencil_x = g_showData.pencil_x;
+			l_pencil_y = g_showData.pencil_y;
+			l_radius = g_showData.data[0];
+			l_pixelType = g_showData.pixelType;
+			gfx_mono_generic_draw_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_DRAW_CIRC;
+		break;
+
+		case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
+			l_pencil_x = g_showData.pencil_x;
+			l_pencil_y = g_showData.pencil_y;
+			l_radius = g_showData.data[0];
+			l_pixelType = g_showData.pixelType;
+			gfx_mono_generic_draw_filled_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC;
+		break;
+	}
+
+	cpu_irq_restore(flags);
+	return 0;
+}
+
+uint8_t lcd_show_new_refosc_data(void)
 {
 	static uint8_t idx = 1;
 
 	/* First entries are showed first, when modified */
 
 	irqflags_t flags = cpu_irq_save();
-	cpu_irq_disable();
 
 	/* Always */
 	if (g_showData.newTime) {
@@ -633,7 +746,7 @@ void lcd_animation_prepare(void)
 	s_animation_train_origin = -ANIMATION_TRAIN_BLANK_LEN;
 	s_animation_dx = 1;
 
-	/* prepare train */	
+	/* prepare train */
 	for (idx = 0; idx < ANIMATION_TRAIN_BLANK_LEN; ++idx) {
 		if (!idx) {
 			s_animation_train_left[idx] = 0;
@@ -678,7 +791,14 @@ void lcd_animation_prepare(void)
 
 void lcd_animation_loop(void)
 {
-	if (s_animation_dx) {
+	irqflags_t flags;
+	uint8_t l_doAnimation;
+
+	flags = cpu_irq_save();
+	l_doAnimation = g_status.doAnimation;  // TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+	cpu_irq_restore(flags);
+
+	while (l_doAnimation && s_animation_dx) {
 		float now = get_abs_time();
 
 		if ((now - s_animation_time_last_train) >= 0.04f) {  // 25x per sec
@@ -711,17 +831,32 @@ void lcd_animation_loop(void)
 
 		if ((now - s_animation_time_last_temp) >= 0.50f) {  // 2x per sec
 			s_animation_time_last_temp = now;
-			s_task();
+			task();
 			s_lcd_test_temp();
 			s_lcd_test_light();
 		}
 
 		s_lcd_test_lines();  // Every cycle
+
+		flags = cpu_irq_save();
+		l_doAnimation = g_status.doAnimation;  // TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+		cpu_irq_restore(flags);
 	}
+
+	flags = cpu_irq_save();
+	g_status.doAnimation = false;
+	cpu_irq_restore(flags);
 }
 
 void lcd_test(uint8_t pattern_bm)
 {
+	irqflags_t flags;
+
+	flags = cpu_irq_save();
+	g_status.doAnimation = false;
+	g_status.isAnimationStopped = false;
+	cpu_irq_restore(flags);
+
 	if (pattern_bm & (1 << 0)) {
 		// TEST 1
 		for (int i = 0; i < GFX_MONO_LCD_WIDTH; ++i) {
@@ -780,13 +915,78 @@ void lcd_test(uint8_t pattern_bm)
 		// TEST 8
 		lcd_animation_prepare();
 
+		flags = cpu_irq_save();
 		g_status.doAnimation = true;
+		cpu_irq_restore(flags);
+
 		lcd_animation_loop();
 	}
 }
 
 
 /* ISR - interrupt disabled functions called within the TWI interrupt handling */
+
+void isr_lcd_set_mode(int8_t mode)
+{
+	g_SmartLCD_mode = mode;
+	if (mode) {
+		g_status.doAnimation = false;	// Stop animation demo
+
+	} else {
+		// Reset display
+		lcd_init();
+		lcd_test(0b11110001);			// Start animation again
+	}
+}
+
+
+void isr_smartlcd_cmd(uint8_t cmd)
+{
+	g_showData.cmd = cmd;
+}
+
+void isr_smartlcd_cmd_data1(uint8_t cmd, uint8_t data0)
+{
+	isr_smartlcd_cmd(cmd);
+	g_showData.data[0] = data0;
+}
+
+void isr_smartlcd_cmd_data2(uint8_t cmd, uint8_t data0, uint8_t data1)
+{
+	isr_smartlcd_cmd_data1(cmd, data0);
+	g_showData.data[1] = data1;
+}
+
+void isr_smartlcd_cmd_data3(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2)
+{
+	isr_smartlcd_cmd_data2(cmd, data0, data1);
+	g_showData.data[2] = data2;
+}
+
+void isr_smartlcd_cmd_data4(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3)
+{
+	isr_smartlcd_cmd_data3(cmd, data0, data1, data2);
+	g_showData.data[3] = data3;
+}
+
+void isr_smartlcd_cmd_data5(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4)
+{
+	isr_smartlcd_cmd_data4(cmd, data0, data1, data2, data3);
+	g_showData.data[4] = data4;
+}
+
+void isr_smartlcd_cmd_data6(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
+{
+	isr_smartlcd_cmd_data5(cmd, data0, data1, data2, data3, data4);
+	g_showData.data[5] = data5;
+}
+
+
+void isr_lcd_write(const char *strbuf)
+{
+	gfx_mono_draw_string(strbuf, g_lcd_pencil_x, g_lcd_pencil_y, lcd_get_sysfont());
+}
+
 
 void isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100)
 {

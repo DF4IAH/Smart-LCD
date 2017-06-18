@@ -3,7 +3,7 @@
  *
  * Created: 22.02.2017 16:54:56
  *  Author: DF4IAH
- */ 
+ */
 
 
 #ifndef LCD_H_
@@ -20,7 +20,7 @@
 
 // Gain: 0, 1, 2, 3; PM: 32/63 = 50%
 #define C_LCD_GAIN_BM				(2 << 6)
-#define C_LCD_PM					28
+#define C_LCD_PM					22
 // NOTES: Optimum=15.6V, Max=16.0V
 // BR=2&Gain=2&PM=0  --> 14.89V
 // BR=2&Gain=2&PM=28 --> 15.50V
@@ -61,11 +61,21 @@ void    lcd_cr(void);
 void    lcd_home(void);
 void    lcd_cls(void);
 void    lcd_show_template(void);
-uint8_t lcd_show_new_data(void);
+uint8_t lcd_show_new_smartlcd_data(void);
+uint8_t lcd_show_new_refosc_data(void);
 void    lcd_animation_prepare(void);
 void    lcd_animation_loop(void);
 void    lcd_test(uint8_t pattern_bm);
 
+void	isr_lcd_set_mode(int8_t mode);
+void	isr_smartlcd_cmd(uint8_t cmd);
+void	isr_smartlcd_cmd_data1(uint8_t cmd, uint8_t data0);
+void	isr_smartlcd_cmd_data2(uint8_t cmd, uint8_t data0, uint8_t data1);
+void	isr_smartlcd_cmd_data3(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2);
+void	isr_smartlcd_cmd_data4(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3);
+void	isr_smartlcd_cmd_data5(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4);
+void	isr_smartlcd_cmd_data6(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
+void	isr_lcd_write(const char *strbuf);
 void    isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100);
 void    isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
 void    isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);

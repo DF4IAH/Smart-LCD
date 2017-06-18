@@ -3,20 +3,53 @@
  *
  * Created: 13.02.2017 08:48:44
  *  Author: DF4IAH
- */ 
+ */
 
 
 #ifndef TWI_H_
 #define TWI_H_
 
-/* @see 10MHz-Ref-Osc application to compare the address of this "Smart-LCD" */
-#define TWI_SLAVE_ADDR_10MHZREFOSC							0x22
-#define TWI_SLAVE_ADDR_SMARTLCD								0x30
+// I2C address of the Smart-LCD device
+#define TWI_SLAVE_ADDR_SMARTLCD								0x22
 
 /* exactly the address above w/o masking out any bits */
 #define TWI_SLAVE_ADDR_BM									0b0000000
 
 #define TWI_SLAVE_ADDR_GCE									0b1
+
+// unique commands of the Smart-LCD device for all modes
+#define TWI_SMART_LCD_CMD_NOOP								0x00
+#define TWI_SMART_LCD_CMD_GET_VER							0x01
+#define TWI_SMART_LCD_CMD_SET_MODE							0x02
+#define TWI_SMART_LCD_CMD_GET_STATE							0x03
+
+// mode 0x10 commands (Smart-LCD draw box)
+#define TWI_SMART_LCD_CMD_CLS								0x10
+#define TWI_SMART_LCD_CMD_SET_PIXEL_TYPE					0x14
+#define TWI_SMART_LCD_CMD_SET_POS_X_Y						0x20
+#define TWI_SMART_LCD_CMD_WRITE								0x30
+#define TWI_SMART_LCD_CMD_DRAW_LINE							0x32
+#define TWI_SMART_LCD_CMD_DRAW_RECT							0x34
+#define TWI_SMART_LCD_CMD_DRAW_FILLED_RECT					0x36
+#define TWI_SMART_LCD_CMD_DRAW_CIRC							0x38
+#define TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC					0x3A
+
+// mode 0x20 commands (10 MHz-Ref-Osc)
+#define TWI_SMART_LCD_CMD_SHOW_CLK_STATE					0x80
+#define TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY					0x81
+#define TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC					0x82
+#define TWI_SMART_LCD_CMD_SHOW_PPB							0x83
+
+#define TWI_SMART_LCD_CMD_SHOW_TCXO_PWM						0x84
+#define TWI_SMART_LCD_CMD_SHOW_TCXO_VC						0x85
+
+#define TWI_SMART_LCD_CMD_SHOW_SATS							0x88
+#define TWI_SMART_LCD_CMD_SHOW_DOP							0x89
+#define TWI_SMART_LCD_CMD_SHOW_POS_STATE					0x8A
+#define TWI_SMART_LCD_CMD_SHOW_POS_LAT						0x8B
+#define TWI_SMART_LCD_CMD_SHOW_POS_LON						0x8C
+#define TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT					0x8D
+
 
 /* TWI TWSR states after mask is applied */
 #define TWI_TWSR_STATE_MASK									0xF8
@@ -50,28 +83,6 @@
 
 #define TWI_TWSR_BUS_ERROR_STARTSTOP						0x00
 #define TWI_TWSR_BUS_ERROR_UNKNOWN							0xF8
-
-
-
-/* Commands used by the 10MHz-Ref-Osc */
-#define TWI_SMART_LCD_CMD_NOOP								0x00
-
-#define TWI_SMART_LCD_CMD_GETVER							0x01
-
-#define TWI_SMART_LCD_CMD_SHOW_CLK_STATE					0x80
-#define TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY					0x81
-#define TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC					0x82
-#define TWI_SMART_LCD_CMD_SHOW_PPM							0x83
-
-#define TWI_SMART_LCD_CMD_SHOW_TCXO_PWM						0x84
-#define TWI_SMART_LCD_CMD_SHOW_TCXO_VC						0x85
-
-#define TWI_SMART_LCD_CMD_SHOW_SATS							0x88
-#define TWI_SMART_LCD_CMD_SHOW_DOP							0x89
-#define TWI_SMART_LCD_CMD_SHOW_POS_STATE					0x8A
-#define TWI_SMART_LCD_CMD_SHOW_POS_LAT						0x8B
-#define TWI_SMART_LCD_CMD_SHOW_POS_LON						0x8C
-#define TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT					0x8D
 
 
 uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur);
