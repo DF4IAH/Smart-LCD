@@ -48,6 +48,7 @@
 
 extern status_t				g_status;
 extern showData_t			g_showData;
+extern uint8_t				g_SmartLCD_mode;
 extern uint_fast32_t		g_timer_abs_msb;
 extern uint8_t				g_adc_state;
 extern float				g_adc_light;
@@ -122,7 +123,7 @@ ISR(__vector_8, ISR_BLOCK)
 
 ISR(__vector_9, ISR_BLOCK)
 {	/* TIMER 2 OVF - Overflow */
-	if (g_status.isAnimationStopped) {
+	if (g_status.isAnimationStopped && (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC)) {
 		static uint8_t state_old = 0;
 		static uint8_t state_ctr = 0;
 		static uint8_t second_old = 0;
