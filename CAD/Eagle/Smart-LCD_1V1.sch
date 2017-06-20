@@ -7679,7 +7679,7 @@ General-purpose diode for high-speed switching</description>
 <part name="R454" library="rcl" deviceset="R-EU_" device="R0805" value="22kR"/>
 <part name="C455" library="rcl" deviceset="C-EU" device="C0805" value="470nF"/>
 <part name="C452" library="rcl" deviceset="C-EU" device="C0805" value="470pF"/>
-<part name="R132" library="rcl" deviceset="R-EU_" device="R0805" value="1MR"/>
+<part name="R132" library="rcl" deviceset="R-EU_" device="R0805" value="270kR"/>
 <part name="FM502" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
 <part name="FM501" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
 <part name="FM503" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
@@ -7695,6 +7695,15 @@ General-purpose diode for high-speed switching</description>
 <text x="29.464" y="122.936" size="2.1844" layer="97" ratio="12">LEDs</text>
 <text x="200.152" y="73.66" size="1.778" layer="97">RD/!WR</text>
 <text x="200.152" y="71.12" size="1.778" layer="97">EN</text>
+<text x="198.12" y="162.56" size="1.778" layer="97">X131-1 = SFH203, cathode
+X131-2 = SFH203, anode</text>
+<text x="10.16" y="142.24" size="1.778" layer="97">X151-1 = GND, LED cathodes
+X151-2 = LED red,   anode
+X151-3 = LED green, anode</text>
+<text x="127" y="162.56" size="1.778" layer="97">X141-1 = GND
+X141-2 = RotEnc-I
+X141-3 = PushBut
+X141-4 = RotEnc-Q</text>
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
@@ -8409,13 +8418,12 @@ General-purpose diode for high-speed switching</description>
 <description>I2C connector</description>
 <plain>
 <text x="121.92" y="91.44" size="2.1844" layer="97" ratio="12">I2C</text>
-<text x="121.92" y="68.58" size="1.778" layer="97">PINs:
-1  GND
-2  SCL
-3  VCC 5.0V
-4  SDA
-5  VCC 3.3V
-6  GND</text>
+<text x="116.84" y="63.5" size="1.778" layer="97">X301-1 = GND
+X301-2 = SCL
+X301-3 = VCC 5.0V
+X301-4 = SDA
+X301-5 = VCC 3.3V
+X301-6 = GND</text>
 </plain>
 <instances>
 <instance part="FRAME3" gate="G$1" x="0" y="0"/>
@@ -8516,6 +8524,10 @@ General-purpose diode for high-speed switching</description>
 <description>Audio</description>
 <plain>
 <text x="192.024" y="125.476" size="2.1844" layer="97" ratio="12">Audio</text>
+<text x="190.5" y="147.32" size="1.778" layer="97">X411-1 = Spk left +  (8 ohms)
+X411-2 = Spk left -  (8 ohms)
+X411-3 = N.C.
+X411-4 = N.C.</text>
 </plain>
 <instances>
 <instance part="FRAME4" gate="G$1" x="0" y="0"/>
