@@ -12,18 +12,18 @@
 // I2C address of the Smart-LCD device
 #define TWI_SLAVE_ADDR_SMARTLCD								0x22
 
-/* exactly the address above w/o masking out any bits */
+/* Exactly the address above w/o masking out any bits */
 #define TWI_SLAVE_ADDR_BM									0b0000000
 
 #define TWI_SLAVE_ADDR_GCE									0b1
 
-// unique commands of the Smart-LCD device for all modes
+// The unique commands of the Smart-LCD device for all modes
 #define TWI_SMART_LCD_CMD_NOOP								0x00
 #define TWI_SMART_LCD_CMD_GET_VER							0x01
 #define TWI_SMART_LCD_CMD_SET_MODE							0x02
 #define TWI_SMART_LCD_CMD_GET_STATE							0x03
 
-// mode 0x10 commands (Smart-LCD draw box)
+// Mode 0x10 commands (Smart-LCD draw box)
 #define TWI_SMART_LCD_CMD_CLS								0x10
 #define TWI_SMART_LCD_CMD_SET_PIXEL_TYPE					0x14
 #define TWI_SMART_LCD_CMD_SET_POS_X_Y						0x20
@@ -34,7 +34,7 @@
 #define TWI_SMART_LCD_CMD_DRAW_CIRC							0x38
 #define TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC					0x3A
 
-// mode 0x20 commands (10 MHz-Ref-Osc)
+// Mode 0x20 commands (10 MHz-Ref-Osc)
 #define TWI_SMART_LCD_CMD_SHOW_CLK_STATE					0x80
 #define TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY					0x81
 #define TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC					0x82
@@ -49,6 +49,12 @@
 #define TWI_SMART_LCD_CMD_SHOW_POS_LAT						0x8B
 #define TWI_SMART_LCD_CMD_SHOW_POS_LON						0x8C
 #define TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT					0x8D
+
+
+/* */
+#define TWI_SMART_LCD_MASTER_BUF_LEN						 8
+#define TWI_SMART_LCD_SLAVE_BUF_LEN							16
+#define TWI_SMART_LCD_SLAVE_RET_BUF_LEN						 2
 
 
 /* TWI TWSR states after mask is applied */

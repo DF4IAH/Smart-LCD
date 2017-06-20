@@ -447,11 +447,7 @@ void task(void)
 
 				lcd_cls();
 
-				if (l_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
-					/* Smart-LCD drawing box comes up */
-					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
-
-				} else if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
+				if (l_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
 					/* Come up with the data presenter for the 10 MHz-Ref.-Osc. */
 					gfx_mono_generic_draw_rect(0, 0, 240, 128, GFX_PIXEL_SET);
 					const char buf[] = "<==== 10 MHz.-Ref.-Osc. Smart-LCD ====>";

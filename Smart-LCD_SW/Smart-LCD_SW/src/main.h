@@ -11,6 +11,8 @@
 
 #include <gfx_mono/gfx_mono.h>
 
+#include "twi.h"
+
 
 /* ATmega 328P - fuses ext:0xFD hi:0xB9 lo:0xC2 */
 
@@ -59,7 +61,7 @@ typedef struct showData {
 	uint16_t	newRsvrd											: 4;
 
 	uint8_t				cmd;
-	uint8_t				data[6];
+	uint8_t				data[TWI_SMART_LCD_SLAVE_BUF_LEN];
 
 	gfx_mono_color_t	pixelType;
 	gfx_coord_t			pencil_x;

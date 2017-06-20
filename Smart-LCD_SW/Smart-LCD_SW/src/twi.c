@@ -53,11 +53,11 @@ static uint8_t				s_tx_next_len = 0;
 static uint8_t				s_tx_next_d[8];
 static uint8_t				s_tx_lock = 0;
 static uint8_t				s_tx_len = 0;
-static uint8_t				s_tx_d[8];
+static uint8_t				s_tx_d[TWI_SMART_LCD_MASTER_BUF_LEN];
 
 /* TWI Slave mode */
-static uint8_t				s_rx_d[8];
-static uint8_t				s_rx_ret_d[8];
+static uint8_t				s_rx_d[TWI_SMART_LCD_SLAVE_BUF_LEN];
+static uint8_t				s_rx_ret_d[TWI_SMART_LCD_SLAVE_RET_BUF_LEN];
 static uint8_t				s_rx_ret_len = 0;
 
 
@@ -161,32 +161,62 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 					{
 						switch (data[2]) {
 							case 1:
-								isr_smartlcd_cmd_data1(cmd, data[3]);
+								isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 							break;
 
 							case 2:
-								isr_smartlcd_cmd_data2(cmd, data[3], data[4]);
+								isr_smartlcd_cmd_data3(cmd, data[2], data[3], data[4]);
 							break;
 
 							case 3:
-								isr_smartlcd_cmd_data3(cmd, data[3], data[4], data[5]);
+								isr_smartlcd_cmd_data4(cmd, data[2], data[3], data[4], data[5]);
 							break;
 
 							case 4:
-								isr_smartlcd_cmd_data4(cmd, data[3], data[4], data[5], data[6]);
+								isr_smartlcd_cmd_data5(cmd, data[2], data[3], data[4], data[5], data[6]);
 							break;
 
 							case 5:
-								isr_smartlcd_cmd_data5(cmd, data[3], data[4], data[5], data[6], data[7]);
+								isr_smartlcd_cmd_data6(cmd, data[2], data[3], data[4], data[5], data[6], data[7]);
 							break;
 
 							case 6:
-								isr_smartlcd_cmd_data6(cmd, data[3], data[4], data[5], data[6], data[7], data[8]);
+								isr_smartlcd_cmd_data7(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8]);
+							break;
+
+							case 7:
+								isr_smartlcd_cmd_data8(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9]);
+							break;
+
+							case 8:
+								isr_smartlcd_cmd_data9(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10]);
+							break;
+
+							case 9:
+								isr_smartlcd_cmd_data10(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
+							break;
+
+							case 10:
+								isr_smartlcd_cmd_data11(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
+							break;
+
+							case 11:
+								isr_smartlcd_cmd_data12(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13]);
+							break;
+
+							case 12:
+								isr_smartlcd_cmd_data13(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14]);
+							break;
+
+							case 13:
+								isr_smartlcd_cmd_data14(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
 							break;
 
 							case 0:
 							default:
-								isr_smartlcd_cmd(cmd);
+							{
+								// nothing to be done
+							}
 							break;
 						}  // switch (data[2])
 					}
@@ -354,18 +384,14 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	/* Slave Receiver Mode */
 
 	case TWI_TWSR_S_SLAW_MYADDR_RECEIVED:		// SLA+W received and ACK returned
-		nop();
-		// fall-through.
 	case TWI_TWSR_S_SLAW_MYADDR_ARBIT_LOST:
-		mem_set(s_rx_d, 8, 0x00);
+		mem_set(s_rx_d, TWI_SMART_LCD_SLAVE_BUF_LEN, 0x00);
 		s_rx_d[0] = twd >> 1;					// [0]=Target address (== MYADDR)
 		pos_i = 1;								// Starting of reception
 		twcr_new |= _BV(TWEA);					// Send ACK
 	break;
 
 	case TWI_TWSR_S_SLAW_OMNIADDR_RECEIVED:		// GCA received and ACK sent
-		nop();
-		// fall-through.
 	case TWI_TWSR_S_SLAW_OMNIADDR_ARBIT_LOST:
 		s_rx_d[0] = twd >> 1;					// GCA
 		pos_i = 1;								// Starting of reception
@@ -373,13 +399,12 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 	break;
 
 	case TWI_TWSR_S_SLAW_MYADDR_DATA_ACK:		// Data after SLA+W received
-		nop();
-		// fall-through.
 	case TWI_TWSR_S_SLAW_OMNIADDR_DATA_ACK:
 		if (cnt_i != 0b1111) {					// Closed parameter form
-			if (pos_i <= 0b1110) {
+			if (pos_i < 0b1111) {
 				s_rx_d[pos_i] = twd;			// [1]=cmd, [2..]=parameters
 			}
+
 			if (pos_i == 1) {
 				/* Load receive counter */
 				if (s_rx_d[0] == TWI_SLAVE_ADDR_SMARTLCD) {
@@ -433,6 +458,19 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 						case TWI_SMART_LCD_CMD_SHOW_POS_LON:
 							cnt_i = 6;
 						break;
+						
+						case TWI_SMART_LCD_CMD_WRITE:
+							cnt_i = TWI_SMART_LCD_SLAVE_BUF_LEN;	// Max length of incoming data
+						break;
+					}
+				}
+			}
+			else if (pos_i == 2) {
+				if (s_rx_d[0] == TWI_SLAVE_ADDR_SMARTLCD) {
+					if (s_rx_d[1] == TWI_SMART_LCD_CMD_WRITE) {
+						/* Correct length of string to actual size */
+						uint8_t str_len = s_rx_d[2];
+						cnt_i = ((str_len <= (TWI_SMART_LCD_SLAVE_BUF_LEN - 2)) && (str_len < 0b1111)) ?  (str_len + 2) : 2;
 					}
 				}
 			}

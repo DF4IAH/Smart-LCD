@@ -14,10 +14,6 @@
  * The initialization and a command-set is managed by this module. See
  * specification "UC1608_20041104" for details.
  *
- * \par Content
- *
- * -# Include the ASF header files (through asf.h)
- *
  */
 
 /*
@@ -28,7 +24,9 @@
  * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
  */
 #include <asf.h>
+
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 
 #include "gfx_mono/sysfont.h"
@@ -442,12 +440,12 @@ uint8_t lcd_show_new_smartlcd_data(void)
 		case TWI_SMART_LCD_CMD_WRITE:
 			len = g_showData.data[0];
 			for (i = 0; i < len; ++i) {
-				buf[i] = g_showData.data[i+1];
+				buf[i] = g_showData.data[1+i];
 			}
 			buf[len] = 0;
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
-			gfx_mono_draw_string(buf, l_pencil_x, l_pencil_y, &sysfont);
+			isr_lcd_write(buf, l_pencil_x, l_pencil_y);
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_WRITE;
@@ -460,6 +458,8 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_to_y = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
 			gfx_mono_generic_draw_line(l_pencil_x, l_pencil_y, l_to_x, l_to_y, l_pixelType);
+			g_showData.pencil_x = l_to_x;
+			g_showData.pencil_y = l_to_y;
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_LINE;
@@ -939,6 +939,18 @@ void isr_lcd_set_mode(int8_t mode)
 	}
 }
 
+void isr_lcd_write(const char *strbuf, gfx_coord_t pos_x, gfx_coord_t pos_y)
+{
+	if (!strbuf) {
+		return;
+	}
+
+	uint8_t len = strnlen(strbuf, 255);
+	if ((0 < len) && (len < 255)) {
+		gfx_mono_draw_string(strbuf, pos_x, pos_y, &sysfont);
+	}
+}
+
 
 void isr_smartlcd_cmd(uint8_t cmd)
 {
@@ -981,10 +993,52 @@ void isr_smartlcd_cmd_data6(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t d
 	g_showData.data[5] = data5;
 }
 
-
-void isr_lcd_write(const char *strbuf)
+void isr_smartlcd_cmd_data7(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6)
 {
-	gfx_mono_draw_string(strbuf, g_lcd_pencil_x, g_lcd_pencil_y, lcd_get_sysfont());
+	isr_smartlcd_cmd_data6(cmd, data0, data1, data2, data3, data4, data5);
+	g_showData.data[6] = data6;
+}
+
+void isr_smartlcd_cmd_data8(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7)
+{
+	isr_smartlcd_cmd_data7(cmd, data0, data1, data2, data3, data4, data5, data6);
+	g_showData.data[7] = data7;
+}
+
+void isr_smartlcd_cmd_data9(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8)
+{
+	isr_smartlcd_cmd_data8(cmd, data0, data1, data2, data3, data4, data5, data6, data7);
+	g_showData.data[8] = data8;
+}
+
+void isr_smartlcd_cmd_data10(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9)
+{
+	isr_smartlcd_cmd_data9(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8);
+	g_showData.data[9] = data9;
+}
+
+void isr_smartlcd_cmd_data11(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10)
+{
+	isr_smartlcd_cmd_data10(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9);
+	g_showData.data[10] = data10;
+}
+
+void isr_smartlcd_cmd_data12(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11)
+{
+	isr_smartlcd_cmd_data11(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10);
+	g_showData.data[11] = data11;
+}
+
+void isr_smartlcd_cmd_data13(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11, uint8_t data12)
+{
+	isr_smartlcd_cmd_data12(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11);
+	g_showData.data[12] = data12;
+}
+
+void isr_smartlcd_cmd_data14(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11, uint8_t data12, uint8_t data13)
+{
+	isr_smartlcd_cmd_data13(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12);
+	g_showData.data[13] = data13;
 }
 
 
