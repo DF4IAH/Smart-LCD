@@ -11,6 +11,8 @@
 
 #include <stdint.h>
 
+#include "gfx_mono/gfx_mono.h"
+
 
 // MUX: 1 = 128; Power Control: 0b01 = 26nF .. 43nF
 #define C_LCD_PWR_CTRL				0b101
@@ -75,7 +77,15 @@ void	isr_smartlcd_cmd_data3(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t d
 void	isr_smartlcd_cmd_data4(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3);
 void	isr_smartlcd_cmd_data5(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4);
 void	isr_smartlcd_cmd_data6(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5);
-void	isr_lcd_write(const char *strbuf);
+void	isr_smartlcd_cmd_data7(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6);
+void	isr_smartlcd_cmd_data8(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7);
+void	isr_smartlcd_cmd_data9(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8);
+void	isr_smartlcd_cmd_data10(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9);
+void	isr_smartlcd_cmd_data11(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10);
+void	isr_smartlcd_cmd_data12(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11);
+void	isr_smartlcd_cmd_data13(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11, uint8_t data12);
+void	isr_smartlcd_cmd_data14(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11, uint8_t data12, uint8_t data13);
+void	isr_lcd_write(const char *strbuf, gfx_coord_t pos_x, gfx_coord_t pos_y);
 void    isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100);
 void    isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day);
 void    isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second);
