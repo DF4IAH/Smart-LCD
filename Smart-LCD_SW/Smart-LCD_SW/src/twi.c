@@ -250,16 +250,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			}  // if (!(g_showData.cmd))
 		}  // if (g_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD)
 
-		else if (
-			(g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) ||
-			(g_SmartLCD_mode == C_SMART_LCD_MODE_UNIQUE)		// TODO: implement mode setting in 10 MHz-Ref.-Osc. device and delete this line and next #if .. #endif block
-		) {
-#if 1
-			if ((g_SmartLCD_mode == C_SMART_LCD_MODE_UNIQUE) && (cmd == TWI_SMART_LCD_CMD_SHOW_CLK_STATE)) {
-				isr_lcd_set_mode(C_SMART_LCD_MODE_REFOSC);
-			}
-#endif
-
+		else if (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
 			switch (cmd) {
 				case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
 					isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(data[2], (uint16_t) (data[3] | (data[4] << 8)), (int16_t) (data[5] | (data[6] << 8)));
