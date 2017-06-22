@@ -48,6 +48,9 @@
 #include "gfx_mono_lcd_uc1608.h"
 
 
+gfx_mono_lcd_uc1608_cache_data_t g_gfx_mono_lcd_uc1608_cache = { 0 };
+
+
 /**
  * \ingroup gfx_mono_lcd_uc1608
  * @{
@@ -81,6 +84,8 @@ void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_
 			lcd_bus_write_ram(*(data_pt++));								// Write byte slice to LCD panel
 		}
 	}
+
+	gfx_mono_lcd_uc1608_cache_clear();
 }
 
 /**
@@ -160,6 +165,10 @@ uint8_t gfx_mono_lcd_uc1608_get_pixel(gfx_coord_t x, gfx_coord_t y)
 void gfx_mono_lcd_uc1608_put_byte(gfx_coord_t page, gfx_coord_t column, uint8_t data)
 {
 	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
+		/* Write back modified (dirty) data to the cache */
+		gfx_mono_lcd_uc1608_cache_write_byte(page, column, data);
+
+		/* Write current data back to the display device */
 		lcd_page_set(page);
 		lcd_col_set(column);
 		lcd_bus_write_ram(data);										// Write byte slice to RAM
@@ -178,10 +187,20 @@ uint8_t gfx_mono_lcd_uc1608_get_byte(gfx_coord_t page, gfx_coord_t column)
 	uint8_t data = 0;
 
 	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
+		/* Request data from the cache */
+		if (gfx_mono_lcd_uc1608_cache_read_byte(page, column, &data)) {
+			return data;
+		}
+
+		/* Cache miss: read current data from the display unit */
 		lcd_page_set(page);
 		lcd_col_set(column);
 		data = lcd_bus_read_ram();										// Read byte slice from RAM
+
+		/* Store current data to the cache */
+		gfx_mono_lcd_uc1608_cache_write_byte(page, column, data);
 	}
+
 	return data;
 }
 
@@ -218,9 +237,86 @@ void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column, gfx_mon
 				break;
 		}
 
-		lcd_col_set(column);
-		lcd_bus_write_ram(data);										// Write byte slice to RAM
+		gfx_mono_lcd_uc1608_put_byte(page, column, data);
 	}
 }
+
+
+/**
+ * \brief Search an index position of a cached address
+ *
+ * This function does a look-up and searches for the index of
+ * the cache-array, where the byte position matches.
+ *
+ * \param page       Page address
+ * \param column     Page offset (x coordinate)
+ * \return           Address value to be used for the caching-system.
+ */
+uint16_t gfx_mono_lcd_uc1608_cache_calc_adr(uint8_t page, uint8_t column)
+{
+	if ((page < GFX_MONO_LCD_PAGES) && (column < GFX_MONO_LCD_WIDTH)) {
+		return 0x4000U | (((uint16_t) page) << 8) | column;
+	}
+
+	return 0x8000U;  // Non-valid position
+}
+
+/**
+ * \brief Clear all cached data
+ *
+ */
+void gfx_mono_lcd_uc1608_cache_clear()
+{
+	g_gfx_mono_lcd_uc1608_cache.adr = 0;
+}
+
+/**
+ * \brief Store changed data to the cache
+ *
+ * This function stores the data to the cache. The importance is re-calculated for each
+ * cache items.
+ *
+ * \param page       Page address
+ * \param column     Page offset (x coordinate)
+ * \param data       Data to be stored in the cache
+ */
+void gfx_mono_lcd_uc1608_cache_write_byte(uint8_t page, uint8_t column, uint8_t data)
+{
+	const uint16_t adr = gfx_mono_lcd_uc1608_cache_calc_adr(page, column);
+	if (!(adr & 0x4000U)) {
+		return;												// Non-valid position
+	}
+
+	g_gfx_mono_lcd_uc1608_cache.adr  = adr;
+	g_gfx_mono_lcd_uc1608_cache.data = data;
+}
+
+/**
+ * \brief Search an index position of a cached address
+ *
+ * This function does a look-up and searches for the index of
+ * the cache-array, where the byte position matches.
+ *
+ * \param page       Page address
+ * \param column     Page offset (x coordinate)
+ * \param data		 Address to which data should be stored at
+ * \return           True if data returned, false when cache miss has happened.
+ */
+bool gfx_mono_lcd_uc1608_cache_read_byte(uint8_t page, uint8_t column, uint8_t* data)
+{
+	//int8_t idx = gfx_mono_lcd_uc1608_cache_addr_get_idx(page, column);
+	const uint16_t adr = gfx_mono_lcd_uc1608_cache_calc_adr(page, column);
+	if (!(adr & 0x4000)) {
+		return false;
+	}
+
+	if ((g_gfx_mono_lcd_uc1608_cache.adr == adr) && data) {
+		*data = g_gfx_mono_lcd_uc1608_cache.data;
+		return true;
+	}
+
+	return false;  // Cache miss
+}
+
 
 /** @} */
