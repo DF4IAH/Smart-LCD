@@ -149,13 +149,7 @@ void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column,
 gfx_mono_color_t pixel_mask, gfx_mono_color_t color);
 
 
-uint16_t gfx_mono_lcd_uc1608_cache_calc_adr(uint8_t page, uint8_t column);
-
 void gfx_mono_lcd_uc1608_cache_clear(void);
-
-void gfx_mono_lcd_uc1608_cache_write_byte(uint8_t page, uint8_t column, uint8_t data);
-
-bool gfx_mono_lcd_uc1608_cache_read_byte(uint8_t page, uint8_t column, uint8_t* data);
 
 
 /** @} */
