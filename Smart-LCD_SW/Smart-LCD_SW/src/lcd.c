@@ -416,6 +416,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 
 	switch (g_showData.cmd) {
 		case TWI_SMART_LCD_CMD_CLS:
+			gfx_mono_lcd_uc1608_cache_clear();
 			lcd_cls();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
@@ -446,6 +447,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			isr_lcd_write(buf, l_pencil_x, l_pencil_y);
+			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_WRITE;
@@ -458,6 +460,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_to_y = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
 			gfx_mono_generic_draw_line(l_pencil_x, l_pencil_y, l_to_x, l_to_y, l_pixelType);
+			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.pencil_x = l_to_x;
 			g_showData.pencil_y = l_to_y;
 			g_showData.cmd = 0;
@@ -472,6 +475,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_height = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
 			gfx_mono_generic_draw_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
+			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_RECT;
@@ -484,6 +488,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_height = g_showData.data[1];
 			l_pixelType = g_showData.pixelType;
 			gfx_mono_generic_draw_filled_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
+			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_FILLED_RECT;
@@ -495,6 +500,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_radius = g_showData.data[0];
 			l_pixelType = g_showData.pixelType;
 			gfx_mono_generic_draw_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_CIRC;
@@ -506,6 +512,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_radius = g_showData.data[0];
 			l_pixelType = g_showData.pixelType;
 			gfx_mono_generic_draw_filled_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
+			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
 			cpu_irq_restore(flags);
 			return TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC;
@@ -531,6 +538,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.time_hour, g_showData.time_minute, g_showData.time_second);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  2 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		return 255;
 	}
 
@@ -541,6 +549,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.date_day, g_showData.date_month, g_showData.date_year);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  1 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		return 254;
 	}
 
@@ -549,6 +558,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.newClkState = false;
 		cpu_irq_restore(flags);
 		lcd_show_new_clk_state(g_showData.clkState_clk_state, g_showData.clkState_phaseVolt1000, g_showData.clkState_phaseDeg100);
+		gfx_mono_lcd_uc1608_cache_clear();
 		return 253;
 	}
 
@@ -560,6 +570,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.satUse_west, g_showData.satUse_east, g_showData.satUse_used);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 15 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  6 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 2;
 		return 1;
 	}
@@ -571,6 +582,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		(int) (g_showData.satDop_dop100 / 100.0f), g_showData.satDop_dop100 % 100);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  7 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 3;
 		return 2;
 	}
@@ -582,6 +594,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.posState_fi, g_showData.posState_m2);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 13 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  8 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 4;
 		return 3;
 	}
@@ -593,6 +606,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.posLat_sgn, g_showData.posLat_deg, 0x7e, g_showData.posLat_min_int, g_showData.posLat_min_frac10000);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  9 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 5;
 		return 4;
 	}
@@ -604,6 +618,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.posLon_sgn, g_showData.posLon_deg, 0x7e, g_showData.posLon_min_int, g_showData.posLon_min_frac10000);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 10 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 6;
 		return 5;
 	}
@@ -615,6 +630,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.pos_height_int, g_showData.pos_height_frac10);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP + 11 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 7;
 		return 6;
 	}
@@ -626,6 +642,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.ppb_int, g_showData.ppb_frac1000);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  3 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 8;
 		return 7;
 	}
@@ -648,6 +665,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		snprintf(s_lcd_prepare_buf, sizeof(s_lcd_prepare_buf), "%3d.%03d",
 		(int) f_pwm, (int) ((f_pwm - floorf(f_pwm)) * 1000.0f));
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 23 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  4 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 9;
 		return 8;
 	}
@@ -659,6 +677,7 @@ uint8_t lcd_show_new_refosc_data(void)
 		g_showData.pv_int, g_showData.pv_frac1000);
 		cpu_irq_restore(flags);
 		gfx_mono_draw_string(s_lcd_prepare_buf, LCD_SHOW_LINE_LEFT + 10 * LCD_SHOW_CLMN_WIDTH,  LCD_SHOW_LINE_TOP +  5 * LCD_SHOW_LINE_HEIGHT, &sysfont);
+		gfx_mono_lcd_uc1608_cache_clear();
 		idx = 10;
 		return 9;
 	}

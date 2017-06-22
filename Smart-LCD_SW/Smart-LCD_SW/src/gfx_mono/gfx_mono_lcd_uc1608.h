@@ -123,6 +123,12 @@
 	;
 
 
+typedef struct gfx_mono_lcd_uc1608_cache_data {
+	uint16_t		adr;
+	uint8_t			data;
+} gfx_mono_lcd_uc1608_cache_data_t;
+
+
 void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page,
 gfx_coord_t page_offset, gfx_coord_t width);
 
@@ -141,6 +147,9 @@ uint8_t gfx_mono_lcd_uc1608_get_byte(gfx_coord_t page, gfx_coord_t column);
 
 void gfx_mono_lcd_uc1608_mask_byte(gfx_coord_t page, gfx_coord_t column,
 gfx_mono_color_t pixel_mask, gfx_mono_color_t color);
+
+
+void gfx_mono_lcd_uc1608_cache_clear(void);
 
 
 /** @} */
