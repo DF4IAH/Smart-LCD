@@ -129,8 +129,22 @@ static void s_tc_init(void)
 		  | _BV(PSRASY)							// Timer 2   prescaler is synced
 		  | _BV(PSRSYNC);						// Timer 0/1 prescaler is synced
 
-	/* TC0: not in use */
+	/* TC0 - Overflows with about 122 Hz for the ADC convertion */
 	{
+		sysclk_enable_module(POWER_RED_REG0, PRTIM0_bm);
+
+		TCCR0A  = (0b00  << COM0A0)				// Normal port operations
+				| (0b00  << WGM00);				// Counter mode
+
+		TCCR0B  = ( 0b0  << WGM02)
+				| (0b100 << CS00);				// CLKio DIV 256 = 31250 Hz --> / 2**8 = 122 Hz looping rate
+
+		TCNT0   = 0;							// Clear current value
+
+		OCR0A   = 0x00;							// Compare value not used
+
+		TIFR0   = 0b00000111;					// Clear all flags
+		TIMSK0  = _BV(TOIE0);					// TOIE0: overflow interrupt
 	}
 
 	/* TC1 - OC1A: Audio output @ 16-bit counter PWM, used: 9-bit resolution - overflows with 15625 Hz */
@@ -150,13 +164,15 @@ static void s_tc_init(void)
 		OCR1AH  =        0b0           ;		// Mid-range compare value for zero audio output
 		OCR1AL  =            0b10000000;
 
-		TIMSK1  = _BV(TOIE1);					// TOIE1 interrupt
 		TIFR1   = 0b00100111;					// Clear all flags (when restarting without reset)
+		TIMSK1  = _BV(TOIE1);					// TOIE1 interrupt
 	}
 
 	/* TC2 - OC2A: LCD backlight w/ 8-bit resolution - overflows with abt. 61 Hz */
 	{
 		sysclk_enable_module(POWER_RED_REG0, PRTIM2_bm);
+
+		ASSR    = 0;							// No async. TOSC1 mode
 
 		TCCR2A  = (0b10  << COM2A0)				// HI --> LO when compare value is reached - non-inverted PWM mode
 				| (0b11  << WGM20);				// WGM: 0b011 = Fast PWM mode 8 bit
@@ -168,16 +184,14 @@ static void s_tc_init(void)
 
 		OCR2A   = 0x00;							// LCD backlight dimmed down
 
-		TIMSK2  = 0b00000001;					// TOIE2: overflow interrupt
 		TIFR2   = 0b00000111;					// Clear all flags
-
-		ASSR    = 0;							// No async. TOSC1 mode
+		TIMSK2  = _BV(TOIE2);					// TOIE2: overflow interrupt
 	}
 }
 
 static void s_tc_start(void)
 {
-	/* TC0: not in use */
+	/* TC0: Overflows with about 30 Hz for the ADC convertion */
 	/* TC1: Audio output @ 16-bit counter PWM, used: 10-bit resolution */
 	/* TC2: LCD backlight w/ 8-bit resolution */
 	{
@@ -190,8 +204,13 @@ static void s_tc_disable(void)
 {
 	irqflags_t flags = cpu_irq_save();
 
-	/* TC0: not in use */
+	/* TC0 - Overflows with about 122 Hz for the ADC convertion */
 	{
+		TIMSK0  = 0;							// no interrupts
+
+		TCCR0A  = 0;
+		TCCR0B  = 0;
+
 		sysclk_disable_module(POWER_RED_REG0, PRTIM0_bm);
 	}
 
@@ -201,11 +220,11 @@ static void s_tc_disable(void)
 		ioport_set_pin_dir(AUDIO_PWM, IOPORT_DIR_INPUT);
 		ioport_set_pin_mode(AUDIO_PWM, IOPORT_MODE_PULLDOWN);
 
+		TIMSK1  = 0;							// no interrupts
+
 		TCCR1A  = 0;							// release alternate port function
 		TCCR1B  = 0;
 		TCCR1C  = 0;
-
-		TIMSK1  = 0;							// no interrupts
 
 		sysclk_disable_module(POWER_RED_REG0, PRTIM1_bm);
 	}
@@ -215,12 +234,12 @@ static void s_tc_disable(void)
 		ioport_set_pin_dir(LCDBL_PWM, IOPORT_DIR_OUTPUT);
 		ioport_set_pin_level(LCDBL_PWM, false);	// turn backlight off
 
-		TCCR2A  = 0;							// release alternate port function
-		TCCR2B  = 0;
-
 		TIMSK2  = 0;							// no interrupts
 
 		ASSR    = 0;							// no async TOSC1 mode
+
+		TCCR2A  = 0;							// release alternate port function
+		TCCR2B  = 0;
 
 		sysclk_disable_module(POWER_RED_REG0, PRTIM2_bm);
 	}
@@ -237,14 +256,21 @@ static void s_adc_init(void)
 
 	adc_disable_digital_inputs(_BV(ADC0D));		// disable the digital input on the ADC0 port
 
-	adc_init(ADC_PRESCALER_DIV128);
+	adc_init(ADC_PRESCALER_DIV64);
 	adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
+
+#if 1
+	/* ADC is started by TC0 timer directly - disadvantage: lower amplitude precision */
+	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC0_OVERFLOW);
+	adc_enable_autotrigger();
+#else
+	adc_disable_autotrigger();
+#endif
 
 	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
 	adc_enable_interrupt();						// enable the ADC interrupt
 
-	adc_set_autotrigger_source(ADC_AUTOTRIGGER_SOURCE_TC1_OVERFLOW);
-	adc_enable_autotrigger();
+	adc_start_conversion();						// initial convertion doing an ADC set-up
 }
 
 static void s_adc_disable(void)
@@ -253,7 +279,7 @@ static void s_adc_disable(void)
 	adc_disable_autotrigger();
 	adc_set_autotrigger_source(0);
 	adc_set_admux(0);
-	adc_disable_digital_inputs(0);
+	//adc_disable_digital_inputs(0);
 
 	sysclk_disable_module(POWER_RED_REG0, PRADC_bm);	// disable ADC sub-module
 }
@@ -366,22 +392,25 @@ void eeprom_nvm_settings_read(uint8_t flags)
 
 /* TASK section */
 
-static void s_task_backlight(float adc_photo)
+static void s_task_backlight(float adc_light)
 {
 	/* calculate the 8-bit backlight PWM value based on the ADC photo diode current */
-	const uint16_t	BL_ADC_OFF			=   950;
-	const uint16_t	BL_MIN_INTENSITY	=    10;
-	uint16_t lum = (uint16_t) adc_photo;
+	const uint16_t	BL_ADC_OFF			= 950;
+	const uint16_t	BL_MIN_INTENSITY	=   2;
+	static uint8_t  last =  0;
 
-	if (lum < BL_ADC_OFF) {
-		OCR2A	= (uint8_t) (BL_MIN_INTENSITY + (255.0f - BL_MIN_INTENSITY) \
-				  * (((float) lum - BL_MIN_INTENSITY) / BL_ADC_OFF));			// no interrupt lock needed
-		TCCR2A |= (0b10  << COM2A0);
-
+	if (adc_light < BL_ADC_OFF) {
+		uint8_t now = (uint8_t) (BL_MIN_INTENSITY + (255.0f - BL_MIN_INTENSITY) * ((adc_light - BL_MIN_INTENSITY) / BL_ADC_OFF));	// no interrupt lock needed
+		if ((now > (last + 1)) || (now + 1 < last)) {
+			OCR2A = now;
+		}
+		TCCR2A |= (0b10 << COM2A0);
+#if 1
 	} else {
-		// too much light for backlight
+		// enough ambient light for display, turn backlight off
 		OCR2A   = 0;
 		TCCR2A &= ~(0b11  << COM2A0);
+#endif
 	}
 }
 
@@ -408,15 +437,15 @@ void task(void)
 	uint8_t more;
 
 	flags = cpu_irq_save();
-	l_adc_temp = g_adc_temp;
 	l_adc_light = g_adc_light;
+	l_adc_temp = g_adc_temp;
 	cpu_irq_restore(flags);
-
-	/* Calculate new current temperature */
-	s_task_temp(l_adc_temp);
 
 	/* Calculate new backlight PWM value and set that */
 	s_task_backlight(l_adc_light);
+
+	/* Calculate new current temperature */
+	s_task_temp(l_adc_temp);
 
 	/* Loops as long as more data is ready to be presented */
 	do {
@@ -463,7 +492,7 @@ void task(void)
 	} while (more);
 }
 
-static void s_enter_sleep(uint8_t sleep_mode)
+void enter_sleep(uint8_t sleep_mode)
 {
 	SMCR  = (sleep_mode << SM0)
 		  | _BV(SE);							// enable sleep command
@@ -492,8 +521,8 @@ int main (void)
 	/* Init of sub-modules */
 	sysclk_init();	PRR = 0b11101011;			// For debugging this module has to be powered on, again
 	ioport_init();
-	s_tc_init();
 	s_adc_init();
+	s_tc_init();
 
 	/* I/O pins go active here */
 	board_init();
@@ -531,7 +560,7 @@ int main (void)
 	runmode = 1;
     while (runmode) {
 	    task();
-	    s_enter_sleep(SLEEP_MODE_IDLE);
+	    enter_sleep(SLEEP_MODE_IDLE);
     }
 
 
@@ -550,7 +579,7 @@ int main (void)
 	s_adc_disable();
 	s_tc_disable();
 
-    s_enter_sleep(SLEEP_MODE_PWR_DOWN);
+    enter_sleep(SLEEP_MODE_PWR_DOWN);
 
     return retcode;								// should never be reached
 }

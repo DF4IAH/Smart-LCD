@@ -61,6 +61,260 @@ static uint8_t				s_rx_ret_d[TWI_SMART_LCD_SLAVE_RET_BUF_LEN];
 static uint8_t				s_rx_ret_len = 0;
 
 
+/* ISR - interrupt disabled functions called within the TWI interrupt handling */
+
+static void s_isr_lcd_set_mode(int8_t mode)
+{
+	g_SmartLCD_mode = mode;
+	if (mode) {
+		g_status.doAnimation = false;	// Stop animation demo
+
+		} else {
+		// Reset display
+		lcd_init();
+		lcd_test(0b11110001);			// Start animation again
+	}
+}
+
+
+static void s_isr_smartlcd_cmd(uint8_t cmd)
+{
+	g_showData.cmd = cmd;
+}
+
+static void s_isr_smartlcd_cmd_data1(uint8_t cmd, uint8_t data0)
+{
+	s_isr_smartlcd_cmd(cmd);
+	g_showData.data[0] = data0;
+}
+
+static void s_isr_smartlcd_cmd_data2(uint8_t cmd, uint8_t data0, uint8_t data1)
+{
+	s_isr_smartlcd_cmd_data1(cmd, data0);
+	g_showData.data[1] = data1;
+}
+
+static void s_isr_smartlcd_cmd_data3(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2)
+{
+	s_isr_smartlcd_cmd_data2(cmd, data0, data1);
+	g_showData.data[2] = data2;
+}
+
+static void s_isr_smartlcd_cmd_data4(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3)
+{
+	s_isr_smartlcd_cmd_data3(cmd, data0, data1, data2);
+	g_showData.data[3] = data3;
+}
+
+static void s_isr_smartlcd_cmd_data5(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4)
+{
+	s_isr_smartlcd_cmd_data4(cmd, data0, data1, data2, data3);
+	g_showData.data[4] = data4;
+}
+
+static void s_isr_smartlcd_cmd_data6(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5)
+{
+	s_isr_smartlcd_cmd_data5(cmd, data0, data1, data2, data3, data4);
+	g_showData.data[5] = data5;
+}
+
+static void s_isr_smartlcd_cmd_data7(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6)
+{
+	s_isr_smartlcd_cmd_data6(cmd, data0, data1, data2, data3, data4, data5);
+	g_showData.data[6] = data6;
+}
+
+static void s_isr_smartlcd_cmd_data8(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7)
+{
+	s_isr_smartlcd_cmd_data7(cmd, data0, data1, data2, data3, data4, data5, data6);
+	g_showData.data[7] = data7;
+}
+
+static void s_isr_smartlcd_cmd_data9(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8)
+{
+	s_isr_smartlcd_cmd_data8(cmd, data0, data1, data2, data3, data4, data5, data6, data7);
+	g_showData.data[8] = data8;
+}
+
+static void s_isr_smartlcd_cmd_data10(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9)
+{
+	s_isr_smartlcd_cmd_data9(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8);
+	g_showData.data[9] = data9;
+}
+
+static void s_isr_smartlcd_cmd_data11(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10)
+{
+	s_isr_smartlcd_cmd_data10(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9);
+	g_showData.data[10] = data10;
+}
+
+static void s_isr_smartlcd_cmd_data12(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11)
+{
+	s_isr_smartlcd_cmd_data11(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10);
+	g_showData.data[11] = data11;
+}
+
+static void s_isr_smartlcd_cmd_data13(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11, uint8_t data12)
+{
+	s_isr_smartlcd_cmd_data12(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11);
+	g_showData.data[12] = data12;
+}
+
+static void s_isr_smartlcd_cmd_data14(uint8_t cmd, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t data4, uint8_t data5, uint8_t data6, uint8_t data7, uint8_t data8, uint8_t data9, uint8_t data10, uint8_t data11, uint8_t data12, uint8_t data13)
+{
+	s_isr_smartlcd_cmd_data13(cmd, data0, data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12);
+	g_showData.data[13] = data13;
+}
+
+
+static void s_isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100)
+{
+	// interrupt is already disabled, here
+	if ((g_showData.clkState_clk_state     != clk_state    )  ||
+	(g_showData.clkState_phaseVolt1000 != phaseVolt1000)  ||
+	(g_showData.clkState_phaseDeg100   != phaseDeg100  )) {
+		g_showData.newClkState            = true;
+		g_showData.clkState_clk_state     = clk_state;
+		g_showData.clkState_phaseVolt1000 = phaseVolt1000;
+		g_showData.clkState_phaseDeg100   = phaseDeg100;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
+{
+	// interrupt is already disabled, here
+	if (g_showData.date_year != year ||
+	g_showData.date_month != month ||
+	g_showData.date_day != day) {
+		g_showData.newDate = true;
+		g_showData.date_year = year;
+		g_showData.date_month = month;
+		g_showData.date_day = day;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second)
+{
+	// interrupt is already disabled, here
+	if (g_showData.time_hour != hour ||
+	g_showData.time_minute != minute ||
+	g_showData.time_second != second) {
+		g_showData.newTime = true;
+		g_showData.time_hour = hour;
+		g_showData.time_minute = minute;
+		g_showData.time_second = second;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000)
+{
+	// interrupt is already disabled, here
+	if (g_showData.ppb_int != ppm_int ||
+	g_showData.ppb_frac1000 != ppm_frac1000) {
+		g_showData.newPpb = true;
+		g_showData.ppb_int = ppm_int;
+		g_showData.ppb_frac1000 = ppm_frac1000;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac256)
+{
+	// interrupt is already disabled, here
+	if (g_showData.pwm_int != pwm_int ||
+	g_showData.pwm_frac256 != pwm_frac256) {
+		g_showData.newPwm = true;
+		g_showData.pwm_int = pwm_int;
+		g_showData.pwm_frac256 = pwm_frac256;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000)
+{
+	// interrupt is already disabled, here
+	if (g_showData.pv_int != pv_int ||
+	g_showData.pv_frac1000 != pv_frac1000) {
+		g_showData.newPv = true;
+		g_showData.pv_int = pv_int;
+		g_showData.pv_frac1000 = pv_frac1000;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used)
+{
+	// interrupt is already disabled, here
+	if (g_showData.satUse_west != sat_west ||
+	g_showData.satUse_east != sat_east ||
+	g_showData.satUse_used != sat_used) {
+		g_showData.newSatUse = true;
+		g_showData.satUse_west = sat_west;
+		g_showData.satUse_east = sat_east;
+		g_showData.satUse_used = sat_used;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
+{
+	// interrupt is already disabled, here
+	if (g_showData.satDop_dop100 != sat_dop100) {
+		g_showData.newSatDop = true;
+		g_showData.satDop_dop100 = sat_dop100;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2)
+{
+	// interrupt is already disabled, here
+	if (g_showData.posState_fi != state_fi ||
+	g_showData.posState_m2 != state_m2) {
+		g_showData.newPosState = true;
+		g_showData.posState_fi = state_fi;
+		g_showData.posState_m2 = state_m2;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t lat_min_int, uint16_t lat_min_frac10000)
+{
+	// interrupt is already disabled, here
+	if (g_showData.posLat_sgn != lat_sgn ||
+	g_showData.posLat_deg != lat_deg ||
+	g_showData.posLat_min_int != lat_min_int ||
+	g_showData.posLat_min_int != lat_min_int ||
+	g_showData.posLat_min_frac10000 != lat_min_frac10000) {
+		g_showData.newPosLat = true;
+		g_showData.posLat_sgn = lat_sgn;
+		g_showData.posLat_deg = lat_deg;
+		g_showData.posLat_min_int = lat_min_int;
+		g_showData.posLat_min_frac10000 = lat_min_frac10000;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lon_min_int, uint16_t lon_min_frac10000)
+{
+	// interrupt is already disabled, here
+	if (g_showData.posLon_sgn != lon_sgn ||
+	g_showData.posLon_deg != lon_deg ||
+	g_showData.posLon_deg != lon_deg ||
+	g_showData.posLon_min_int != lon_min_int ||
+	g_showData.posLon_min_frac10000 != lon_min_frac10000) {
+		g_showData.newPosLon = true;
+		g_showData.posLon_sgn = lon_sgn;
+		g_showData.posLon_deg = lon_deg;
+		g_showData.posLon_min_int = lon_min_int;
+		g_showData.posLon_min_frac10000 = lon_min_frac10000;
+	}
+}
+
+static void s_isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height_int, uint8_t height_frac10)
+{
+	// interrupt is already disabled, here
+	if ((g_showData.pos_height_int != height_int) || (g_showData.pos_height_frac10 != height_frac10)) {
+		g_showData.newPosHeight = true;
+		g_showData.pos_height_int = height_int;
+		g_showData.pos_height_frac10 = height_frac10;
+	}
+}
+
+
 #if 0
 static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
 {
@@ -130,7 +384,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			return;
 
 			case TWI_SMART_LCD_CMD_SET_MODE:
-			isr_lcd_set_mode(data[2]);
+			s_isr_lcd_set_mode(data[2]);
 			return;
 
 			case TWI_SMART_LCD_CMD_GET_STATE:
@@ -146,70 +400,70 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			if (!(g_showData.cmd)) {							// Do when no command in process only
 				switch (cmd) {
 					case TWI_SMART_LCD_CMD_CLS:					// Clear screen
-						isr_smartlcd_cmd(cmd);
+						s_isr_smartlcd_cmd(cmd);
 					break;
 
 					case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:		// Set next pixels (OFF / ON / XOR)
-						isr_smartlcd_cmd_data1(cmd, data[2]);
+						s_isr_smartlcd_cmd_data1(cmd, data[2]);
 					break;
 
 					case TWI_SMART_LCD_CMD_SET_POS_X_Y:			// Set pencil position (x, y)
-						isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
+						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
 					case TWI_SMART_LCD_CMD_WRITE:				// Write text of length (length, buffer...)
 					{
 						switch (data[2]) {
 							case 1:
-								isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
+								s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 							break;
 
 							case 2:
-								isr_smartlcd_cmd_data3(cmd, data[2], data[3], data[4]);
+								s_isr_smartlcd_cmd_data3(cmd, data[2], data[3], data[4]);
 							break;
 
 							case 3:
-								isr_smartlcd_cmd_data4(cmd, data[2], data[3], data[4], data[5]);
+								s_isr_smartlcd_cmd_data4(cmd, data[2], data[3], data[4], data[5]);
 							break;
 
 							case 4:
-								isr_smartlcd_cmd_data5(cmd, data[2], data[3], data[4], data[5], data[6]);
+								s_isr_smartlcd_cmd_data5(cmd, data[2], data[3], data[4], data[5], data[6]);
 							break;
 
 							case 5:
-								isr_smartlcd_cmd_data6(cmd, data[2], data[3], data[4], data[5], data[6], data[7]);
+								s_isr_smartlcd_cmd_data6(cmd, data[2], data[3], data[4], data[5], data[6], data[7]);
 							break;
 
 							case 6:
-								isr_smartlcd_cmd_data7(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8]);
+								s_isr_smartlcd_cmd_data7(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8]);
 							break;
 
 							case 7:
-								isr_smartlcd_cmd_data8(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9]);
+								s_isr_smartlcd_cmd_data8(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9]);
 							break;
 
 							case 8:
-								isr_smartlcd_cmd_data9(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10]);
+								s_isr_smartlcd_cmd_data9(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10]);
 							break;
 
 							case 9:
-								isr_smartlcd_cmd_data10(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
+								s_isr_smartlcd_cmd_data10(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11]);
 							break;
 
 							case 10:
-								isr_smartlcd_cmd_data11(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
+								s_isr_smartlcd_cmd_data11(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12]);
 							break;
 
 							case 11:
-								isr_smartlcd_cmd_data12(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13]);
+								s_isr_smartlcd_cmd_data12(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13]);
 							break;
 
 							case 12:
-								isr_smartlcd_cmd_data13(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14]);
+								s_isr_smartlcd_cmd_data13(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14]);
 							break;
 
 							case 13:
-								isr_smartlcd_cmd_data14(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
+								s_isr_smartlcd_cmd_data14(cmd, data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]);
 							break;
 
 							case 0:
@@ -223,23 +477,23 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 					break;
 
 					case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y)
-						isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
+						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
 					case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height)
-						isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
+						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
 					case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
-						isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
+						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
 					case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
-						isr_smartlcd_cmd_data1(cmd, data[2]);
+						s_isr_smartlcd_cmd_data1(cmd, data[2]);
 					break;
 
 					case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
-						isr_smartlcd_cmd_data1(cmd, data[2]);
+						s_isr_smartlcd_cmd_data1(cmd, data[2]);
 					break;
 
 					default:
@@ -253,51 +507,51 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		else if (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
 			switch (cmd) {
 				case TWI_SMART_LCD_CMD_SHOW_CLK_STATE:
-					isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(data[2], (uint16_t) (data[3] | (data[4] << 8)), (int16_t) (data[5] | (data[6] << 8)));
+					s_isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(data[2], (uint16_t) (data[3] | (data[4] << 8)), (int16_t) (data[5] | (data[6] << 8)));
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_YEAR_MON_DAY:
-					isr_lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
+					s_isr_lcd_10mhz_ref_osc_show_date(data[2] | (data[3] << 8), data[4], data[5]);
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
-					isr_lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
+					s_isr_lcd_10mhz_ref_osc_show_time(data[2], data[3], data[4]);
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_PPB:
-					isr_lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
+					s_isr_lcd_10mhz_ref_osc_show_ppm((int16_t) (data[2] | (data[3] << 8)), data[4] | (data[5] << 8));
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
-					isr_lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
+					s_isr_lcd_10mhz_ref_osc_show_pwm(data[2], data[3]);
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_TCXO_VC:
-					isr_lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
+					s_isr_lcd_10mhz_ref_osc_show_pv(data[2], data[3] | (data[4] << 8));
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_SATS:
-					isr_lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
+					s_isr_lcd_10mhz_ref_osc_show_sat_use(data[2], data[3], data[4]);
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_DOP:
-					isr_lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
+					s_isr_lcd_10mhz_ref_osc_show_sat_dop(data[2] | (data[3] << 8));
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
-					isr_lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
+					s_isr_lcd_10mhz_ref_osc_show_pos_state(data[2], data[3]);
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_POS_LAT:
-					isr_lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
+					s_isr_lcd_10mhz_ref_osc_show_pos_lat(data[2], data[3], data[4], data[5] | (data[6] << 8));
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_POS_LON:
-					isr_lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
+					s_isr_lcd_10mhz_ref_osc_show_pos_lon(data[2], data[3], data[4], data[5] | (data[6] << 8));
 				break;
 
 				case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
-					isr_lcd_10mhz_ref_osc_show_pos_height((data[2] | (data[3] << 8)), data[4]);
+					s_isr_lcd_10mhz_ref_osc_show_pos_height((data[2] | (data[3] << 8)), data[4]);
 				break;
 
 				default:

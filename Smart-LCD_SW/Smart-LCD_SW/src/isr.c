@@ -231,6 +231,19 @@ ISR(__vector_13, ISR_BLOCK)
 		OCR1AH = (uint8_t) (audio_out >> 8);					// 9 bit
 		OCR1AL = (uint8_t) (audio_out & 0xff);
 	}
+
+#if 0
+	/* Start A/D convertion by entering ADC sleep-mode */
+	while ((ADCSRA & (1 << ADSC))) {
+		/* wait for conversion complete */
+	}
+	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
+	adc_enable_interrupt();						// enable the ADC interrupt
+	cpu_irq_enable();
+	//adc_start_conversion();						// TODO ???
+	enter_sleep(SLEEP_MODE_ADC);
+	adc_disable_interrupt();
+#endif
 }
 
 ISR(__vector_14, ISR_BLOCK)
@@ -245,7 +258,18 @@ ISR(__vector_15, ISR_BLOCK)
 
 ISR(__vector_16, ISR_BLOCK)
 {	/* TIMER 0 OVF - Overflow */
-	s_bad_interrupt();
+#if 0
+	/* Start A/D convertion by entering ADC sleep-mode */
+	while ((ADCSRA & (1 << ADSC))) {
+		/* wait for conversion complete */
+	}
+	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
+	adc_enable_interrupt();						// enable the ADC interrupt
+	cpu_irq_enable();
+
+	enter_sleep(SLEEP_MODE_ADC);
+	adc_disable_interrupt();
+#endif
 }
 
 ISR(__vector_17, ISR_BLOCK)
@@ -270,16 +294,12 @@ ISR(__vector_20, ISR_BLOCK)
 
 ISR(__vector_21, ISR_BLOCK)
 {	/* ADC */
-	uint16_t adc_val;
-	uint8_t  reason = g_adc_state;
+	uint16_t adc_val = ADCL | (ADCH << 8);
+	uint8_t  reason  = g_adc_state;
 
-	/* CLI part */
-	adc_val  = ADCL;
-	adc_val |= ADCH << 8;
+	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
 
-	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (no ISR for TOV1 activated!)
-
-	switch (g_adc_state) {
+	switch (reason) {
 		case ADC_STATE_PRE_LDR:
 			// drop one ADC value after switching MUX
 			g_adc_state = ADC_STATE_VLD_LDR;
@@ -302,28 +322,18 @@ ISR(__vector_21, ISR_BLOCK)
 			g_adc_state = ADC_STATE_PRE_LDR;
 	}
 
-	uint16_t adc_light_last = g_adc_light;
-	uint16_t adc_temp_last  = g_adc_temp;
-
-	/* SEI part */
-	cpu_irq_enable();
-
-	__vector_21__bottom(reason, adc_val, adc_light_last, adc_temp_last);
-}
-
-/* do not static this function to avoid code inlining that would inherit many push operations in the critical section */
-void __vector_21__bottom(uint8_t reason, uint16_t adc_val, uint16_t adc_light_last, uint16_t adc_temp_last)
-{
 	/* Low pass filtering and enhancing the data depth */
 	if (reason == ADC_STATE_VLD_LDR) {
-		float calc = g_adc_light ?  0.998f * g_adc_light + 0.002f * adc_val : adc_val;			// load with initial value if none is set before
-
+		uint16_t l_adc_light = g_adc_light;
+		cpu_irq_enable();
+		float calc = l_adc_light ?  0.980f * l_adc_light + 0.020f * adc_val : adc_val;	// load with initial value if none is set before
 		cpu_irq_disable();
 		g_adc_light = calc;
 
 	} else if (reason == ADC_STATE_VLD_TEMP) {
-		float calc = g_adc_temp ?  0.9995f * g_adc_temp + 0.0005f * adc_val : adc_val;		// load with initial value if none is set before
-
+		uint16_t l_adc_temp  = g_adc_temp;
+		cpu_irq_enable();
+		float calc = l_adc_temp ?   0.995f * l_adc_temp  + 0.005f * adc_val : adc_val;	// load with initial value if none is set before
 		cpu_irq_disable();
 		g_adc_temp = calc;
 	}
