@@ -9,10 +9,10 @@
 <grid distance="0.05" unitdist="inch" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
-<layer number="2" name="Route2" color="1" fill="3" visible="no" active="yes"/>
+<layer number="2" name="Route2" color="1" fill="3" visible="yes" active="yes"/>
 <layer number="3" name="Route3" color="4" fill="3" visible="no" active="no"/>
 <layer number="14" name="Route14" color="1" fill="6" visible="no" active="no"/>
-<layer number="15" name="Route15" color="4" fill="6" visible="no" active="yes"/>
+<layer number="15" name="Route15" color="4" fill="6" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
@@ -2071,7 +2071,7 @@ Your Eurocircuits Team
 <attribute name="NAME" x="43.815" y="17.78" size="0.6096" layer="26" rot="MR90"/>
 <attribute name="VALUE" x="43.815" y="16.51" size="0.6096" layer="28" rot="MR90"/>
 </element>
-<element name="R122" library="rcl" package="R0805" value="1R" x="71.755" y="6.35" smashed="yes" rot="MR0">
+<element name="R122" library="rcl" package="R0805" value="3R3" x="71.755" y="6.35" smashed="yes" rot="MR0">
 <attribute name="NAME" x="73.025" y="7.62" size="0.6096" layer="26" rot="MR0"/>
 <attribute name="VALUE" x="70.485" y="4.445" size="0.6096" layer="28" rot="MR0"/>
 </element>
@@ -2832,6 +2832,28 @@ Your Eurocircuits Team
 <approved hash="5,16,0bc556ad105a2239"/>
 <approved hash="5,16,394704f726d84881"/>
 <approved hash="5,16,6c47fba68d9a1c68"/>
+<approved hash="18,30,502359a5f25ea5ce"/>
+<approved hash="18,30,a0ed2a0f7ef1b5d9"/>
+<approved hash="18,30,3234292fe23e30e7"/>
+<approved hash="18,30,b6b6abe40b242350"/>
+<approved hash="5,16,c0616f5f3119dc37"/>
+<approved hash="5,16,179e1ce196e723dd"/>
+<approved hash="5,16,6de97b2de3e30ae6"/>
+<approved hash="5,16,d61b411e6ca6c429"/>
+<approved hash="5,16,2ac5a5b0dd91c04c"/>
+<approved hash="5,16,a74b98f5c0b1cfcb"/>
+<approved hash="5,16,bae2958aa1853600"/>
+<approved hash="5,16,678ef37e26c3322a"/>
+<approved hash="5,16,e2a534e15c26f586"/>
+<approved hash="5,16,4111eb6fa323c6d2"/>
+<approved hash="5,16,9718c804c39c70e6"/>
+<approved hash="5,16,445fecdc0acf4e2a"/>
+<approved hash="5,16,37aeb7825973f3f6"/>
+<approved hash="5,16,f87357fb00eee869"/>
+<approved hash="5,16,3e8f903c01335cad"/>
+<approved hash="5,16,99a9e2911be8bfce"/>
+<approved hash="5,16,ac21aa62eb7e5530"/>
+<approved hash="5,16,a4dcf0a33da382f3"/>
 <approved hash="14,2,4560133c26085e53"/>
 <approved hash="14,15,4560133c26085e53"/>
 <approved hash="14,2,054304f693e87426"/>
@@ -2852,10 +2874,6 @@ Your Eurocircuits Team
 <approved hash="18,29,3af13590c07dcf1c"/>
 <approved hash="18,29,490a167acebcfc34"/>
 <approved hash="18,29,23cfa006f5011b30"/>
-<approved hash="18,30,502359a5f25ea5ce"/>
-<approved hash="18,30,a0ed2a0f7ef1b5d9"/>
-<approved hash="18,30,3234292fe23e30e7"/>
-<approved hash="18,30,b6b6abe40b242350"/>
 <approved hash="18,30,6adbd4eb1b0530f1"/>
 <approved hash="18,30,b8fcd4d88a31d5f1"/>
 <approved hash="18,30,6eec48c4312d9af0"/>
@@ -2884,24 +2902,6 @@ Your Eurocircuits Team
 <approved hash="18,30,31e5001e13892d86"/>
 <approved hash="18,30,45e4f20a489da287"/>
 <approved hash="18,30,b5e5c007859083f6"/>
-<approved hash="5,16,c0616f5f3119dc37"/>
-<approved hash="5,16,179e1ce196e723dd"/>
-<approved hash="5,16,6de97b2de3e30ae6"/>
-<approved hash="5,16,d61b411e6ca6c429"/>
-<approved hash="5,16,2ac5a5b0dd91c04c"/>
-<approved hash="5,16,a74b98f5c0b1cfcb"/>
-<approved hash="5,16,bae2958aa1853600"/>
-<approved hash="5,16,678ef37e26c3322a"/>
-<approved hash="5,16,e2a534e15c26f586"/>
-<approved hash="5,16,4111eb6fa323c6d2"/>
-<approved hash="5,16,9718c804c39c70e6"/>
-<approved hash="5,16,445fecdc0acf4e2a"/>
-<approved hash="5,16,37aeb7825973f3f6"/>
-<approved hash="5,16,f87357fb00eee869"/>
-<approved hash="5,16,3e8f903c01335cad"/>
-<approved hash="5,16,99a9e2911be8bfce"/>
-<approved hash="5,16,ac21aa62eb7e5530"/>
-<approved hash="5,16,a4dcf0a33da382f3"/>
 <approved hash="5,16,a4c50fcff565b202"/>
 <approved hash="5,16,07b3c502c65c0800"/>
 <approved hash="5,16,c37a518c057f62d3"/>
@@ -2909,8 +2909,8 @@ Your Eurocircuits Team
 <approved hash="5,16,22e1c86e838a95d6"/>
 <approved hash="5,16,e884294ba77192af"/>
 <approved hash="5,16,c1fd4d0b05796255"/>
-<approved hash="5,16,980634964a9572bf"/>
 <approved hash="5,16,e4c70e11d3edc5e8"/>
+<approved hash="5,16,980634964a9572bf"/>
 <approved hash="5,16,bf0a82bfbc605595"/>
 <approved hash="5,16,6d47fba68d9c1d6a"/>
 <approved hash="5,16,4d3904f726d6cd7f"/>
