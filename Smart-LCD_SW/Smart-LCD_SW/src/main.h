@@ -112,6 +112,7 @@ void eeprom_nvm_settings_read(uint8_t flags);
 
 /* TASK section */
 void task(void);
+void enter_sleep(uint8_t sleep_mode);
 void halt(void);
 
 
