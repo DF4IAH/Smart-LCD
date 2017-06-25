@@ -7685,6 +7685,7 @@ General-purpose diode for high-speed switching</description>
 <part name="FM503" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
 <part name="FM504" library="df4iah_fiducial" deviceset="FIDUCIAL_MARK_1MM" device=""/>
 <part name="D131" library="df4iah_diode" deviceset="BAS70-04" device="" value="BZX84-C2V4"/>
+<part name="R122" library="rcl" deviceset="R-EU_" device="R0805" value="1R"/>
 </parts>
 <sheets>
 <sheet>
@@ -7718,7 +7719,7 @@ X141-4 = RotEnc-Q</text>
 <instance part="R101" gate="G$1" x="73.66" y="139.7"/>
 <instance part="R121" gate="G$1" x="160.02" y="86.36"/>
 <instance part="Q121" gate="G$1" x="182.88" y="86.36"/>
-<instance part="GND121" gate="1" x="185.42" y="78.74"/>
+<instance part="GND121" gate="1" x="213.36" y="78.74"/>
 <instance part="X131" gate="A" x="200.66" y="149.86"/>
 <instance part="+3V3_131" gate="G$1" x="154.94" y="154.94"/>
 <instance part="R131" gate="G$1" x="167.64" y="149.86"/>
@@ -7751,6 +7752,7 @@ X141-4 = RotEnc-Q</text>
 <attribute name="NAME" x="183.642" y="141.7066" size="1.778" layer="95"/>
 <attribute name="VALUE" x="188.722" y="135.7376" size="1.778" layer="96"/>
 </instance>
+<instance part="R122" gate="G$1" x="203.2" y="81.28"/>
 </instances>
 <busses>
 <bus name="LCD_BUS:VB1_N,VB1_P,VB0_N,VB0_P,VLCD,VBIAS,D[0..7],WR[0..1],CD,CS,!RST,LED_K">
@@ -7763,10 +7765,6 @@ X141-4 = RotEnc-Q</text>
 </busses>
 <nets>
 <net name="GND" class="0">
-<segment>
-<pinref part="Q121" gate="G$1" pin="E"/>
-<pinref part="GND121" gate="1" pin="GND"/>
-</segment>
 <segment>
 <pinref part="C131" gate="G$1" pin="2"/>
 <pinref part="GND131" gate="1" pin="GND"/>
@@ -7812,6 +7810,11 @@ X141-4 = RotEnc-Q</text>
 <segment>
 <pinref part="C111" gate="G$1" pin="2"/>
 <pinref part="GND111" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="GND121" gate="1" pin="GND"/>
+<pinref part="R122" gate="G$1" pin="2"/>
+<wire x1="213.36" y1="81.28" x2="208.28" y2="81.28" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="+3V3" class="0">
@@ -8122,6 +8125,14 @@ X141-4 = RotEnc-Q</text>
 <pinref part="X141" gate="G$1" pin="3"/>
 <wire x1="127" y1="149.86" x2="129.54" y2="149.86" width="0.1524" layer="91"/>
 <label x="137.16" y="137.16" size="1.778" layer="95" rot="R90"/>
+</segment>
+</net>
+<net name="LED_PWM_E" class="0">
+<segment>
+<pinref part="R122" gate="G$1" pin="1"/>
+<pinref part="Q121" gate="G$1" pin="E"/>
+<wire x1="198.12" y1="81.28" x2="185.42" y2="81.28" width="0.1524" layer="91"/>
+<label x="182.88" y="78.74" size="1.778" layer="95"/>
 </segment>
 </net>
 </nets>
