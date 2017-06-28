@@ -17,8 +17,12 @@
 /* ATmega 328P - fuses ext:0xFD hi:0xB9 lo:0xC2 */
 
 
-/* Version V1.1 */
-#define VERSION														0x11
+/* VERSION: YYM, MDD */
+#define VERSION_HIGH												170
+#define VERSION_LOW													629
+
+/* I2C-Version V1.1 */
+#define I2C_VERSION													0x11
 
 
 enum C_SMART_LCD_MODE__ENUM {
@@ -102,6 +106,16 @@ typedef struct showData {
 
 } showData_t;
 
+typedef struct buttons_struct {
+	int32_t		counter;
+
+	uint8_t		pushBut												: 1;
+	uint8_t		rotEnc_I											: 1;
+	uint8_t		rotEnc_Q											: 1;
+	uint8_t		rotEnd_quad											: 2;
+	uint8_t		reserved											: 3;  // fill to 8 bits
+} buttons_t;
+
 
 /* UTILITIES section */
 float get_abs_time(void);
@@ -111,7 +125,7 @@ void eeprom_nvm_settings_read(uint8_t flags);
 
 
 /* TASK section */
-void task(void);
+void task(float timestamp);
 void enter_sleep(uint8_t sleep_mode);
 void halt(void);
 
