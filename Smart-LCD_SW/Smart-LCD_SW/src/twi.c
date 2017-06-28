@@ -46,7 +46,6 @@ extern showData_t			g_showData;
 extern gfx_mono_color_t		g_lcd_pixel_type;
 extern gfx_coord_t			g_lcd_pencil_x;
 extern gfx_coord_t			g_lcd_pencil_y;
-extern char					g_strbuf[8];
 
 /* TWI Master mode */
 static uint8_t				s_tx_next_len = 0;
@@ -379,7 +378,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		/* unique command section for all modes */
 		switch (cmd) {
 			case TWI_SMART_LCD_CMD_GET_VER:
-			s_rx_ret_d[0] = VERSION;
+			s_rx_ret_d[0] = I2C_VERSION;
 			s_rx_ret_len = 1;
 			return;
 
@@ -712,7 +711,7 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 						case TWI_SMART_LCD_CMD_SHOW_POS_LON:
 							cnt_i = 6;
 						break;
-						
+
 						case TWI_SMART_LCD_CMD_WRITE:
 							cnt_i = TWI_SMART_LCD_SLAVE_BUF_LEN;	// Max length of incoming data
 						break;

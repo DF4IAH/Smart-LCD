@@ -55,21 +55,13 @@ int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
 status_t			g_status							= { 0 };
 showData_t			g_showData							= { 0 };
+volatile buttons_t			g_buttons							= { 0 };
 uint8_t				g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
 gfx_mono_color_t	g_lcd_pixel_type					= GFX_PIXEL_CLR;
 gfx_coord_t			g_lcd_pencil_x						= 0;
 gfx_coord_t			g_lcd_pencil_y						= 0;
-char				g_strbuf[8]							= { 0 };  // size is limited due to  TWIS_SEND_BUFFER_SIZE  of the ATxmega ASF
-
-uint8_t				g_u8_DEBUG11						= 0,
-					g_u8_DEBUG12						= 0,
-					g_u8_DEBUG13						= 0;
-
-uint_fast32_t		g_u32_DEBUG21						= 0;
-
-float				g_f_DEBUG31							= 0.f,
-					g_f_DEBUG32							= 0.f;
-
+uint8_t				g_resetCause						= 0;
+char				g_strbuf[48]						= { 0 };
 
 
 /* MAIN STATIC section */
@@ -96,6 +88,13 @@ static void s_reset_global_vars(void)
 	g_status.isAnimationStopped = false;
 
 	cpu_irq_restore(flags);
+}
+
+inline
+static uint8_t s_2bit_gray_to_dec(uint8_t gray)
+{
+	gray &= 0x03;
+	return gray ^ (gray >> 1);
 }
 
 
@@ -352,10 +351,10 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 
 void eeprom_nvm_settings_write(uint8_t flags)
 {
-	/* VERSION */
+	/* I2C_VERSION */
 	if (flags & 0x80) {
 		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_VERSION,
-		VERSION);
+		I2C_VERSION);
 	}
 
 	/* LCD_PM */
@@ -367,10 +366,10 @@ void eeprom_nvm_settings_write(uint8_t flags)
 
 void eeprom_nvm_settings_read(uint8_t flags)
 {
-	/* VERSION */
+	/* I2C_VERSION */
 	if (flags & C_EEPROM_NVM_SETTING_VERSION) {
 		uint8_t ver = eeprom_read_byte((const uint8_t *) C_EEPROM_ADDR_VERSION);
-		if (ver != VERSION) {
+		if (ver != I2C_VERSION) {
 			eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_VERSION);
 		}
 	}
@@ -392,17 +391,34 @@ void eeprom_nvm_settings_read(uint8_t flags)
 
 /* TASK section */
 
-static void s_task_backlight(float adc_light)
+static void s_task_temp(float adc_temp)
+{
+	const float C_temp_coef_k			= 1.0595703f;
+	const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 1.1f;
+	const float C_temp_coef_ofs			= 64.50f + C_temp_coef_ofs_atmel;
+
+	/* Temperature calculation for °C */
+	float l_temp = 25.f + (adc_temp - C_temp_coef_ofs) * C_temp_coef_k;
+
+	irqflags_t flags = cpu_irq_save();
+	g_temp = l_temp;
+	cpu_irq_restore(flags);
+}
+
+static void s_task_backlight(float adc_light, float timestamp)
 {
 	/* calculate the 8-bit backlight PWM value based on the ADC photo diode current */
 	const uint16_t	BL_ADC_OFF			= 950;
 	const uint16_t	BL_MIN_INTENSITY	=   2;
-	static uint8_t  last =  0;
+	static int16_t  pwm_last =  0;
+	static float    ts_last = 0.f;
 
 	if (adc_light < BL_ADC_OFF) {
-		uint8_t now = (uint8_t) (BL_MIN_INTENSITY + (255.0f - BL_MIN_INTENSITY) * ((adc_light - BL_MIN_INTENSITY) / BL_ADC_OFF));	// no interrupt lock needed
-		if ((now > (last + 1)) || (now + 1 < last)) {
-			OCR2A = now;
+		int16_t pwm_now = (int16_t) (BL_MIN_INTENSITY + (255.0f - BL_MIN_INTENSITY) * ((adc_light - BL_MIN_INTENSITY) / BL_ADC_OFF));	// no interrupt lock needed
+		if ((pwm_now > (pwm_last + 1)) || (pwm_now < (pwm_last - 1)) || ((timestamp - ts_last) > 0.5f) || (timestamp < ts_last)) {
+			OCR2A = (uint8_t) pwm_now;
+			pwm_last = pwm_now;
+			ts_last = timestamp;
 		}
 		TCCR2A |= (0b10 << COM2A0);
 #if 1
@@ -414,38 +430,66 @@ static void s_task_backlight(float adc_light)
 	}
 }
 
-static void s_task_temp(float adc_temp)
+static void s_task_buttons(uint8_t but_portB, uint8_t but_portC, float timestamp)
 {
-	const float C_temp_coef_k			= 1.0595703f;
-	const float C_temp_coef_ofs_atmel	= 1024 * 0.314f / 1.1f;
-	const float C_temp_coef_ofs			= 59.25f + C_temp_coef_ofs_atmel;
-
-	/* Temperature calculation for °C */
-	float l_temp = 25.f + (adc_temp - C_temp_coef_ofs) * C_temp_coef_k;
+	static uint8_t dec_old = 0;
 
 	irqflags_t flags = cpu_irq_save();
-	g_temp = l_temp;
+	buttons_t l_buttons = g_buttons;
+	cpu_irq_restore(flags);
+
+	l_buttons.pushBut	  = but_portB & 0x04 ?  0 : 1;
+	l_buttons.rotEnc_I	  = but_portC & 0x02 ?  0 : 1;
+	l_buttons.rotEnc_Q	  = but_portC & 0x04 ?  0 : 1;
+	l_buttons.rotEnd_quad = s_2bit_gray_to_dec((l_buttons.rotEnc_Q << 1) | l_buttons.rotEnc_I);
+
+	int8_t delta = l_buttons.rotEnd_quad - dec_old;
+	if ((delta ==  1) ||
+	    (delta == -3)
+	) {
+		if (!l_buttons.rotEnd_quad) {
+			l_buttons.counter++;
+		}
+
+	} else if ((delta == -1) ||
+	           (delta ==  3)
+	) {
+		if (l_buttons.rotEnd_quad == 3) {
+			l_buttons.counter--;
+		}
+	}
+
+	dec_old = l_buttons.rotEnd_quad;
+
+	flags = cpu_irq_save();
+	g_buttons = l_buttons;
 	cpu_irq_restore(flags);
 }
 
-void task(void)
+void task(float timestamp)
 {
 	/* TASK when woken up */
 	float l_adc_temp, l_adc_light;
+	uint8_t l_portB, l_portC;
 	irqflags_t flags;
 	uint8_t l_SmartLCD_mode, l_doAnimation, l_isAnimationStopped;
 	uint8_t more;
 
 	flags = cpu_irq_save();
-	l_adc_light = g_adc_light;
 	l_adc_temp = g_adc_temp;
+	l_adc_light = g_adc_light;
+	l_portB = PINB;
+	l_portC = PINC;
 	cpu_irq_restore(flags);
-
-	/* Calculate new backlight PWM value and set that */
-	s_task_backlight(l_adc_light);
 
 	/* Calculate new current temperature */
 	s_task_temp(l_adc_temp);
+
+	/* Calculate new backlight PWM value and set that */
+	s_task_backlight(l_adc_light, timestamp);
+
+	/* Detect button pushes and rotary encoder settings */
+	s_task_buttons(l_portB, l_portC, timestamp);
 
 	/* Loops as long as more data is ready to be presented */
 	do {
@@ -528,6 +572,7 @@ int main (void)
 	board_init();
 
 	reset_cause_t rc = reset_cause_get_causes();
+	g_resetCause = rc;
 	if (rc & CHIP_RESET_CAUSE_EXTRST	||
 		rc & CHIP_RESET_CAUSE_BOD_CPU	||
 		rc & CHIP_RESET_CAUSE_POR		||
@@ -535,7 +580,6 @@ int main (void)
 		s_reset_global_vars();
 	} else {
 		/* DEBUG */
-		g_u32_DEBUG21 = rc;
 		asm_break();
 	}
 
@@ -553,13 +597,13 @@ int main (void)
 
 	/* Initialize external components */
 	lcd_init();
-	lcd_test(0b11110001);						// Debugging purposes
+	lcd_test(0b11111101);						// Debugging purposes
 
 
 	/* main loop */
 	runmode = 1;
     while (runmode) {
-	    task();
+	    task(get_abs_time());
 	    enter_sleep(SLEEP_MODE_IDLE);
     }
 

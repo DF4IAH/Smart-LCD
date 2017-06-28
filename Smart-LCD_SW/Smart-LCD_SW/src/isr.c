@@ -306,8 +306,17 @@ ISR(__vector_21, ISR_BLOCK)
 		break;
 
 		case ADC_STATE_VLD_LDR:
+		{
+			/* Low pass filtering and enhancing the data depth */
+			float l_adc_light = g_adc_light;
+			cpu_irq_enable();
+			float calc = l_adc_light ?  0.980f * l_adc_light + 0.020f * adc_val : adc_val;	// load with initial value if none is set before
+			cpu_irq_disable();
+			g_adc_light = calc;
+
 			adc_set_admux(ADC_MUX_TEMPSENSE | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 			g_adc_state = ADC_STATE_PRE_TEMP;
+		}
 		break;
 
 		case ADC_STATE_PRE_TEMP:
@@ -316,26 +325,18 @@ ISR(__vector_21, ISR_BLOCK)
 		break;
 
 		case ADC_STATE_VLD_TEMP:
+		{
+			/* Low pass filtering and enhancing the data depth */
+			float l_adc_temp  = g_adc_temp;
+			cpu_irq_enable();
+			float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
+			cpu_irq_disable();
+			g_adc_temp = calc;
+		}
 			// fall-through.
 		default:
 			adc_set_admux(ADC_MUX_ADC0 | ADC_VREF_1V1 | ADC_ADJUSTMENT_RIGHT);
 			g_adc_state = ADC_STATE_PRE_LDR;
-	}
-
-	/* Low pass filtering and enhancing the data depth */
-	if (reason == ADC_STATE_VLD_LDR) {
-		uint16_t l_adc_light = g_adc_light;
-		cpu_irq_enable();
-		float calc = l_adc_light ?  0.980f * l_adc_light + 0.020f * adc_val : adc_val;	// load with initial value if none is set before
-		cpu_irq_disable();
-		g_adc_light = calc;
-
-	} else if (reason == ADC_STATE_VLD_TEMP) {
-		uint16_t l_adc_temp  = g_adc_temp;
-		cpu_irq_enable();
-		float calc = l_adc_temp ?   0.995f * l_adc_temp  + 0.005f * adc_val : adc_val;	// load with initial value if none is set before
-		cpu_irq_disable();
-		g_adc_temp = calc;
 	}
 }
 
