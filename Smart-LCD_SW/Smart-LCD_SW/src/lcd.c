@@ -463,7 +463,10 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_pencil_y = g_showData.pencil_y;
 			l_to_x = g_showData.data[0];
 			l_to_y = g_showData.data[1];
-			l_pixelType = g_showData.pixelType;
+			l_pixelType = g_showData.data[2];
+			if (l_pixelType == 255) {
+				l_pixelType = g_showData.pixelType;
+			}
 			gfx_mono_generic_draw_line(l_pencil_x, l_pencil_y, l_to_x, l_to_y, l_pixelType);
 			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.pencil_x = l_to_x;
@@ -478,7 +481,10 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_pencil_y = g_showData.pencil_y;
 			l_width = g_showData.data[0];
 			l_height = g_showData.data[1];
-			l_pixelType = g_showData.pixelType;
+			l_pixelType = g_showData.data[2];
+			if (l_pixelType == 255) {
+				l_pixelType = g_showData.pixelType;
+			}
 			gfx_mono_generic_draw_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
 			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
@@ -491,7 +497,10 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_pencil_y = g_showData.pencil_y;
 			l_width = g_showData.data[0];
 			l_height = g_showData.data[1];
-			l_pixelType = g_showData.pixelType;
+			l_pixelType = g_showData.data[2];
+			if (l_pixelType == 255) {
+				l_pixelType = g_showData.pixelType;
+			}
 			gfx_mono_generic_draw_filled_rect(l_pencil_x, l_pencil_y, l_width, l_height, l_pixelType);
 			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
@@ -503,7 +512,10 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_radius = g_showData.data[0];
-			l_pixelType = g_showData.pixelType;
+			l_pixelType = g_showData.data[1];
+			if (l_pixelType == 255) {
+				l_pixelType = g_showData.pixelType;
+			}
 			gfx_mono_generic_draw_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
 			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;
@@ -515,7 +527,10 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_radius = g_showData.data[0];
-			l_pixelType = g_showData.pixelType;
+			l_pixelType = g_showData.data[1];
+			if (l_pixelType == 255) {
+				l_pixelType = g_showData.pixelType;
+			}
 			gfx_mono_generic_draw_filled_circle(l_pencil_x, l_pencil_y, l_radius, l_pixelType, GFX_QUADRANT0 | GFX_QUADRANT1 | GFX_QUADRANT2 | GFX_QUADRANT3);
 			gfx_mono_lcd_uc1608_cache_clear();
 			g_showData.cmd = 0;

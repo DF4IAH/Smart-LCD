@@ -679,21 +679,21 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 						case TWI_SMART_LCD_CMD_SET_MODE:
 						case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:
-						case TWI_SMART_LCD_CMD_DRAW_CIRC:
-						case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:
 							cnt_i = 2;
 						break;
 
 						case TWI_SMART_LCD_CMD_SET_POS_X_Y:
-						case TWI_SMART_LCD_CMD_DRAW_LINE:
-						case TWI_SMART_LCD_CMD_DRAW_RECT:
-						case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:
+						case TWI_SMART_LCD_CMD_DRAW_CIRC:
+						case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:
 						case TWI_SMART_LCD_CMD_SHOW_DOP:
 						case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
 						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:
 							cnt_i = 3;
 						break;
 
+						case TWI_SMART_LCD_CMD_DRAW_LINE:
+						case TWI_SMART_LCD_CMD_DRAW_RECT:
+						case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:
 						case TWI_SMART_LCD_CMD_SHOW_HR_MIN_SEC:
 						case TWI_SMART_LCD_CMD_SHOW_POS_HEIGHT:
 						case TWI_SMART_LCD_CMD_SHOW_SATS:
