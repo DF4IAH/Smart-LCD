@@ -127,7 +127,7 @@ static void s_isr_smartlcd_cmd_set_backlight(uint8_t cmd, uint8_t mode, uint8_t 
 
 static void s_isr_smartlcd_cmd_set_contrast(uint8_t cmd, uint8_t bias)
 {
-	g_lcd_contrast_pm = bias < 0x3f ?  bias : 0x3f;
+	g_lcd_contrast_pm = bias & 0x3f;
 	lcd_contrast_update();
 
 	if (bias & 0x80) {

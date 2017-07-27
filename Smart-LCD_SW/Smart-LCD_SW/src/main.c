@@ -356,13 +356,13 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 void eeprom_nvm_settings_write(uint8_t flags)
 {
 	/* I2C_VERSION */
-	if (flags & 0x80) {
+	if (flags & C_EEPROM_NVM_SETTING_VERSION) {
 		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_VERSION,
 		I2C_VERSION);
 	}
 
 	/* LCD_PM */
-	if (flags & 0x01) {
+	if (flags & C_EEPROM_NVM_SETTING_LCD_CONTRAST) {
 		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_LCD_PM,
 		g_lcd_contrast_pm & 0x3F);
 	}
