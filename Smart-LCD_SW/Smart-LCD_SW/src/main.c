@@ -48,14 +48,18 @@ uint8_t				g_adc_state							= 0;
 float				g_adc_light							= 0.f;
 float				g_adc_temp							= 0.f;
 float				g_temp								= 0.f;
+bool				g_lcdbl_auto						= true;
 uint8_t				g_lcdbl_dimmer						= 0;
 uint8_t				g_lcd_contrast_pm					= 0;
 uint8_t				g_audio_out_loudness				= 0;
+uint16_t			g_audio_out_inc						= 0;
+uint8_t				g_audio_out_length					= 0;
 int16_t				g_audio_pwm_accu					= 0;
 uint8_t				g_audio_pwm_ramp_dwn				= 0;
 status_t			g_status							= { 0 };
 showData_t			g_showData							= { 0 };
-volatile buttons_t			g_buttons							= { 0 };
+volatile buttons_t	g_buttons							= { 0 };
+uint32_t			g_rotenc_events						= 0;
 uint8_t				g_SmartLCD_mode						= C_SMART_LCD_MODE_UNIQUE;
 gfx_mono_color_t	g_lcd_pixel_type					= GFX_PIXEL_CLR;
 gfx_coord_t			g_lcd_pencil_x						= 0;
@@ -352,13 +356,13 @@ void mem_set(uint8_t* buf, uint8_t count, uint8_t val)
 void eeprom_nvm_settings_write(uint8_t flags)
 {
 	/* I2C_VERSION */
-	if (flags & 0x80) {
+	if (flags & C_EEPROM_NVM_SETTING_VERSION) {
 		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_VERSION,
 		I2C_VERSION);
 	}
 
 	/* LCD_PM */
-	if (flags & 0x01) {
+	if (flags & C_EEPROM_NVM_SETTING_LCD_CONTRAST) {
 		eeprom_write_byte((uint8_t *) C_EEPROM_ADDR_LCD_PM,
 		g_lcd_contrast_pm & 0x3F);
 	}
@@ -486,7 +490,9 @@ void task(float timestamp)
 	s_task_temp(l_adc_temp);
 
 	/* Calculate new backlight PWM value and set that */
-	s_task_backlight(l_adc_light, timestamp);
+	if (g_lcdbl_auto) {
+		s_task_backlight(l_adc_light, timestamp);
+	}
 
 	/* Detect button pushes and rotary encoder settings */
 	s_task_buttons(l_portB, l_portC, timestamp);

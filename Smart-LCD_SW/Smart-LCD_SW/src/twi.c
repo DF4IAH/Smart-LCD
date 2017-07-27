@@ -40,7 +40,14 @@
 #include "twi.h"
 
 
+extern float				g_adc_light;
+extern float				g_temp;
+extern bool					g_lcdbl_auto;
+extern uint8_t				g_lcd_contrast_pm;
+extern uint16_t				g_audio_out_inc;
+extern uint8_t				g_audio_out_length;
 extern status_t				g_status;
+extern uint32_t				g_rotenc_events;
 extern uint8_t				g_SmartLCD_mode;
 extern showData_t			g_showData;
 extern gfx_mono_color_t		g_lcd_pixel_type;
@@ -73,6 +80,111 @@ static void s_isr_lcd_set_mode(int8_t mode)
 		lcd_init();
 		lcd_test(0b11110001);			// Start animation again
 	}
+}
+
+static void s_isr_smartlcd_cmd_set_leds(uint8_t cmd, uint8_t leds)
+{
+	uint8_t cur = PORTB & 0x3f;
+
+	/* Red LED */
+	if (leds & 0x01) {
+		cur |= _BV(PORTB6);
+	}
+
+	/* Green LED */
+	if (leds & 0x02) {
+		cur |= _BV(PORTB7);
+	}
+
+	PORTB = cur;
+}
+
+static void s_isr_smartlcd_cmd_set_beep(uint8_t cmd, uint8_t length_10ms, uint8_t pitch_10Hz)
+{
+	/* Set the pitch of the tone */
+	{
+		uint32_t l_audio_out_inc = ((uint32_t)pitch_10Hz * 10 * 0x00010000UL) / 15625U;
+		g_audio_out_inc = (uint16_t) (l_audio_out_inc < 0xffff ?  l_audio_out_inc : 0xffff);
+	}
+
+	/* Set duration of beep - 122 equals to one second */
+	{
+		uint16_t l_audio_out_length = (122U * length_10ms) / 100;
+		g_audio_out_length = (uint8_t) (l_audio_out_length < 255 ?  l_audio_out_length : 255);
+	}
+}
+
+static void s_isr_smartlcd_cmd_set_backlight(uint8_t cmd, uint8_t mode, uint8_t pwm)
+{
+	if (mode & 0x01) {
+		g_lcdbl_auto = true;
+
+	} else {
+		g_lcdbl_auto = false;
+		OCR2A = pwm;
+	}
+}
+
+static void s_isr_smartlcd_cmd_set_contrast(uint8_t cmd, uint8_t bias)
+{
+	g_lcd_contrast_pm = bias & 0x3f;
+	lcd_contrast_update();
+
+	if (bias & 0x80) {
+		eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
+	}
+}
+
+
+static uint8_t s_isr_smartlcd_cmd_req_rotbut(uint8_t* data_out)
+{
+	if (data_out) {
+		*data_out	= (uint8_t) ( g_rotenc_events        & 0xff);
+		*++data_out	= (uint8_t) ((g_rotenc_events >>  8) & 0xff);
+		*++data_out	= (uint8_t) ((g_rotenc_events >> 16) & 0xff);
+		*++data_out	= (uint8_t) ((g_rotenc_events >> 24) & 0xff);
+
+		/* Reset list of events */
+		g_rotenc_events = 0;
+
+		return 4;
+	}
+	return 0;
+}
+
+static uint8_t s_isr_smartlcd_cmd_req_light(uint8_t* data_out)
+{
+	if (data_out) {
+		*data_out = (uint8_t) ((uint16_t)g_adc_light >> 2);
+		return 1;
+	}
+	return 0;
+}
+
+static uint8_t s_isr_smartlcd_cmd_req_temp(uint8_t* data_out)
+{
+	if (data_out) {
+		uint8_t hi;
+		uint8_t lo;
+		float l_temp;
+
+		if (g_temp >= 0.f) {
+			l_temp = g_temp;
+			hi = (int8_t)l_temp;
+			lo = (uint8_t) ((l_temp - hi) * 100.f);
+
+		} else {
+			l_temp = -g_temp;
+			hi = (int8_t)l_temp;
+			lo = (uint8_t) ((l_temp - hi) * 100.f);
+			hi = -hi;
+		}
+
+		*data_out	= hi;
+		*++data_out	= lo;
+		return 2;
+	}
+	return 0;
 }
 
 
@@ -495,6 +607,37 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
+					case TWI_SMART_LCD_CMD_GET_ROTBUT:			// State of rotary encoder and button: factor of 4 bytes each - 4bits per event - 0: I/Q down, 1: I/Q up, 2: button released, 3: button pressed | 4: another event follows | 8: event list overflowed.
+						s_rx_ret_len = s_isr_smartlcd_cmd_req_rotbut(s_rx_ret_d);
+						return;
+					break;
+
+					case TWI_SMART_LCD_CMD_GET_LIGHT:			// Request ambient light: 1 byte - 0..255
+						s_rx_ret_len = s_isr_smartlcd_cmd_req_light(s_rx_ret_d);
+						return;
+					break;
+
+					case TWI_SMART_LCD_CMD_GET_TEMP:			// Request temperature: 2 bytes - deg . 1/100 degree
+						s_rx_ret_len = s_isr_smartlcd_cmd_req_temp(s_rx_ret_d);
+						return;
+					break;
+
+					case TWI_SMART_LCD_CMD_SET_LEDS:			// LEDs: 1 byte - 0x01 red  0x02 green
+						s_isr_smartlcd_cmd_set_leds(cmd, data[2]);
+					break;
+
+					case TWI_SMART_LCD_CMD_SET_BEEP:			// Sound beep: 2 bytes - length x10ms, pitch x10Hz
+						s_isr_smartlcd_cmd_set_beep(cmd, data[2], data[3]);
+					break;
+
+					case TWI_SMART_LCD_CMD_SET_BACKLIGHT:		// LCD backlight: 2 bytes - 0x01 automatic, 0..255 (0% .. 100%)
+						s_isr_smartlcd_cmd_set_backlight(cmd, data[2], data[3]);
+					break;
+
+					case TWI_SMART_LCD_CMD_SET_CONTRAST:		// LCD contrast: 1 byte - 0..63 (bias voltage)
+						s_isr_smartlcd_cmd_set_contrast(cmd, data[2]);
+					break;
+
 					default:
 					{
 						// do nothing
@@ -672,19 +815,34 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 						case TWI_SMART_LCD_CMD_GET_VER:
 						case TWI_SMART_LCD_CMD_GET_STATE:
+						case TWI_SMART_LCD_CMD_GET_LIGHT:
 							cnt_i = 1;
 							cnt_o = 1;
+						break;
+
+						case TWI_SMART_LCD_CMD_GET_TEMP:
+							cnt_i = 1;
+							cnt_o = 2;
+						break;
+
+						case TWI_SMART_LCD_CMD_GET_ROTBUT:
+							cnt_i = 1;
+							cnt_o = 4;
 						break;
 
 
 						case TWI_SMART_LCD_CMD_SET_MODE:
 						case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:
+						case TWI_SMART_LCD_CMD_SET_LEDS:
+						case TWI_SMART_LCD_CMD_SET_CONTRAST:
 							cnt_i = 2;
 						break;
 
 						case TWI_SMART_LCD_CMD_SET_POS_X_Y:
 						case TWI_SMART_LCD_CMD_DRAW_CIRC:
 						case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:
+						case TWI_SMART_LCD_CMD_SET_BEEP:
+						case TWI_SMART_LCD_CMD_SET_BACKLIGHT:
 						case TWI_SMART_LCD_CMD_SHOW_DOP:
 						case TWI_SMART_LCD_CMD_SHOW_POS_STATE:
 						case TWI_SMART_LCD_CMD_SHOW_TCXO_PWM:

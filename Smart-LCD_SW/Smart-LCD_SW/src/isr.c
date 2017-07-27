@@ -55,6 +55,8 @@ extern float				g_adc_light;
 extern float				g_adc_temp;
 extern uint8_t				g_lcd_contrast_pm;
 extern uint8_t				g_audio_out_loudness;
+extern uint16_t				g_audio_out_inc;
+extern uint8_t				g_audio_out_length;
 extern int16_t				g_audio_pwm_accu;
 extern uint8_t				g_audio_pwm_ramp_dwn;
 
@@ -125,7 +127,6 @@ ISR(__vector_9, ISR_BLOCK)
 {	/* TIMER 2 OVF - Overflow */
 	if (g_status.isAnimationStopped && (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC)) {
 		static uint8_t state_old = 0;
-		static uint8_t state_ctr = 0;
 		static uint8_t second_old = 0;
 		static uint8_t button_ctr = 0;
 		uint8_t cur = PORTB & 0x3f;
@@ -135,7 +136,7 @@ ISR(__vector_9, ISR_BLOCK)
 		if (g_showData.clkState_clk_state < 0xf) {
 			cur |= _BV(PORTB6);  // LED = red
 			if (state_old != 0x02) {
-				state_ctr = 122;  // 1 sec
+				g_audio_out_length = 122;  // 1 sec
 			}
 			state_old = 0x02;
 
@@ -146,21 +147,14 @@ ISR(__vector_9, ISR_BLOCK)
 			/* Acoustic phase tracker */
 			if (g_showData.time_second != second_old) {
 				second_old = g_showData.time_second;
-				state_ctr = 6;
+				g_audio_out_length = 6;
 			}
 
 		} else {
 			if (!state_old) {
-				state_ctr = 30;  // 1/4 sec
+				g_audio_out_length = 30;  // 1/4 sec
 			}
 			state_old = 0x01;
-		}
-
-		if (state_ctr) {
-			--state_ctr;
-			g_audio_out_loudness = 9;  // max 9
-		} else {
-			g_audio_out_loudness = 0;
 		}
 
 		PORTB = cur;
@@ -177,7 +171,7 @@ ISR(__vector_9, ISR_BLOCK)
 					lcd_contrast_update();
 				}
 			} else if (!(sw & 0x02)) {							// SW-Q: increment contrast voltage
-				if (g_lcd_contrast_pm < 0x3F) {
+				if (g_lcd_contrast_pm < 0x3f) {
 					++g_lcd_contrast_pm;
 					lcd_contrast_update();
 				}
@@ -185,6 +179,14 @@ ISR(__vector_9, ISR_BLOCK)
 				eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
 			}
 		}
+	}
+
+	/* Beep length enables audio output */
+	if (g_audio_out_length) {
+		--g_audio_out_length;
+		g_audio_out_loudness = 9;  // max 9
+	} else {
+		g_audio_out_loudness = 0;
 	}
 }
 
@@ -208,7 +210,13 @@ ISR(__vector_13, ISR_BLOCK)
 	++g_timer_abs_msb;
 
 	if (g_status.isAnimationStopped && g_audio_out_loudness) {
-		int16_t l_audio_pwm_inc = 3691 + (g_showData.clkState_phaseDeg100 >> 2);  // (880 Hz / 15625 Hz) * 16384 Steps * 8
+		int16_t l_audio_pwm_inc;
+
+		if (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
+			l_audio_pwm_inc = 3691 + (g_showData.clkState_phaseDeg100 >> 2);  // (880 Hz / 15625 Hz) * 16384 Steps * 8 / 2
+		} else {
+			l_audio_pwm_inc = g_audio_out_inc;
+		}
 
 		/* Generate triangle signal */
 		if (g_audio_pwm_ramp_dwn) {
