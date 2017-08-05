@@ -510,6 +510,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		if (g_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
 			if (!(g_showData.cmd)) {							// Do when no command in process only
 				switch (cmd) {
+					case TWI_SMART_LCD_CMD_RESET:				// Reset LCD module
 					case TWI_SMART_LCD_CMD_CLS:					// Clear screen
 						s_isr_smartlcd_cmd(cmd);
 					break;
@@ -808,11 +809,6 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 					cnt_o = 0;
 
 					switch (s_rx_d[1]) {
-						case TWI_SMART_LCD_CMD_NOOP:
-							cnt_i = 1;
-						break;
-
-
 						case TWI_SMART_LCD_CMD_GET_VER:
 						case TWI_SMART_LCD_CMD_GET_STATE:
 						case TWI_SMART_LCD_CMD_GET_LIGHT:
@@ -830,6 +826,12 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 							cnt_o = 4;
 						break;
 
+
+						case TWI_SMART_LCD_CMD_NOOP:
+						case TWI_SMART_LCD_CMD_RESET:
+						case TWI_SMART_LCD_CMD_CLS:
+						cnt_i = 1;
+						break;
 
 						case TWI_SMART_LCD_CMD_SET_MODE:
 						case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:

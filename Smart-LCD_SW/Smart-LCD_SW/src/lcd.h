@@ -62,6 +62,7 @@ void    lcd_col_set(uint8_t col);
 void    lcd_cr(void);
 void    lcd_home(void);
 void    lcd_cls(void);
+void	lcd_reset(void);
 void	lcd_write(const char *strbuf, gfx_coord_t pos_x, gfx_coord_t pos_y);
 void    lcd_show_template(void);
 uint8_t lcd_show_new_smartlcd_data(void);
