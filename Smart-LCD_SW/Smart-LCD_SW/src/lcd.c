@@ -233,13 +233,19 @@ void lcd_cls(void)
 		lcd_bus_write_cmd(0b00000000);								// Set Column Address LSB (0)
 		lcd_bus_write_cmd(0b00010000);								// Set Column Address MSB (0)
 
-		for (uint8_t cnt = GFX_MONO_LCD_WIDTH; cnt; --cnt) {		// clear all columns of that page
+		for (uint8_t cnt = GFX_MONO_LCD_WIDTH; cnt; --cnt) {		// Clear all columns of that page
 			lcd_bus_write_ram(0);
 		}
 	}
 
 	/* Set cursor to home position */
 	lcd_home();
+}
+
+void lcd_reset(void)
+{
+	/* Call lcd_init() which resets LCD and boots up again */
+	lcd_init();
 }
 
 void lcd_write(const char *strbuf, gfx_coord_t pos_x, gfx_coord_t pos_y)
@@ -420,6 +426,14 @@ uint8_t lcd_show_new_smartlcd_data(void)
 	irqflags_t flags = cpu_irq_save();
 
 	switch (g_showData.cmd) {
+		case TWI_SMART_LCD_CMD_RESET:
+			gfx_mono_lcd_uc1608_cache_clear();
+			lcd_reset();
+			g_showData.cmd = 0;
+			cpu_irq_restore(flags);
+			return TWI_SMART_LCD_CMD_CLS;
+		break;
+
 		case TWI_SMART_LCD_CMD_CLS:
 			gfx_mono_lcd_uc1608_cache_clear();
 			lcd_cls();
