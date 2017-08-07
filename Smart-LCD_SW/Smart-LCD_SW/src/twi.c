@@ -121,7 +121,17 @@ static void s_isr_smartlcd_cmd_set_backlight(uint8_t cmd, uint8_t mode, uint8_t 
 
 	} else {
 		g_lcdbl_auto = false;
-		OCR2A = pwm;
+
+		if (pwm) {
+			OCR2A = pwm;
+
+			/* Switch on PWM */
+			TCCR2A |= (0b10 << COM2A0);
+
+		} else {
+			/* Switch off PWM */
+			TCCR2A &= ~(0b11  << COM2A0);
+		}
 	}
 }
 
