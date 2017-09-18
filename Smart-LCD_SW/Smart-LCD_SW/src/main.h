@@ -19,10 +19,20 @@
 
 /* VERSION: YYM, MDD */
 #define VERSION_HIGH												170
-#define VERSION_LOW													807
+#define VERSION_LOW													918
 
 /* I2C-Version V1.1 */
 #define I2C_VERSION													0x11
+
+
+/* Port definitions */
+#define OC1A_GPIO													IOPORT_CREATE_PIN(PORTB, 1)
+#define LED_RED_GPIO												IOPORT_CREATE_PIN(PORTB, 6)
+#define LED_GREEN_GPIO												IOPORT_CREATE_PIN(PORTB, 7)
+
+
+/* TC1 counter max. value gives 100µs = 10kHz overflow frequency @ CPUclk = 8MHz */
+#define C_TC1_TOPVAL												800
 
 
 enum C_SMART_LCD_MODE__ENUM {

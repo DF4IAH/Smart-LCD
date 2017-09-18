@@ -49,16 +49,18 @@
 extern status_t				g_status;
 extern showData_t			g_showData;
 extern uint8_t				g_SmartLCD_mode;
-extern uint_fast32_t		g_timer_abs_msb;
+extern uint32_t				g_timer_abs_100us;
 extern uint8_t				g_adc_state;
 extern float				g_adc_light;
 extern float				g_adc_temp;
 extern uint8_t				g_lcd_contrast_pm;
-extern uint8_t				g_audio_out_loudness;
-extern uint16_t				g_audio_out_inc;
+extern bool					g_audio_out_on;
+extern uint8_t				g_audio_out_mod;
 extern uint8_t				g_audio_out_length;
 extern int16_t				g_audio_pwm_accu;
 extern uint8_t				g_audio_pwm_ramp_dwn;
+extern bool					g_led_red;
+extern bool					g_led_green;
 
 
 /* Forward declarations */
@@ -83,7 +85,7 @@ static void s_bad_interrupt(void)
 }
 
 
-ISR(__vector_1, ISR_BLOCK)  // variants: ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
+ISR(__vector_1, ISR_BLOCK)											// Variants: ISR_BLOCK, ISR_NOBLOCK, ISR_NAKED
 {	/* INT0 */
 	s_bad_interrupt();
 }
@@ -125,24 +127,35 @@ ISR(__vector_8, ISR_BLOCK)
 
 ISR(__vector_9, ISR_BLOCK)
 {	/* TIMER 2 OVF - Overflow */
+	uint8_t pinb = PINB;
+	uint8_t pinc = PINC;
+
+	ioport_set_pin_level(LED_RED_GPIO,   g_led_red   ?  IOPORT_PIN_LEVEL_HIGH : IOPORT_PIN_LEVEL_LOW);
+	ioport_set_pin_level(LED_GREEN_GPIO, g_led_green ?  IOPORT_PIN_LEVEL_HIGH : IOPORT_PIN_LEVEL_LOW);
+
+	/* BOTTOM */
+	TIFR2 |= _BV(TOV2);
+	cpu_irq_enable();
+
 	if (g_status.isAnimationStopped && (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC)) {
 		static uint8_t state_old = 0;
 		static uint8_t second_old = 0;
 		static uint8_t button_ctr = 0;
-		uint8_t cur = PORTB & 0x3f;
 
-		/* signaling the grade of deviation */
-		g_audio_out_loudness = 0;
+		/* Signaling the grade of deviation */
+		g_audio_out_on = false;
 		if (g_showData.clkState_clk_state < 0xf) {
-			cur |= _BV(PORTB6);  // LED = red
-			if (state_old != 0x02) {
-				g_audio_out_length = 122;  // 1 sec
+			g_led_red		= true;									// LED = red
+			g_led_green		= false;
+			if (state_old  != 0x02) {
+				g_audio_out_length = 122;							// 1 sec
 			}
 			state_old = 0x02;
 
 		} else if ((g_showData.clkState_clk_state == 0xf) && (-4 < g_showData.ppb_int) && (g_showData.ppb_int < 4)) {
-			cur |= _BV(PORTB7);  // LED = green
-			state_old = 0x00;
+			g_led_green		= true;									// LED = green
+			g_led_red		= false;
+			state_old		= 0x00;
 
 			/* Acoustic phase tracker */
 			if (g_showData.time_second != second_old) {
@@ -152,30 +165,34 @@ ISR(__vector_9, ISR_BLOCK)
 
 		} else {
 			if (!state_old) {
-				g_audio_out_length = 30;  // 1/4 sec
+				g_audio_out_length = 30;							// 1/4 sec
+				g_led_red = g_led_green = false;
 			}
 			state_old = 0x01;
 		}
 
-		PORTB = cur;
-
-		/* sampling I/Q and push buttons */
+		/* Sampling I/Q and push buttons - de-noise */
 		if (button_ctr) {
 			--button_ctr;
+
 		} else {
 			button_ctr = 12;
-			uint8_t sw = (PINC & 0x06) >> 1;
-			if (!(sw & 0x01)) {									// SW-I: decrement contrast voltage
+			bool sw_b = !(pinb & _BV(PINB2));
+			bool sw_i = !(pinc & _BV(PINC1));
+			bool sw_q = !(pinc & _BV(PINC2));
+			if (sw_i) {												// SW-I: decrement contrast voltage
 				if (g_lcd_contrast_pm) {
 					--g_lcd_contrast_pm;
 					lcd_contrast_update();
 				}
-			} else if (!(sw & 0x02)) {							// SW-Q: increment contrast voltage
+			} else if (sw_q) {										// SW-Q: increment contrast voltage
 				if (g_lcd_contrast_pm < 0x3f) {
 					++g_lcd_contrast_pm;
 					lcd_contrast_update();
 				}
-			} else if (!(PINB & _BV(PINB2))) {					// Pushbutton: store value in EEPROM
+			}
+
+			if (sw_b) {												// Pushbutton: store value in EEPROM
 				eeprom_nvm_settings_write(C_EEPROM_NVM_SETTING_LCD_CONTRAST);
 			}
 		}
@@ -184,9 +201,9 @@ ISR(__vector_9, ISR_BLOCK)
 	/* Beep length enables audio output */
 	if (g_audio_out_length) {
 		--g_audio_out_length;
-		g_audio_out_loudness = 9;  // max 9
+		g_audio_out_on = true;
 	} else {
-		g_audio_out_loudness = 0;
+		g_audio_out_on = false;
 	}
 }
 
@@ -206,38 +223,43 @@ ISR(__vector_12, ISR_BLOCK)
 }
 
 ISR(__vector_13, ISR_BLOCK)
-{	/* TIMER 1 OVF - Overflow */
-	++g_timer_abs_msb;
+{	/* TIMER 1 OVF - Overflow (frequency = 10 kHz) */
+	static uint8_t	s_audio_pwm_mod		= 0;
+	static bool		s_audio_toggle		= false;
 
-	if (g_status.isAnimationStopped && g_audio_out_loudness) {
-		int16_t l_audio_pwm_inc;
+	/* 100µs counter */
+	++g_timer_abs_100us;
 
+	/* Audio output */
+	if (s_audio_pwm_mod) {
+		if (!(g_timer_abs_100us % s_audio_pwm_mod)) {
+			s_audio_toggle = !s_audio_toggle;
+			ioport_set_pin_level(OC1A_GPIO, s_audio_toggle);
+		}
+	}
+
+#if 0
+	/* BOTTOM */
+	TIFR1 |= _BV(TOV1);
+	cpu_irq_enable();
+#endif
+
+	/* Preparation for next cycle */
+	if (g_status.isAnimationStopped && g_audio_out_on) {
 		if (g_SmartLCD_mode == C_SMART_LCD_MODE_REFOSC) {
-			l_audio_pwm_inc = 3691 + (g_showData.clkState_phaseDeg100 >> 2);  // (880 Hz / 15625 Hz) * 16384 Steps * 8 / 2
-		} else {
-			l_audio_pwm_inc = g_audio_out_inc;
-		}
-
-		/* Generate triangle signal */
-		if (g_audio_pwm_ramp_dwn) {
-			g_audio_pwm_accu -= l_audio_pwm_inc;
-			if (g_audio_pwm_accu <= -16383) {
-				g_audio_pwm_ramp_dwn = false;
-				int16_t residue = -g_audio_pwm_accu - 16383;
-				g_audio_pwm_accu = -16383 + residue;
+			int16_t pitch = g_showData.clkState_phaseDeg100 >> 9;	// One pitch step each 5 deg
+			if (pitch < -4) {
+				pitch = -4;
+			} else if (pitch > 3) {
+				pitch = 3;
 			}
+			s_audio_pwm_mod = (uint8_t) (5 - pitch);
 		} else {
-			g_audio_pwm_accu += l_audio_pwm_inc;
-			if (g_audio_pwm_accu >= +16383) {
-				g_audio_pwm_ramp_dwn = true;
-				int16_t residue = g_audio_pwm_accu - 16383;
-				g_audio_pwm_accu = 16383 - residue;
-			}
+			s_audio_pwm_mod = g_audio_out_mod;
 		}
-
-		int16_t audio_out = 256 + (g_audio_pwm_accu >> (15 - g_audio_out_loudness));  // 6 + 9
-		OCR1AH = (uint8_t) (audio_out >> 8);					// 9 bit
-		OCR1AL = (uint8_t) (audio_out & 0xff);
+	} else {
+		/* Turn off sound */
+		s_audio_pwm_mod = 0;
 	}
 
 #if 0
@@ -245,10 +267,10 @@ ISR(__vector_13, ISR_BLOCK)
 	while ((ADCSRA & (1 << ADSC))) {
 		/* wait for conversion complete */
 	}
-	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
-	adc_enable_interrupt();						// enable the ADC interrupt
+	ADCSRA |= _BV(ADIF);											// Clear interrupt status bit by setting it to clear
+	adc_enable_interrupt();											// Enable the ADC interrupt
 	cpu_irq_enable();
-	//adc_start_conversion();						// TODO ???
+	//adc_start_conversion();										// TODO ???
 	enter_sleep(SLEEP_MODE_ADC);
 	adc_disable_interrupt();
 #endif
@@ -271,8 +293,8 @@ ISR(__vector_16, ISR_BLOCK)
 	while ((ADCSRA & (1 << ADSC))) {
 		/* wait for conversion complete */
 	}
-	ADCSRA |= _BV(ADIF);						// clear interrupt status bit by setting it to clear
-	adc_enable_interrupt();						// enable the ADC interrupt
+	ADCSRA |= _BV(ADIF);											// Clear interrupt status bit by setting it to clear
+	adc_enable_interrupt();											// Enable the ADC interrupt
 	cpu_irq_enable();
 
 	enter_sleep(SLEEP_MODE_ADC);
@@ -305,7 +327,7 @@ ISR(__vector_21, ISR_BLOCK)
 	uint16_t adc_val = ADCL | (ADCH << 8);
 	uint8_t  reason  = g_adc_state;
 
-	//TIFR1 |= _BV(TOV1);							// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
+	//TIFR1 |= _BV(TOV1);											// Reset Timer1 overflow status bit (when no ISR for TOV1 activated!)
 
 	switch (reason) {
 		case ADC_STATE_PRE_LDR:
@@ -328,7 +350,7 @@ ISR(__vector_21, ISR_BLOCK)
 		break;
 
 		case ADC_STATE_PRE_TEMP:
-			// drop one ADC value after switching MUX
+			/* Drop one ADC value after switching MUX */
 			g_adc_state = ADC_STATE_VLD_TEMP;
 		break;
 
@@ -337,7 +359,7 @@ ISR(__vector_21, ISR_BLOCK)
 			/* Low pass filtering and enhancing the data depth */
 			float l_adc_temp  = g_adc_temp;
 			cpu_irq_enable();
-			float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// load with initial value if none is set before
+			float calc = l_adc_temp ?  0.998f * l_adc_temp  + 0.002f * adc_val : adc_val;	// Load with initial value if none is set before
 			cpu_irq_disable();
 			g_adc_temp = calc;
 		}
