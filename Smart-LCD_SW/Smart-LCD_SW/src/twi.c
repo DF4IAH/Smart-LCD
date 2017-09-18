@@ -44,7 +44,7 @@ extern float				g_adc_light;
 extern float				g_temp;
 extern bool					g_lcdbl_auto;
 extern uint8_t				g_lcd_contrast_pm;
-extern uint16_t				g_audio_out_inc;
+extern uint16_t				g_audio_out_mod;
 extern uint8_t				g_audio_out_length;
 extern status_t				g_status;
 extern uint32_t				g_rotenc_events;
@@ -53,6 +53,8 @@ extern showData_t			g_showData;
 extern gfx_mono_color_t		g_lcd_pixel_type;
 extern gfx_coord_t			g_lcd_pencil_x;
 extern gfx_coord_t			g_lcd_pencil_y;
+extern bool					g_led_red;
+extern bool					g_led_green;
 
 /* TWI Master mode */
 static uint8_t				s_tx_next_len = 0;
@@ -73,44 +75,43 @@ static void s_isr_lcd_set_mode(int8_t mode)
 {
 	g_SmartLCD_mode = mode;
 	if (mode) {
-		g_status.doAnimation = false;	// Stop animation demo
+		g_status.doAnimation = false;								// Stop animation demo
 
 		} else {
 		// Reset display
 		lcd_init();
-		lcd_test(0b11110001);			// Start animation again
+		lcd_test(0b11110001);										// Start animation again
 	}
 }
 
 static void s_isr_smartlcd_cmd_set_leds(uint8_t cmd, uint8_t leds)
 {
-	uint8_t cur = PORTB & 0x3f;
+	g_led_red	= leds & 0x01;
+	g_led_green	= leds & 0x02;
 
 	/* Red LED */
-	if (leds & 0x01) {
-		cur |= _BV(PORTB6);
-	}
+	ioport_set_pin_level(LED_RED_GPIO,   g_led_red   ?  IOPORT_PIN_LEVEL_HIGH : IOPORT_PIN_LEVEL_LOW);
 
 	/* Green LED */
-	if (leds & 0x02) {
-		cur |= _BV(PORTB7);
-	}
-
-	PORTB = cur;
+	ioport_set_pin_level(LED_GREEN_GPIO, g_led_green ?  IOPORT_PIN_LEVEL_HIGH : IOPORT_PIN_LEVEL_LOW);
 }
 
 static void s_isr_smartlcd_cmd_set_beep(uint8_t cmd, uint8_t length_10ms, uint8_t pitch_10Hz)
 {
+	if (!length_10ms || !pitch_10Hz) {
+		return;
+	}
+
 	/* Set the pitch of the tone */
 	{
-		uint32_t l_audio_out_inc = ((uint32_t)pitch_10Hz * 10 * 0x00010000UL) / 15625U;
-		g_audio_out_inc = (uint16_t) (l_audio_out_inc < 0xffff ?  l_audio_out_inc : 0xffff);
+		uint16_t l_audio_out_mod = 5000U / ((uint16_t)pitch_10Hz * 10U);
+		g_audio_out_mod = (uint8_t) (l_audio_out_mod < 0xff ?  l_audio_out_mod : 0xff);
 	}
 
 	/* Set duration of beep - 122 equals to one second */
 	{
 		uint16_t l_audio_out_length = (122U * length_10ms) / 100;
-		g_audio_out_length = (uint8_t) (l_audio_out_length < 255 ?  l_audio_out_length : 255);
+		g_audio_out_length = (uint8_t) (l_audio_out_length < 0xff ?  l_audio_out_length : 0xff);
 	}
 }
 
@@ -290,7 +291,7 @@ static void s_isr_smartlcd_cmd_data14(uint8_t cmd, uint8_t data0, uint8_t data1,
 
 static void s_isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint8_t clk_state, uint16_t phaseVolt1000, int16_t phaseDeg100)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if ((g_showData.clkState_clk_state     != clk_state    )  ||
 	(g_showData.clkState_phaseVolt1000 != phaseVolt1000)  ||
 	(g_showData.clkState_phaseDeg100   != phaseDeg100  )) {
@@ -303,7 +304,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_clkstate_phaseVolt1000_phaseDeg100(uint
 
 static void s_isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8_t day)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.date_year != year ||
 	g_showData.date_month != month ||
 	g_showData.date_day != day) {
@@ -316,7 +317,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_date(uint16_t year, int8_t month, uint8
 
 static void s_isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8_t second)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.time_hour != hour ||
 	g_showData.time_minute != minute ||
 	g_showData.time_second != second) {
@@ -329,7 +330,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_time(uint8_t hour, int8_t minute, uint8
 
 static void s_isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1000)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.ppb_int != ppm_int ||
 	g_showData.ppb_frac1000 != ppm_frac1000) {
 		g_showData.newPpb = true;
@@ -340,7 +341,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_ppm(int16_t ppm_int, uint16_t ppm_frac1
 
 static void s_isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac256)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.pwm_int != pwm_int ||
 	g_showData.pwm_frac256 != pwm_frac256) {
 		g_showData.newPwm = true;
@@ -351,7 +352,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_pwm(uint8_t pwm_int, uint8_t pwm_frac25
 
 static void s_isr_lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.pv_int != pv_int ||
 	g_showData.pv_frac1000 != pv_frac1000) {
 		g_showData.newPv = true;
@@ -362,7 +363,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_pv(uint8_t pv_int, uint16_t pv_frac1000
 
 static void s_isr_lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_east, uint8_t sat_used)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.satUse_west != sat_west ||
 	g_showData.satUse_east != sat_east ||
 	g_showData.satUse_used != sat_used) {
@@ -375,7 +376,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_sat_use(uint8_t sat_west, uint8_t sat_e
 
 static void s_isr_lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.satDop_dop100 != sat_dop100) {
 		g_showData.newSatDop = true;
 		g_showData.satDop_dop100 = sat_dop100;
@@ -384,7 +385,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_sat_dop(uint16_t sat_dop100)
 
 static void s_isr_lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t state_m2)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.posState_fi != state_fi ||
 	g_showData.posState_m2 != state_m2) {
 		g_showData.newPosState = true;
@@ -395,7 +396,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_pos_state(uint8_t state_fi, uint8_t sta
 
 static void s_isr_lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_deg, uint8_t lat_min_int, uint16_t lat_min_frac10000)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.posLat_sgn != lat_sgn ||
 	g_showData.posLat_deg != lat_deg ||
 	g_showData.posLat_min_int != lat_min_int ||
@@ -411,7 +412,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_pos_lat(uint8_t lat_sgn, uint8_t lat_de
 
 static void s_isr_lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_deg, uint8_t lon_min_int, uint16_t lon_min_frac10000)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if (g_showData.posLon_sgn != lon_sgn ||
 	g_showData.posLon_deg != lon_deg ||
 	g_showData.posLon_deg != lon_deg ||
@@ -427,7 +428,7 @@ static void s_isr_lcd_10mhz_ref_osc_show_pos_lon(uint8_t lon_sgn, uint8_t lon_de
 
 static void s_isr_lcd_10mhz_ref_osc_show_pos_height(int16_t height_int, uint8_t height_frac10)
 {
-	// interrupt is already disabled, here
+	/* interrupt is already disabled, here */
 	if ((g_showData.pos_height_int != height_int) || (g_showData.pos_height_frac10 != height_frac10)) {
 		g_showData.newPosHeight = true;
 		g_showData.pos_height_int = height_int;
@@ -441,28 +442,28 @@ static void s_twi_tx_prepare(uint8_t msgCnt, uint8_t msg[])
 {
 	if (msgCnt && msg) {
 		if (!s_tx_lock && !s_tx_next_len) {
-			// Prepare master message buffer
+			/* Prepare master message buffer */
 			for (int idx = msgCnt; idx >= 0; --idx) {
 				s_tx_d[idx] = msg[idx];
 			}
 			s_tx_len = msgCnt;
 
 		} else if (s_tx_lock && !s_tx_next_len) {
-			// Stash message into next message facility
+			/* Stash message into next message facility */
 			for (int idx = msgCnt; idx >= 0; --idx) {
 				s_tx_next_d[idx] = msg[idx];
 			}
 			s_tx_next_len = msgCnt;
-		} // else ... the message is lost
+		}  // else ... the message is lost
 	}
 }
 #endif
 
 static void s_twi_tx_done(void)
 {
-	// Called when  s_tx_lock == 0
+	/* Called when  s_tx_lock == 0 */
 	if (s_tx_next_len) {
-		// Load	next master message
+		/* Load	next master message */
 		for (int idx = s_tx_next_len; idx >= 0; --idx) {
 			s_tx_d[idx] = s_tx_next_d[idx];
 		}
@@ -485,7 +486,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 
 	if (isGCA) {
 		switch (cmd) {
-			case 0b0100000:								// IDENTIFY
+			case 0b0100000:											// IDENTIFY
 				// TODO: prepare ADR+R data
 			break;
 
@@ -509,7 +510,7 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 			return;
 
 			case TWI_SMART_LCD_CMD_GET_STATE:
-			s_rx_ret_d[0] = g_showData.cmd ?  0x81 : 0x80;		// (Valid << 7) | (Busy << 0)
+			s_rx_ret_d[0] = g_showData.cmd ?  0x81 : 0x80;			// (Valid << 7) | (Busy << 0)
 			s_rx_ret_len = 1;
 			return;
 
@@ -518,22 +519,22 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 		}
 
 		if (g_SmartLCD_mode == C_SMART_LCD_MODE_SMARTLCD) {
-			if (!(g_showData.cmd)) {							// Do when no command in process only
+			if (!(g_showData.cmd)) {								// Do when no command in process only
 				switch (cmd) {
-					case TWI_SMART_LCD_CMD_RESET:				// Reset LCD module
-					case TWI_SMART_LCD_CMD_CLS:					// Clear screen
+					case TWI_SMART_LCD_CMD_RESET:					// Reset LCD module
+					case TWI_SMART_LCD_CMD_CLS:						// Clear screen
 						s_isr_smartlcd_cmd(cmd);
 					break;
 
-					case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:		// Set next pixels (OFF / ON / XOR)
+					case TWI_SMART_LCD_CMD_SET_PIXEL_TYPE:			// Set next pixels (OFF / ON / XOR)
 						s_isr_smartlcd_cmd_data1(cmd, data[2]);
 					break;
 
-					case TWI_SMART_LCD_CMD_SET_POS_X_Y:			// Set pencil position (x, y)
+					case TWI_SMART_LCD_CMD_SET_POS_X_Y:				// Set pencil position (x, y)
 						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
-					case TWI_SMART_LCD_CMD_WRITE:				// Write text of length (length, buffer...)
+					case TWI_SMART_LCD_CMD_WRITE:					// Write text of length (length, buffer...)
 					{
 						switch (data[2]) {
 							case 1:
@@ -598,54 +599,54 @@ static void s_isr_twi_rcvd_command_closed_form(uint8_t data[], uint8_t cnt)
 					}
 					break;
 
-					case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y) with color
+					case TWI_SMART_LCD_CMD_DRAW_LINE:				// Draw line from current pencil position to next position (x, y) with color
 						s_isr_smartlcd_cmd_data3(cmd, data[2], data[3], data[4]);
 					break;
 
-					case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height) with color
+					case TWI_SMART_LCD_CMD_DRAW_RECT:				// Draw rectangular frame with pencil's start position with dimension (width, height) with color
 						s_isr_smartlcd_cmd_data3(cmd, data[2], data[3], data[4]);
 					break;
 
-					case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height) with color
+					case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:		// Draw filled rectangular frame with pencil's start position with dimension (width, height) with color
 						s_isr_smartlcd_cmd_data3(cmd, data[2], data[3], data[4]);
 					break;
 
-					case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius) with color
+					case TWI_SMART_LCD_CMD_DRAW_CIRC:				// Draw circle or ellipse from the pencil's center point with (radius) with color
 						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
-					case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius) with color
+					case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:		// Draw filled circle or ellipse from the pencil's center point with (radius) with color
 						s_isr_smartlcd_cmd_data2(cmd, data[2], data[3]);
 					break;
 
-					case TWI_SMART_LCD_CMD_GET_ROTBUT:			// State of rotary encoder and button: factor of 4 bytes each - 4bits per event - 0: I/Q down, 1: I/Q up, 2: button released, 3: button pressed | 4: another event follows | 8: event list overflowed.
+					case TWI_SMART_LCD_CMD_GET_ROTBUT:				// State of rotary encoder and button: factor of 4 bytes each - 4bits per event - 0: I/Q down, 1: I/Q up, 2: button released, 3: button pressed | 4: another event follows | 8: event list overflowed.
 						s_rx_ret_len = s_isr_smartlcd_cmd_req_rotbut(s_rx_ret_d);
 						return;
 					break;
 
-					case TWI_SMART_LCD_CMD_GET_LIGHT:			// Request ambient light: 1 byte - 0..255
+					case TWI_SMART_LCD_CMD_GET_LIGHT:				// Request ambient light: 1 byte - 0..255
 						s_rx_ret_len = s_isr_smartlcd_cmd_req_light(s_rx_ret_d);
 						return;
 					break;
 
-					case TWI_SMART_LCD_CMD_GET_TEMP:			// Request temperature: 2 bytes - deg . 1/100 degree
+					case TWI_SMART_LCD_CMD_GET_TEMP:				// Request temperature: 2 bytes - deg . 1/100 degree
 						s_rx_ret_len = s_isr_smartlcd_cmd_req_temp(s_rx_ret_d);
 						return;
 					break;
 
-					case TWI_SMART_LCD_CMD_SET_LEDS:			// LEDs: 1 byte - 0x01 red  0x02 green
+					case TWI_SMART_LCD_CMD_SET_LEDS:				// LEDs: 1 byte - 0x01 red  0x02 green
 						s_isr_smartlcd_cmd_set_leds(cmd, data[2]);
 					break;
 
-					case TWI_SMART_LCD_CMD_SET_BEEP:			// Sound beep: 2 bytes - length x10ms, pitch x10Hz
+					case TWI_SMART_LCD_CMD_SET_BEEP:				// Sound beep: 2 bytes - length x10ms, pitch x10Hz
 						s_isr_smartlcd_cmd_set_beep(cmd, data[2], data[3]);
 					break;
 
-					case TWI_SMART_LCD_CMD_SET_BACKLIGHT:		// LCD backlight: 2 bytes - 0x01 automatic, 0..255 (0% .. 100%)
+					case TWI_SMART_LCD_CMD_SET_BACKLIGHT:			// LCD backlight: 2 bytes - 0x01 automatic, 0..255 (0% .. 100%)
 						s_isr_smartlcd_cmd_set_backlight(cmd, data[2], data[3]);
 					break;
 
-					case TWI_SMART_LCD_CMD_SET_CONTRAST:		// LCD contrast: 1 byte - 0..63 (bias voltage)
+					case TWI_SMART_LCD_CMD_SET_CONTRAST:			// LCD contrast: 1 byte - 0..63 (bias voltage)
 						s_isr_smartlcd_cmd_set_contrast(cmd, data[2]);
 					break;
 
@@ -729,46 +730,46 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 	/* Master Transmitter Mode */
 
-	case TWI_TWSR_START:						// Start condition transmitted
+	case TWI_TWSR_START:											// Start condition transmitted
 		s_tx_lock = 1;
 		pos_o = 0;
 
-		cnt_o = 2;								// TEST
-		s_tx_d[0] = (0x12 << TWD1) | (0b0 << TWD0);	// TEST
-		s_tx_d[1] = 0x34;						// TEST
-		s_tx_d[2] = 0x56;						// TEST
-		s_tx_d[3] = 0x78;						// TEST
-		s_tx_d[4] = 0x9a;						// TEST
+		cnt_o = 2;													// TEST
+		s_tx_d[0] = (0x12 << TWD1) | (0b0 << TWD0);					// TEST
+		s_tx_d[1] = 0x34;											// TEST
+		s_tx_d[2] = 0x56;											// TEST
+		s_tx_d[3] = 0x78;											// TEST
+		s_tx_d[4] = 0x9a;											// TEST
 		// fall-through.
-	case TWI_TWSR_REPEATEDSTART:				// Repeated start condition transmitted
+	case TWI_TWSR_REPEATEDSTART:									// Repeated start condition transmitted
 		nop();
 		// fall-through.
-	case TWI_TWSR_M_SLAW_ADDR_ACK:				// SLA+W transmitted and ACK received
+	case TWI_TWSR_M_SLAW_ADDR_ACK:									// SLA+W transmitted and ACK received
 		TWDR = s_tx_d[pos_o++];
 	break;
 
-	case TWI_TWSR_M_SLAW_ADDR_NACK:				// SLA+W transmitted and NACK received
-		twcr_new |= _BV(TWSTO);					// Send STOP
+	case TWI_TWSR_M_SLAW_ADDR_NACK:									// SLA+W transmitted and NACK received
+		twcr_new |= _BV(TWSTO);										// Send STOP
 	break;
 
-	case TWI_TWSR_M_SLAW_DATA_ACK:				// Data byte sent and ACK received
+	case TWI_TWSR_M_SLAW_DATA_ACK:									// Data byte sent and ACK received
 		if (pos_o < cnt_o) {
-			TWDR = s_tx_d[pos_o++];				// Send new data byte
+			TWDR = s_tx_d[pos_o++];									// Send new data byte
 		} else {
 			s_tx_lock = 0;
-			s_twi_tx_done();					// Message sent
-			twcr_new |= _BV(TWSTO);				// Send STOP - no more data available
+			s_twi_tx_done();										// Message sent
+			twcr_new |= _BV(TWSTO);									// Send STOP - no more data available
 		}
 	break;
 
-	case TWI_TWSR_M_SLAW_DATA_NACK:				// Data byte sent and NACK received
+	case TWI_TWSR_M_SLAW_DATA_NACK:									// Data byte sent and NACK received
 		s_tx_lock = 0;
-		s_twi_tx_done();						// Message failure
-		twcr_new |= _BV(TWSTO);					// Send STOP - due to an error or slave not ready situation
+		s_twi_tx_done();											// Message failure
+		twcr_new |= _BV(TWSTO);										// Send STOP - due to an error or slave not ready situation
 	break;
 
-	case TWI_TWSR_M_SLAW_ARBIT_LOST:			// Arbitration lost
-		twcr_new |= _BV(TWSTA);					// Send START (again)
+	case TWI_TWSR_M_SLAW_ARBIT_LOST:								// Arbitration lost
+		twcr_new |= _BV(TWSTA);										// Send START (again)
 	break;
 
 	case TWI_TWSR_M_SLAR_ADDR_ACK:
@@ -790,26 +791,26 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 	/* Slave Receiver Mode */
 
-	case TWI_TWSR_S_SLAW_MYADDR_RECEIVED:		// SLA+W received and ACK returned
+	case TWI_TWSR_S_SLAW_MYADDR_RECEIVED:							// SLA+W received and ACK returned
 	case TWI_TWSR_S_SLAW_MYADDR_ARBIT_LOST:
 		mem_set(s_rx_d, TWI_SMART_LCD_SLAVE_BUF_LEN, 0x00);
-		s_rx_d[0] = twd >> 1;					// [0]=Target address (== MYADDR)
-		pos_i = 1;								// Starting of reception
-		twcr_new |= _BV(TWEA);					// Send ACK
+		s_rx_d[0] = twd >> 1;										// [0]=Target address (== MYADDR)
+		pos_i = 1;													// Starting of reception
+		twcr_new |= _BV(TWEA);										// Send ACK
 	break;
 
-	case TWI_TWSR_S_SLAW_OMNIADDR_RECEIVED:		// GCA received and ACK sent
+	case TWI_TWSR_S_SLAW_OMNIADDR_RECEIVED:							// GCA received and ACK sent
 	case TWI_TWSR_S_SLAW_OMNIADDR_ARBIT_LOST:
-		s_rx_d[0] = twd >> 1;					// GCA
-		pos_i = 1;								// Starting of reception
-		twcr_new |= _BV(TWEA);					// Send after next coming data byte ACK
+		s_rx_d[0] = twd >> 1;										// GCA
+		pos_i = 1;													// Starting of reception
+		twcr_new |= _BV(TWEA);										// Send after next coming data byte ACK
 	break;
 
-	case TWI_TWSR_S_SLAW_MYADDR_DATA_ACK:		// Data after SLA+W received
+	case TWI_TWSR_S_SLAW_MYADDR_DATA_ACK:							// Data after SLA+W received
 	case TWI_TWSR_S_SLAW_OMNIADDR_DATA_ACK:
-		if (cnt_i != 0b1111) {					// Closed parameter form
+		if (cnt_i != 0b1111) {										// Closed parameter form
 			if (pos_i < 0b1111) {
-				s_rx_d[pos_i] = twd;			// [1]=cmd, [2..]=parameters
+				s_rx_d[pos_i] = twd;								// [1]=cmd, [2..]=parameters
 			}
 
 			if (pos_i == 1) {
@@ -900,81 +901,81 @@ uint8_t __vector_24__bottom(uint8_t tws, uint8_t twd, uint8_t twcr_cur)
 
 			if (pos_i < 0b1110) {
 				if (++pos_i <= cnt_i) {
-					twcr_new |= _BV(TWEA);		// Send ACK
+					twcr_new |= _BV(TWEA);							// Send ACK
 				} else {
-					twcr_new &= ~_BV(TWEA);		// Send NACK
+					twcr_new &= ~_BV(TWEA);							// Send NACK
 				}
 			} else {
-				twcr_new &= ~_BV(TWEA);			// Send NACK
+				twcr_new &= ~_BV(TWEA);								// Send NACK
 			}
 
-		} else {								// Open parameter form
+		} else {													// Open parameter form
 			s_rx_d[2] = twd;
 			if (!s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i)) {
-				twcr_new |= _BV(TWEA);			// Send ACK
+				twcr_new |= _BV(TWEA);								// Send ACK
 			} else {
 				pos_i = 0;
-				twcr_new &= ~_BV(TWEA);			// Send NACK
+				twcr_new &= ~_BV(TWEA);								// Send NACK
 			}
 		}
 	break;
 
-	case TWI_TWSR_S_SLAW_MYADDR_DATA_NACK:		// NACK after last data byte sent
+	case TWI_TWSR_S_SLAW_MYADDR_DATA_NACK:							// NACK after last data byte sent
 	case TWI_TWSR_S_SLAW_OMNIADDR_DATA_NACK:
 		if (cnt_i != 0b1111) {
-			s_isr_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
+			s_isr_twi_rcvd_command_closed_form(s_rx_d, pos_i);		// Call interpreter for closed form of parameters
 		} else {
-			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
+			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);		// Call interpreter for open form of parameters
 		}
 		pos_i = 0;
 		cnt_i = 0;
 		mem_set(s_rx_d, 8, 0x00);
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWEA);										// TWI goes to unaddressed, be active again
 	break;
 
-	case TWI_TWSR_S_SLAW_STOP_REPEATEDSTART_RECEIVED:	// STOP or RESTART received while still addressed as slave
+	case TWI_TWSR_S_SLAW_STOP_REPEATEDSTART_RECEIVED:				// STOP or RESTART received while still addressed as slave
 		if (cnt_i != 0b1111) {
-			s_isr_twi_rcvd_command_closed_form(s_rx_d, pos_i);	// Call interpreter for closed form of parameters
+			s_isr_twi_rcvd_command_closed_form(s_rx_d, pos_i);		// Call interpreter for closed form of parameters
 		} else {
-			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);	// Call interpreter for open form of parameters
+			s_isr_twi_rcvd_command_open_form(s_rx_d, ++pos_i);		// Call interpreter for open form of parameters
 		}
 		pos_i = 0;
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWEA);										// TWI goes to unaddressed, be active again
 	break;
 
 
 	/* Slave Transmitter Mode */
 
-	case TWI_TWSR_S_SLAR_MYADDR_DATA_ACK:		// SLA+R received and ACK has been returned
-	case TWI_TWSR_S_SLAR_OMNIADDR_DATA_ACK:		// Data sent and ACK has been returned
+	case TWI_TWSR_S_SLAR_MYADDR_DATA_ACK:							// SLA+R received and ACK has been returned
+	case TWI_TWSR_S_SLAR_OMNIADDR_DATA_ACK:							// Data sent and ACK has been returned
 		pos_o = 0;
 		cnt_o = s_rx_ret_len;
 		s_rx_ret_len = 0;
 		TWDR = cnt_o > pos_o ?  s_rx_ret_d[pos_o++] : 0x00;
 		if (cnt_o > pos_o) {
-			twcr_new |= _BV(TWEA);				// More data to send ACK
+			twcr_new |= _BV(TWEA);									// More data to send ACK
 		} else {
-			twcr_new &= ~_BV(TWEA);				// No more data to send NACK
+			twcr_new &= ~_BV(TWEA);									// No more data to send NACK
 		}
 	break;
 
-	case TWI_TWSR_S_SLAR_OMNIADDR_DATA_NACK:	// Data sent and NACK has been returned
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+	case TWI_TWSR_S_SLAR_OMNIADDR_DATA_NACK:						// Data sent and NACK has been returned
+		twcr_new |= _BV(TWEA);										// TWI goes to unaddressed, be active again
 	break;
 
-	case TWI_TWSR_S_SLAR_MYADDR_LASTDATA_ACK:	// Last data sent and ACK has been returned
+	case TWI_TWSR_S_SLAR_MYADDR_LASTDATA_ACK:						// Last data sent and ACK has been returned
 		/* message transmitted successfully in slave mode */
-		twcr_new |= _BV(TWEA);					// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWEA);										// TWI goes to unaddressed, be active again
 	break;
 
 	case TWI_TWSR_S_SLAR_MYADDR_ARBIT_LOST:
 	case TWI_TWSR_BUS_ERROR_STARTSTOP:
 	case TWI_TWSR_BUS_ERROR_UNKNOWN:
-		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);							// TWI goes to unaddressed, be active again
 	break;
 
 	default:
-		twcr_new |= _BV(TWSTO) | _BV(TWEA);		// TWI goes to unaddressed, be active again
+		twcr_new |= _BV(TWSTO) | _BV(TWEA);							// TWI goes to unaddressed, be active again
 	}
 
 	return twcr_new;

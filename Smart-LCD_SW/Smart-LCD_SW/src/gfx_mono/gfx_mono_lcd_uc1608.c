@@ -86,7 +86,7 @@ void gfx_mono_lcd_uc1608_put_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_
 		}
 
 		for (uint8_t cnt = width; cnt; --cnt) {
-			lcd_bus_write_ram(*(data_pt++));								// Write byte slice to LCD panel
+			lcd_bus_write_ram(*(data_pt++));						// Write byte slice to LCD panel
 		}
 	}
 
@@ -117,7 +117,7 @@ void gfx_mono_lcd_uc1608_get_page(gfx_mono_color_t *data, gfx_coord_t page, gfx_
 		}
 
 		for (uint8_t cnt = width; cnt; --cnt) {
-			*(data_pt++) = lcd_bus_read_ram();								// Read byte slice from LCD panel
+			*(data_pt++) = lcd_bus_read_ram();						// Read byte slice from LCD panel
 		}
 	}
 }
@@ -176,7 +176,7 @@ void gfx_mono_lcd_uc1608_put_byte(gfx_coord_t page, gfx_coord_t column, uint8_t 
 		/* Write current data back to the display device */
 		lcd_page_set(page);
 		lcd_col_set(column);
-		lcd_bus_write_ram(data);										// Write byte slice to RAM
+		lcd_bus_write_ram(data);									// Write byte slice to RAM
 	}
 }
 
@@ -200,7 +200,7 @@ uint8_t gfx_mono_lcd_uc1608_get_byte(gfx_coord_t page, gfx_coord_t column)
 		/* Cache miss: read current data from the display unit */
 		lcd_page_set(page);
 		lcd_col_set(column);
-		data = lcd_bus_read_ram();										// Read byte slice from RAM
+		data = lcd_bus_read_ram();									// Read byte slice from RAM
 
 		/* Store current data to the cache */
 		gfx_mono_lcd_uc1608_cache_write_byte(page, column, data);
@@ -289,7 +289,7 @@ static void gfx_mono_lcd_uc1608_cache_write_byte(uint8_t page, uint8_t column, u
 {
 	const uint16_t adr = gfx_mono_lcd_uc1608_cache_calc_adr(page, column);
 	if (!(adr & 0x4000U)) {
-		return;												// Non-valid position
+		return;														// Non-valid position
 	}
 
 	g_gfx_mono_lcd_uc1608_cache.adr  = adr;

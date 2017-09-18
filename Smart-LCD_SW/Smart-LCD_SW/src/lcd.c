@@ -158,44 +158,44 @@ uint8_t lcd_bounds_y(int y)
 
 void lcd_contrast_update(void)
 {
-		lcd_bus_write_cmd(0b10000001);									// Set Gain and PM (A)
+		lcd_bus_write_cmd(0b10000001);								// Set Gain and PM (A)
 		lcd_bus_write_cmd(C_LCD_GAIN_BM | (g_lcd_contrast_pm & 0x3F));	// Set Gain and PM (B)
 }
 
 void lcd_enable(uint8_t on)
 {
 	if (!on) {
-		lcd_bus_write_cmd(0b10101110);									// Disable DC[2] (Display)
+		lcd_bus_write_cmd(0b10101110);								// Disable DC[2] (Display)
 
 	} else {
-		lcd_bus_write_cmd(0b00101000 | C_LCD_PWR_CTRL);					// Set Power Control
-		lcd_bus_write_cmd(0b00100000 | C_LCD_MR_TC);					// Set MR and TC
-		lcd_bus_write_cmd(0b11101000 | C_LCD_BIASRATIO);				// Set Bias Ratio
+		lcd_bus_write_cmd(0b00101000 | C_LCD_PWR_CTRL);				// Set Power Control
+		lcd_bus_write_cmd(0b00100000 | C_LCD_MR_TC);				// Set MR and TC
+		lcd_bus_write_cmd(0b11101000 | C_LCD_BIASRATIO);			// Set Bias Ratio
 		lcd_contrast_update();
 
-		lcd_bus_write_cmd(0b11000000 | C_LCD_MAPPING);					// Set Mapping
-		lcd_bus_write_cmd(0b10001000 | C_LCD_AC);						// Set RAM Address Control
+		lcd_bus_write_cmd(0b11000000 | C_LCD_MAPPING);				// Set Mapping
+		lcd_bus_write_cmd(0b10001000 | C_LCD_AC);					// Set RAM Address Control
 
-		lcd_bus_write_cmd(0b01000000);									// Set Start Line (0)
-		lcd_bus_write_cmd(0b10010000);									// Set Fixed Lines (0)
+		lcd_bus_write_cmd(0b01000000);								// Set Start Line (0)
+		lcd_bus_write_cmd(0b10010000);								// Set Fixed Lines (0)
 
-		lcd_bus_write_cmd(0b10110000);									// Set Page Address (0)
-		lcd_bus_write_cmd(0b00000000);									// Set Column Address LSB (0)
-		lcd_bus_write_cmd(0b00010000);									// Set Column Address MSB (0)
+		lcd_bus_write_cmd(0b10110000);								// Set Page Address (0)
+		lcd_bus_write_cmd(0b00000000);								// Set Column Address LSB (0)
+		lcd_bus_write_cmd(0b00010000);								// Set Column Address MSB (0)
 		s_lcd_ram_read_nonvalid = true;
 
-		lcd_bus_write_cmd(0b11101111);									// Set Cursor Mode
-		lcd_bus_write_cmd(0b11101110);									// Reset Cursor Mode (now CR := CA)
-		lcd_bus_write_cmd(0b10100100);									// Disable DC[1] (all pixel on)
-		lcd_bus_write_cmd(0b10100110);									// Disable DC[0] (all pixel inverse)
-		lcd_bus_write_cmd(0b10101111);									// Enable  DC[2] (Display)
+		lcd_bus_write_cmd(0b11101111);								// Set Cursor Mode
+		lcd_bus_write_cmd(0b11101110);								// Reset Cursor Mode (now CR := CA)
+		lcd_bus_write_cmd(0b10100100);								// Disable DC[1] (all pixel on)
+		lcd_bus_write_cmd(0b10100110);								// Disable DC[0] (all pixel inverse)
+		lcd_bus_write_cmd(0b10101111);								// Enable  DC[2] (Display)
 	}
 }
 
 void lcd_page_set(uint8_t page)
 {
 	if ((0 <= page) && (page < GFX_MONO_LCD_PAGES)) {
-		lcd_bus_write_cmd(0b10110000 | page);					// Set Page Address
+		lcd_bus_write_cmd(0b10110000 | page);						// Set Page Address
 
 		s_lcd_ram_read_nonvalid = 1;
 	}
@@ -204,8 +204,8 @@ void lcd_page_set(uint8_t page)
 void lcd_col_set(uint8_t col)
 {
 	if ((0 <= col) && (col < GFX_MONO_LCD_WIDTH)) {
-		lcd_bus_write_cmd(0b00000000 | ( col       & 0x0f));	// Set Column Address LSB
-		lcd_bus_write_cmd(0b00010000 | ((col >> 4) & 0x0f));	// Set Column Address MSB
+		lcd_bus_write_cmd(0b00000000 | ( col       & 0x0f));		// Set Column Address LSB
+		lcd_bus_write_cmd(0b00010000 | ((col >> 4) & 0x0f));		// Set Column Address MSB
 
 		s_lcd_ram_read_nonvalid = 1;
 	}
@@ -213,15 +213,15 @@ void lcd_col_set(uint8_t col)
 
 void lcd_cr(void)
 {
-	lcd_bus_write_cmd(0b00000000);								// Set Column Address LSB (0)
-	lcd_bus_write_cmd(0b00010000);								// Set Column Address MSB (0)
+	lcd_bus_write_cmd(0b00000000);									// Set Column Address LSB (0)
+	lcd_bus_write_cmd(0b00010000);									// Set Column Address MSB (0)
 
 	s_lcd_ram_read_nonvalid = 1;
 }
 
 void lcd_home(void)
 {
-	lcd_bus_write_cmd(0b10110000);								// Set Page Address (0)
+	lcd_bus_write_cmd(0b10110000);									// Set Page Address (0)
 	lcd_cr();
 }
 
@@ -472,7 +472,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			return TWI_SMART_LCD_CMD_WRITE;
 		break;
 
-		case TWI_SMART_LCD_CMD_DRAW_LINE:			// Draw line from current pencil position to next position (x, y)
+		case TWI_SMART_LCD_CMD_DRAW_LINE:							// Draw line from current pencil position to next position (x, y)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_to_x = g_showData.data[0];
@@ -490,7 +490,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			return TWI_SMART_LCD_CMD_DRAW_LINE;
 		break;
 
-		case TWI_SMART_LCD_CMD_DRAW_RECT:			// Draw rectangular frame with pencil's start position with dimension (width, height)
+		case TWI_SMART_LCD_CMD_DRAW_RECT:							// Draw rectangular frame with pencil's start position with dimension (width, height)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_width = g_showData.data[0];
@@ -506,7 +506,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			return TWI_SMART_LCD_CMD_DRAW_RECT;
 		break;
 
-		case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:	// Draw filled rectangular frame with pencil's start position with dimension (width, height)
+		case TWI_SMART_LCD_CMD_DRAW_FILLED_RECT:					// Draw filled rectangular frame with pencil's start position with dimension (width, height)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_width = g_showData.data[0];
@@ -522,7 +522,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			return TWI_SMART_LCD_CMD_DRAW_FILLED_RECT;
 		break;
 
-		case TWI_SMART_LCD_CMD_DRAW_CIRC:			// Draw circle or ellipse from the pencil's center point with (radius)
+		case TWI_SMART_LCD_CMD_DRAW_CIRC:							// Draw circle or ellipse from the pencil's center point with (radius)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_radius = g_showData.data[0];
@@ -537,7 +537,7 @@ uint8_t lcd_show_new_smartlcd_data(void)
 			return TWI_SMART_LCD_CMD_DRAW_CIRC;
 		break;
 
-		case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:	// Draw filled circle or ellipse from the pencil's center point with (radius)
+		case TWI_SMART_LCD_CMD_DRAW_FILLED_CIRC:					// Draw filled circle or ellipse from the pencil's center point with (radius)
 			l_pencil_x = g_showData.pencil_x;
 			l_pencil_y = g_showData.pencil_y;
 			l_radius = g_showData.data[0];
@@ -860,7 +860,7 @@ void lcd_animation_prepare(void)
 	}
 
 	for (idx = 0; idx < ANIMATION_TRAIN_BLANK_LEN; ++idx) {
-		s_animation_train_right[ANIMATION_TRAIN_BLANK_LEN - idx - 1] = s_animation_train_left[idx];		// x-mirror
+		s_animation_train_right[ANIMATION_TRAIN_BLANK_LEN - idx - 1] = s_animation_train_left[idx];	// x-mirror
 	}
 
 	/* prepare free line for train */
@@ -873,13 +873,13 @@ void lcd_animation_loop(void)
 	uint8_t l_doAnimation;
 
 	flags = cpu_irq_save();
-	l_doAnimation = g_status.doAnimation;					// TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+	l_doAnimation = g_status.doAnimation;							// TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
 	cpu_irq_restore(flags);
 
 	while (l_doAnimation && s_animation_dx) {
 		float now = get_abs_time();
 
-		if ((now - s_animation_time_last_train) >= 0.04f) {	// 25x per sec
+		if ((now - s_animation_time_last_train) >= 0.04f) {			// 25x per sec
 			s_animation_time_last_train = now;
 			s_animation_train_origin += s_animation_dx;
 
@@ -907,18 +907,18 @@ void lcd_animation_loop(void)
 			}
 		}
 
-		task(now);											// calculate backlight PWM and temperature value
-		if ((now - s_animation_time_last_temp) >= 0.50f) {  // 2x per sec
+		task(now);													// calculate backlight PWM and temperature value
+		if ((now - s_animation_time_last_temp) >= 0.50f) {			// 2x per sec
 			s_animation_time_last_temp = now;
 			s_lcd_test_temp();
 			s_lcd_test_light();
 			s_lcd_test_buttons();
 		}
 
-		s_lcd_test_lines();									// Every cycle
+		s_lcd_test_lines();											// Every cycle
 
 		flags = cpu_irq_save();
-		l_doAnimation = g_status.doAnimation;				// TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
+		l_doAnimation = g_status.doAnimation;						// TWI command TWI_SMART_LCD_CMD_SET_MODE can unset this flag
 		cpu_irq_restore(flags);
 	}
 
