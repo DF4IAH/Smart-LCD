@@ -8142,6 +8142,7 @@ X141-4 = RotEnc-Q</text>
 <plain>
 <text x="157.48" y="121.92" size="1.778" layer="97" rot="R90">BM1</text>
 <text x="154.94" y="121.92" size="1.778" layer="97" rot="R90">BM0</text>
+<text x="154.94" y="68.58" size="1.778" layer="97">do not place U221 and R222</text>
 </plain>
 <instances>
 <instance part="FRAME2" gate="G$1" x="0" y="0"/>
