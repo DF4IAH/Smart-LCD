@@ -8059,6 +8059,7 @@ Audio amplifier, AB, 1 channel, 1 W, 2.5V to 5.5V, SOIC-08</description>
 <text x="116.84" y="45.72" size="2.1844" layer="97" ratio="12">Dig.-Pot.</text>
 <text x="157.48" y="121.92" size="1.778" layer="97" rot="R90">BM1</text>
 <text x="154.94" y="121.92" size="1.778" layer="97" rot="R90">BM0</text>
+<text x="154.94" y="68.58" size="1.778" layer="97">do not place U221 and R222</text>
 </plain>
 <instances>
 <instance part="FRAME2" gate="G$1" x="0" y="0"/>
